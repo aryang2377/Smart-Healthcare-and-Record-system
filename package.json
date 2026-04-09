@@ -1,0 +1,28 @@
+{
+  "name": "smarthealthcare",
+  "version": "1.0.0",
+  "description": "this is a smartheathcare and record system website",
+  "homepage": "https://github.com/aryang2377/Smart-Healthcare-and-Record-system#readme",
+  "bugs": {
+    "url": "https://github.com/aryang2377/Smart-Healthcare-and-Record-system/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aryang2377/Smart-Healthcare-and-Record-system.git"
+  },
+  "license": "ISC",
+  "author": "Aryan Gupta",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon svc/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.4.1",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.1"
+  }
+}
