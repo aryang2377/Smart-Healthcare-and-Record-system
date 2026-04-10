@@ -1,42 +1,75 @@
 <% layout('/layouts/boilerplate.ejs') %>
-<section class="hero">
-        <div class="hero-text">
-            <h1>Smart Healthcare System</h1>
+    <section class="hero">
+        <div class="hero-container">
 
-            <p>
-                Book appointments, store medical reports,
-                and check symptoms easily.
-            </p>
+            <div class="hero-text">
 
-            <div class="hero-buttons">
-                <a href="/appointment" class="btn-primary">
-                    Book Appointment
-                </a>
+                <h1>Smart Healthcare System</h1>
+                <p>
+                    Book appointments easily and manage your
+                    medical records online.
+                </p>
 
-                <a href="/symptom" class="btn-secondary">
-                    Check Symptoms
-                </a>
+                <div class="hero-buttons">
+
+                    <a href="/appointment" class="btn-primary">
+                        Book Appointment
+                    </a>
+
+                    <a href="/symptom" class="btn-secondary">
+                        Check Symptoms
+                    </a>
+
+                </div>
+
             </div>
+
+            <div class="hero-image">
+                <img src="/images/doctor.png" alt="Doctors">
+            </div>
+
         </div>
     </section>
-
-    <!-- FEATURES SECTION -->
-
     <section class="features">
 
-        <div class="card">
-            <h3>Appointment Booking</h3>
-            <p>Schedule doctor visits easily.</p>
-        </div>
 
-        <div class="card">
-            <h3>Medical Reports</h3>
-            <p>Upload and view reports online.</p>
-        </div>
+        <h2 class="section-title">Why Choose Us?</h2>
 
-        <div class="card">
-            <h3>Symptom Checker</h3>
-            <p>Find possible diseases quickly.</p>
+        <div class="features-container">
+            <div class="feature-card">
+
+                <i class="fas fa-calendar-check feature-icon"></i>
+
+                <h3>Easy Appointment Booking</h3>
+
+                <p>
+                    Schedule doctor visits in just a few clicks.
+                </p>
+
+            </div>
+            <div class="feature-card">
+
+                <i class="fas fa-file-medical feature-icon"></i>
+
+                <h3>View Medical Reports</h3>
+
+                <p>
+                    Access your health records securely online.
+                </p>
+
+            </div>
+            <div class="feature-card">
+
+                <i class="fas fa-stethoscope feature-icon"></i>
+
+                <h3>Symptom Checker</h3>
+
+                <p>
+                    Check your symptoms and find related diseases.
+                </p>
+
+            </div>
+
         </div>
 
     </section>
