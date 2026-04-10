@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "dotenv": "^17.4.1",
+    "ejs": "^5.0.1",
+    "ejs-mate": "^4.0.0",
     "express": "^5.2.1",
     "mongoose": "^9.4.1",
     "nodemon": "^3.1.14",
