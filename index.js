@@ -4,6 +4,10 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 const app = express();
 import ejsMate from "ejs-mate";
+import connectDB from "./db/sample.js";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import User from "./models/user.js";
 
 dotenv.config({
     path: "./.env"
@@ -21,6 +25,33 @@ app.get("/",(req,res)=>{
 }
 )
 
-app.listen(process.env.PORT || 4000, () => {
+app.get("/doctors",(req,res)=>{
+    res.render("listings/find doctors");
+})
+
+app.get("dashboard",(req,res)=>{
+    res.render("listings/dashboard");
+})
+
+app.get("/login", (req, res) => {
+  res.render("users/login");
+});
+
+app.get("/register", (req, res) => {
+  res.render("users/register");
+});
+
+app.post("/register", (req, res) => {
+  const { fullname, email, password } = req.body;
+  res.send("User Registered");
+});
+
+connectDB()
+.then(()=>{
+    app.listen(process.env.PORT || 4000, () => {
     console.log(`Server is running at http://localhost:4000`);
+});
+})
+.catch((err)=>{
+    console.log("MONGO DB connection failed",err);
 });

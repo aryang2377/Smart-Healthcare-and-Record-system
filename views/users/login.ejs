@@ -1,0 +1,58 @@
+<% layout('/layouts/boilerplate.ejs') %>
+
+<div class="login-container">
+
+  <div class="login-box">
+
+    <h2>
+      Login to
+      <span class="brand">
+        Smart Healthcare System
+      </span>
+    </h2>
+
+    <form action="/login" method="POST">
+
+      <div class="input-group">
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+        >
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+        >
+      </div>
+
+
+      <button type="submit" class="login-btn">
+        Login
+      </button>
+
+    </form>
+
+    <div class="links">
+
+      <p>
+        <a href="/forgot">Forgot Password?</a>
+      </p>
+
+      <p>
+        Don't have an account?
+        <a href="/signup">Sign Up</a>
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+```

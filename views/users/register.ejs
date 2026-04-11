@@ -1,0 +1,84 @@
+<% layout('/layouts/boilerplate.ejs') %>
+
+<div class="register-container">
+
+  <div class="register-box">
+
+    <h2>
+      Create Account for
+      <span class="brand">
+        Smart Healthcare System
+      </span>
+    </h2>
+
+    <form action="/register" method="POST">
+
+      <!-- Full Name -->
+
+      <div class="input-group">
+        <label>Full Name</label>
+        <input
+          type="text"
+          name="fullname"
+          placeholder="Enter your full name"
+          required
+        >
+      </div>
+
+      <!-- Email -->
+
+      <div class="input-group">
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+        >
+      </div>
+
+      <!-- Password -->
+
+      <div class="input-group">
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          placeholder="Create password"
+          required
+        >
+      </div>
+
+      <!-- Confirm Password -->
+
+      <div class="input-group">
+        <label>Confirm Password</label>
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm password"
+          required
+        >
+      </div>
+
+      <!-- Button -->
+
+      <button type="submit" class="register-btn">
+        Register
+      </button>
+
+    </form>
+
+    <div class="links">
+
+      <p>
+        Already have an account?
+        <a href="/login">Login</a>
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+```
