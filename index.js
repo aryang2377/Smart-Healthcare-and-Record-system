@@ -18,6 +18,8 @@ const __dirname = path.dirname(__filename);
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/",(req,res)=>{
@@ -29,7 +31,7 @@ app.get("/doctors",(req,res)=>{
     res.render("listings/find doctors");
 })
 
-app.get("dashboard",(req,res)=>{
+app.get("/dashboard",(req,res)=>{
     res.render("listings/dashboard");
 })
 
@@ -41,10 +43,66 @@ app.get("/register", (req, res) => {
   res.render("users/register");
 });
 
-app.post("/register", (req, res) => {
-  const { fullname, email, password } = req.body;
-  res.send("User Registered");
+app.post("/login", async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(401)
+        .render("error", { message: "Invalid email or password" });
+    }
+
+    const ismatch = await bcrypt.compare(password, user.password);
+    if (!ismatch) {
+      return res
+        .status(401)
+        .render("error", { message: "Invalid email or password" });
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.redirect("/dashboard");
+  } catch (err) {
+    next(err);
+  }
 });
+
+app.post("/register", async (req, res, next) => {
+  try {
+    const { fullname, email,  password} =
+      req.body;
+    const hashPass = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      fullname,
+      email,
+      password: hashPass,
+    });
+
+    await newUser.save();
+
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "2d",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.redirect("/dashboard");
+  } catch (err) {
+    next(err);
+  }
+});
+
 
 connectDB()
 .then(()=>{
