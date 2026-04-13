@@ -1,0 +1,300 @@
+.dashboard {
+    padding: 35px 50px;
+    background: #f8fbff;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.dashboard-badge {
+    background: linear-gradient(135deg, #2d6cdf, #4c8cff);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(45, 108, 223, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.dashboard-badge:hover {
+    transform: translateY(-2px);
+}
+
+/* SUMMARY */
+.summary-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.summary-card {
+    flex: 1;
+    padding: 20px;
+    border-radius: 16px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.summary-card span {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.summary-card h3 {
+    margin: 5px 0 0;
+    font-size: 24px;
+}
+
+.blue { background: linear-gradient(135deg, #2d6cdf, #4c8cff); }
+.purple { background: linear-gradient(135deg, #7b61ff, #9b87ff); }
+.green { background: linear-gradient(135deg, #2bb673, #4cd98b); }
+
+/* GRID */
+.main-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.card h3 {
+    margin: 0 0 20px;
+    color: #1a1a1a;
+}
+
+/* FORM */
+input, select {
+    width: 100%;
+    padding: 12px 14px;
+    margin: 8px 0 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: #fafbfc;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #2d6cdf;
+    box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.1);
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+}
+
+.row > div {
+    flex: 1;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+/* BUTTON */
+.primary-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #2d6cdf, #4c8cff);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(45, 108, 223, 0.3);
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(45, 108, 223, 0.4);
+}
+
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+/* REMINDER */
+.reminder-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border-radius: 12px;
+    border-left: 4px solid #f39c12;
+}
+
+/* QUICK ACTIONS */
+.quick-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.quick-card {
+    flex: 1;
+    padding: 16px;
+    background: linear-gradient(135deg, #f1f4ff, #e8f0fe);
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.quick-card:hover, .quick-card:focus {
+    background: #2d6cdf;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(45, 108, 223, 0.3);
+}
+
+/* APPOINTMENT */
+.appointment-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    background: #f8f9ff;
+    transition: all 0.2s ease;
+}
+
+.appointment-card:hover {
+    background: #f0f4ff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #2d6cdf, #4c8cff);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.appointment-card strong {
+    color: #1a1a1a;
+    display: block;
+}
+
+.appointment-card p {
+    margin: 2px 0 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.status {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: auto;
+}
+
+.confirmed {
+    background: #e6f4ea;
+    color: #28a745;
+}
+
+.scheduled {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+/* ACTIVITY */
+.activity-item {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s ease;
+}
+
+.activity-item:hover {
+    background: #f8f9fa;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 25px 20px;
+    }
+    
+    .summary-row {
+        flex-direction: column;
+    }
+    
+    .row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .quick-actions {
+        flex-direction: column;
+    }
+    
+    .appointment-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        text-align: left;
+    }
+    
+    .status {
+        margin-left: 0;
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .summary-card h3 {
+        font-size: 20px;
+    }
+}

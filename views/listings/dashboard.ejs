@@ -1,0 +1,133 @@
+<% layout('/layouts/boilerplate.ejs') %>
+
+<section class="dashboard" role="main">
+    <!-- HEADER -->
+    <div class="dashboard-header">
+        <div>
+            <h2>Welcome, Sunil!</h2>
+            <p>Your health overview for today</p>
+        </div>
+        <div class="dashboard-badge" aria-label="Active Patient Status">
+            Active Patient
+        </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary-row">
+        <div class="summary-card blue">
+            <span>Next Appointment</span>
+            <h3>Tomorrow 10:30 AM</h3>
+        </div>
+        <div class="summary-card purple">
+            <span>Total Appointments</span>
+            <h3>6</h3>
+        </div>
+        <div class="summary-card green">
+            <span>Last Visit</span>
+            <h3>12 Apr 2026</h3>
+        </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid">
+        <!-- LEFT -->
+        <div class="card">
+            <h3>Book Appointment</h3>
+            <form aria-labelledby="book-appointment">
+                <label for="patient-name">Your Name</label>
+                <input type="text" id="patient-name" value="Sunil" required>
+
+                <div class="row">
+                    <div>
+                        <label for="patient-age">Age</label>
+                        <input type="number" id="patient-age" min="0" max="120" required>
+                    </div>
+                    <div>
+                        <label for="patient-gender">Gender</label>
+                        <select id="patient-gender" required>
+                            <option selected>Male</option>
+                            <option>Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div>
+                        <label for="appt-date">Date</label>
+                        <input type="date" id="appt-date" required>
+                    </div>
+                    <div>
+                        <label for="appt-time">Time</label>
+                        <input type="time" id="appt-time" required>
+                    </div>
+                </div>
+
+                <label for="doctor-select">Select Doctor</label>
+                <select id="doctor-select" required>
+                    <option>Dr. Rajesh Sharma</option>
+                    <option>Dr. Priya Mehta</option>
+                    <option>Dr. Amit Verma</option>
+                </select>
+
+                <button type="submit" class="primary-btn" aria-label="Confirm Appointment">
+                    Confirm Appointment
+                </button>
+            </form>
+
+            <!-- REMINDER -->
+            <div class="reminder-box" role="alert">
+                Upcoming Checkup Reminder 
+                <strong>Dental Cleaning — Next Week</strong>
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="quick-actions">
+                <div class="quick-card" tabindex="0" role="button" aria-label="Find Doctors">
+                    Find Doctors
+                </div>
+                <div class="quick-card" tabindex="0" role="button" aria-label="Medical Records">
+                    Medical Records
+                </div>
+                <div class="quick-card" tabindex="0" role="button" aria-label="Download Reports">
+                    Download Reports
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="card">
+            <h3>Today's Schedule</h3>
+            <div class="appointment-card">
+                <div class="avatar">PM</div>
+                <div>
+                    <strong>Dr. Priya Mehta</strong>
+                    <p>Dermatologist • 10:30 AM</p>
+                </div>
+                <span class="status confirmed" aria-label="Appointment Confirmed">Confirmed</span>
+            </div>
+
+            <div class="appointment-card">
+                <div class="avatar">AV</div>
+                <div>
+                    <strong>Dr. Amit Verma</strong>
+                    <p>General Physician • 12:00 PM</p>
+                </div>
+                <span class="status scheduled" aria-label="Appointment Scheduled">Scheduled</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="card">
+        <h3>Recent Activity</h3>
+        <div class="activity-item">
+            Appointment booked with Dr. Priya Mehta
+        </div>
+        <div class="activity-item">
+            Report uploaded — Blood Test
+        </div>
+        <div class="activity-item">
+            Profile updated successfully
+        </div>
+    </div>
+</section>
