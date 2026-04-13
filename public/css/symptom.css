@@ -1,0 +1,76 @@
+/* Symptom Page Wrapper */
+
+.symptom-wrapper {
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f5f7fb;
+    padding: 40px 20px;
+}
+
+/* Main Card */
+
+.symptom-card {
+    width: 100%;
+    max-width: 850px;
+    background: white;
+    padding: 35px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+/* Heading */
+
+.symptom-heading {
+    font-size: 30px;
+    font-weight: 600;
+    color: #2d6cdf;
+    margin-bottom: 10px;
+}
+
+/* Subtitle */
+
+.symptom-subtitle {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+/* Textarea */
+
+.symptom-input {
+    width: 100%;
+    height: 160px;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #dcdcdc;
+    font-size: 15px;
+    resize: none;
+    margin-bottom: 20px;
+}
+
+/* Button */
+
+.symptom-btn {
+    width: 100%;
+    padding: 13px;
+    background: #2d6cdf;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: not-allowed;
+    margin-bottom: 20px;
+}
+
+/* Alert */
+
+.construction-alert {
+    background: #fff4e5;
+    border-left: 5px solid #ff9800;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #444;
+}

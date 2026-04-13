@@ -43,6 +43,9 @@ app.get("/register", (req, res) => {
   res.render("users/register");
 });
 
+app.get("/symptom",(req,res)=>{
+  res.render("listings/symptom");
+})
 app.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
