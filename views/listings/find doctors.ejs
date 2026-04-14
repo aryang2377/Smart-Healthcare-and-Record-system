@@ -2,23 +2,69 @@
 
 <section class="find-doctors">
 
-    <h2 class="section-title">
-        Available Doctors
-    </h2>
+    <div class="page-header">
+        <h2>Available Doctors</h2>
+        <p>Search doctors, check availability, and book appointments instantly</p>
+    </div>
 
-    <div class="table-container">
+    <div class="stats-container">
+
+        <div class="stat-card">
+            <div class="stat-number">10</div>
+            <div class="stat-label">Total Doctors</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number">7</div>
+            <div class="stat-label">Available Today</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number">8</div>
+            <div class="stat-label">Specializations</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number">24</div>
+            <div class="stat-label">Appointments</div>
+        </div>
+
+    </div>
+
+    <div class="controls">
+
+        <input 
+            type="text" 
+            placeholder="Search doctor..."
+            class="search-box"
+        >
+
+        <select class="filter-box">
+            <option>All Specializations</option>
+            <option>Cardiologist</option>
+            <option>Dermatologist</option>
+            <option>General Physician</option>
+            <option>Pediatrician</option>
+            <option>Neurologist</option>
+            <option>Gynecologist</option>
+            <option>ENT Specialist</option>
+            <option>Dentist</option>
+        </select>
+
+    </div>
+
+    <div class="doctor-card">
 
         <table class="doctor-table">
 
             <thead>
-
                 <tr>
                     <th>Doctor Name</th>
                     <th>Specialization</th>
                     <th>Available Days</th>
                     <th>Timing</th>
+                    <th>Action</th>
                 </tr>
-
             </thead>
 
             <tbody>
@@ -28,6 +74,11 @@
                     <td>Cardiologist</td>
                     <td>Mon - Fri</td>
                     <td>10 AM - 2 PM</td>
+                    <td>
+                        <button class="book-btn">
+                            Book
+                        </button>
+                    </td>
                 </tr>
 
                 <tr>
@@ -35,6 +86,11 @@
                     <td>Dermatologist</td>
                     <td>Tue - Sat</td>
                     <td>12 PM - 4 PM</td>
+                    <td>
+                        <button class="book-btn">
+                            Book
+                        </button>
+                    </td>
                 </tr>
 
                 <tr>
@@ -42,6 +98,11 @@
                     <td>General Physician</td>
                     <td>Mon - Thu</td>
                     <td>9 AM - 1 PM</td>
+                    <td>
+                        <button class="book-btn">
+                            Book
+                        </button>
+                    </td>
                 </tr>
 
                 <tr>
@@ -49,6 +110,11 @@
                     <td>Pediatrician</td>
                     <td>Mon - Fri</td>
                     <td>11 AM - 3 PM</td>
+                    <td>
+                        <button class="book-btn">
+                            Book
+                        </button>
+                    </td>
                 </tr>
 
                 <tr>
@@ -56,41 +122,11 @@
                     <td>Neurologist</td>
                     <td>Wed - Sun</td>
                     <td>2 PM - 6 PM</td>
-                </tr>
-
-                <tr>
-                    <td>Dr. Anjali Gupta</td>
-                    <td>Gynecologist</td>
-                    <td>Mon - Sat</td>
-                    <td>10 AM - 1 PM</td>
-                </tr>
-
-                <tr>
-                    <td>Dr. Karan Patel</td>
-                    <td>ENT Specialist</td>
-                    <td>Tue - Fri</td>
-                    <td>3 PM - 7 PM</td>
-                </tr>
-
-                <tr>
-                    <td>Dr. Sneha Iyer</td>
-                    <td>Psychiatrist</td>
-                    <td>Mon - Wed</td>
-                    <td>9 AM - 12 PM</td>
-                </tr>
-
-                <tr>
-                    <td>Dr. Vikram Reddy</td>
-                    <td>General Physician</td>
-                    <td>Thu - Sun</td>
-                    <td>1 PM - 5 PM</td>
-                </tr>
-
-                <tr>
-                    <td>Dr. Pooja Nair</td>
-                    <td>Dentist</td>
-                    <td>Mon - Fri</td>
-                    <td>10 AM - 4 PM</td>
+                    <td>
+                        <button class="book-btn">
+                            Book
+                        </button>
+                    </td>
                 </tr>
 
             </tbody>

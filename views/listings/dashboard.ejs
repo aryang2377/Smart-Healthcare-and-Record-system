@@ -1,133 +1,219 @@
 <% layout('/layouts/boilerplate.ejs') %>
 
-<section class="dashboard" role="main">
-    <!-- HEADER -->
-    <div class="dashboard-header">
-        <div>
-            <h2>Welcome, Sunil!</h2>
-            <p>Your health overview for today</p>
-        </div>
-        <div class="dashboard-badge" aria-label="Active Patient Status">
-            Active Patient
-        </div>
-    </div>
+    <section class="dashboard" role="main">
 
-    <!-- SUMMARY -->
-    <div class="summary-row">
-        <div class="summary-card blue">
-            <span>Next Appointment</span>
-            <h3>Tomorrow 10:30 AM</h3>
+        <div class="dashboard-header">
+            <div>
+                <h2>
+                    Welcome,
+                    <%= currentUser ? currentUser.fullname || "User" : "User" %>!
+                </h2>
+                <p>Your health overview for today</p>
+            </div>
+            <div class="dashboard-badge">
+                Active Patient
+            </div>
         </div>
-        <div class="summary-card purple">
-            <span>Total Appointments</span>
-            <h3>6</h3>
-        </div>
-        <div class="summary-card green">
-            <span>Last Visit</span>
-            <h3>12 Apr 2026</h3>
-        </div>
-    </div>
 
-    <!-- MAIN GRID -->
-    <div class="main-grid">
-        <!-- LEFT -->
+        <div class="summary-row">
+
+            <div class="summary-card blue">
+                <span>Next Appointment</span>
+
+                <h3>
+                    <% if (nextAppointment) { %>
+                        <%= new Date(nextAppointment.date).toLocaleDateString() %>
+                            <%= nextAppointment.time %>
+                                <% } else { %>
+                                    No upcoming appointment
+                                    <% } %>
+                </h3>
+            </div>
+
+            <div class="summary-card purple">
+                <span>Total Appointments</span>
+
+                <h3>
+                    <%= totalAppointments %>
+                </h3>
+            </div>
+
+            <div class="summary-card green">
+                <span>Last Visit</span>
+
+                <h3>
+                    <% if (lastVisit) { %>
+                        <%= new Date(lastVisit.date).toLocaleDateString() %>
+                            <% } else { %>
+                                No visits yet
+                                <% } %>
+                </h3>
+            </div>
+
+        </div>
+
+        <div class="main-grid">
+
+            <div class="card">
+
+                <h3>Book Appointment</h3>
+
+                <form action="/appointments" method="POST">
+
+                    <label>Your Name</label>
+
+                    <input type="text" name="patientName" value="<%= currentUser ? currentUser.fullname : '' %>"
+                        required>
+
+                    <div class="row">
+
+                        <div>
+                            <label>Age</label>
+
+                            <input type="number" name="age" min="0" max="120" required>
+                        </div>
+
+                        <div>
+                            <label>Gender</label>
+
+                            <select name="gender" required>
+                                <option value="Male">
+                                    Male
+                                </option>
+
+                                <option value="Female">
+                                    Female
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div>
+                            <label>Date</label>
+
+                            <input type="date" name="date" required>
+                        </div>
+
+                        <div>
+                            <label>Time</label>
+
+                            <input type="time" name="time" required>
+                        </div>
+
+                    </div>
+
+                    <label>Select Doctor</label>
+
+                    <select name="doctorName" required>
+                        <option>
+                            Dr. Rajesh Sharma
+                        </option>
+
+                        <option>
+                            Dr. Priya Mehta
+                        </option>
+
+                        <option>
+                            Dr. Amit Verma
+                        </option>
+                    </select>
+
+                    <button type="submit" class="primary-btn">
+                        Confirm Appointment
+                    </button>
+
+                </form>
+
+                <div class="reminder-box">
+                    Upcoming Checkup Reminder
+                    <strong>
+                        Dental Cleaning — Next Week
+                    </strong>
+                </div>
+
+                <div class="quick-actions">
+
+                    <a href="/doctors" class="quick-card">
+                        Find Doctors
+                    </a>
+
+                    <div class="quick-card">
+                        Medical Records
+                    </div>
+
+                    <div class="quick-card">
+                        Download Reports
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Today's Schedule</h3>
+
+                <% if (todaysSchedule.length> 0) { %>
+
+                    <% todaysSchedule.forEach(function(appt){ %>
+
+                        <div class="appointment-card">
+
+                            <div class="avatar">
+                                <%= appt.doctorName.substring(0,2).toUpperCase() %>
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    <%= appt.doctorName %>
+                                </strong>
+
+                                <p>
+                                    <%= appt.time %>
+                                </p>
+
+                            </div>
+
+                            <span class="status scheduled">
+                                <%= appt.status %>
+                            </span>
+
+                        </div>
+
+                        <% }) %>
+
+                            <% } else { %>
+
+                                <p>
+                                    No appointments today
+                                </p>
+
+                                <% } %>
+
+            </div>
+
+        </div>
+
         <div class="card">
-            <h3>Book Appointment</h3>
-            <form aria-labelledby="book-appointment">
-                <label for="patient-name">Your Name</label>
-                <input type="text" id="patient-name" value="Sunil" required>
 
-                <div class="row">
-                    <div>
-                        <label for="patient-age">Age</label>
-                        <input type="number" id="patient-age" min="0" max="120" required>
-                    </div>
-                    <div>
-                        <label for="patient-gender">Gender</label>
-                        <select id="patient-gender" required>
-                            <option selected>Male</option>
-                            <option>Female</option>
-                        </select>
-                    </div>
-                </div>
+            <h3>Recent Activity</h3>
 
-                <div class="row">
-                    <div>
-                        <label for="appt-date">Date</label>
-                        <input type="date" id="appt-date" required>
-                    </div>
-                    <div>
-                        <label for="appt-time">Time</label>
-                        <input type="time" id="appt-time" required>
-                    </div>
-                </div>
-
-                <label for="doctor-select">Select Doctor</label>
-                <select id="doctor-select" required>
-                    <option>Dr. Rajesh Sharma</option>
-                    <option>Dr. Priya Mehta</option>
-                    <option>Dr. Amit Verma</option>
-                </select>
-
-                <button type="submit" class="primary-btn" aria-label="Confirm Appointment">
-                    Confirm Appointment
-                </button>
-            </form>
-
-            <!-- REMINDER -->
-            <div class="reminder-box" role="alert">
-                Upcoming Checkup Reminder 
-                <strong>Dental Cleaning — Next Week</strong>
+            <div class="activity-item">
+                Appointment booked successfully
             </div>
 
-            <!-- QUICK ACTIONS -->
-            <div class="quick-actions">
-                <div class="quick-card" tabindex="0" role="button" aria-label="Find Doctors">
-                    Find Doctors
-                </div>
-                <div class="quick-card" tabindex="0" role="button" aria-label="Medical Records">
-                    Medical Records
-                </div>
-                <div class="quick-card" tabindex="0" role="button" aria-label="Download Reports">
-                    Download Reports
-                </div>
-            </div>
-        </div>
-
-        <!-- RIGHT -->
-        <div class="card">
-            <h3>Today's Schedule</h3>
-            <div class="appointment-card">
-                <div class="avatar">PM</div>
-                <div>
-                    <strong>Dr. Priya Mehta</strong>
-                    <p>Dermatologist • 10:30 AM</p>
-                </div>
-                <span class="status confirmed" aria-label="Appointment Confirmed">Confirmed</span>
+            <div class="activity-item">
+                Dashboard updated from database
             </div>
 
-            <div class="appointment-card">
-                <div class="avatar">AV</div>
-                <div>
-                    <strong>Dr. Amit Verma</strong>
-                    <p>General Physician • 12:00 PM</p>
-                </div>
-                <span class="status scheduled" aria-label="Appointment Scheduled">Scheduled</span>
+            <div class="activity-item">
+                User logged in securely
             </div>
-        </div>
-    </div>
 
-    <!-- ACTIVITY -->
-    <div class="card">
-        <h3>Recent Activity</h3>
-        <div class="activity-item">
-            Appointment booked with Dr. Priya Mehta
         </div>
-        <div class="activity-item">
-            Report uploaded — Blood Test
-        </div>
-        <div class="activity-item">
-            Profile updated successfully
-        </div>
-    </div>
-</section>
+
+    </section>

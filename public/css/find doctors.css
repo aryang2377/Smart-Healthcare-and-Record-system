@@ -1,53 +1,146 @@
 .find-doctors {
-    padding: 40px 60px;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #eef3fb, #ffffff);
+    padding: 30px 20px 50px;
 }
 
-.section-title {
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #2b6cb0, #4f8edc);
+    color: white;
+    padding: 35px 20px;
+    border-radius: 14px;
     text-align: center;
     margin-bottom: 30px;
-    color: #2f6d3c;
 }
 
-/* Table */
+.page-header h2 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 600;
+}
 
-.table-container {
-    overflow-x: auto;
+.page-header p {
+    margin-top: 8px;
+    font-size: 15px;
+    opacity: 0.95;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.stat-card {
+    flex: 1;
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    transition: 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 30px;
+    font-weight: bold;
+    color: #2b6cb0;
+}
+
+.stat-label {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.search-box {
+    width: 280px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: white;
+    font-size: 14px;
+}
+
+.filter-box {
+    width: 240px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: white;
+    font-size: 14px;
+}
+
+.doctor-card {
+    background: white;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
 }
 
 .doctor-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
 }
 
-/* Header */
-
 .doctor-table thead {
-    background-color: #4b7f3a;
+    background: #2b6cb0;
     color: white;
 }
 
 .doctor-table th {
-    padding: 15px;
-    text-align: center;
-    font-size: 18px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 600;
 }
-
-/* Rows */
 
 .doctor-table td {
-    padding: 15px;
+    padding: 16px;
     text-align: center;
+    font-size: 14px;
 }
 
-/* Alternate Row Color */
+.doctor-table tbody tr {
+    border-bottom: 1px solid #eef2f7;
+    transition: 0.15s;
+}
 
 .doctor-table tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
+    background: #f9fbff;
 }
 
-/* Hover Effect */
-
 .doctor-table tbody tr:hover {
-    background-color: #e6f2e6;
+    background: #eef4ff;
+}
+
+.book-btn {
+    background: #2b6cb0;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.book-btn:hover {
+    background: #1f4e8c;
 }
