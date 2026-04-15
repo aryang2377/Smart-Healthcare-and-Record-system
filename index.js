@@ -51,7 +51,7 @@ const isLoggedIn = (req, res, next) => {
   }
 };
 
-app.use((req, res, next) => {
+app.use(async(req, res, next) => {
   try {
     const token = req.cookies?.token;
 
@@ -60,8 +60,9 @@ app.use((req, res, next) => {
         token,
         process.env.JWT_SECRET
       );
+      const user = await User.findById(decoded.id);
 
-      res.locals.currentUser = decoded;
+      res.locals.currentUser = user;
 
     } else {
       res.locals.currentUser = null;
