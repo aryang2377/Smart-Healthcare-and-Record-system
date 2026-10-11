@@ -1,43 +1,93 @@
 <% layout('/layouts/boilerplate.ejs') %>
 
-<section class="symptom-wrapper">
-
-    <div class="symptom-card">
-
-        <h2 class="symptom-heading">
-            Symptom Checker
-        </h2>
-
-        <p class="symptom-subtitle">
-            Describe your symptoms and get basic health guidance.
-        </p>
-
-        <!-- Textarea -->
-
-        <textarea
-            class="symptom-input"
-            placeholder="Enter your symptoms here..."
-            disabled
-        ></textarea>
-
-        <!-- Button -->
-
-        <button class="symptom-btn" disabled>
-            Submit Symptoms
-        </button>
-
-        <!-- Under Construction Message -->
-
-        <div class="construction-alert">
-
-            ⚠ This feature is currently under construction.
-
-            <br>
-
-            We are working to bring you an intelligent symptom checker soon.
-
+<section class="symptom-page-dark">
+    <div class="symptom-container-dark">
+        <!-- AI Under Construction Header -->
+        <div class="symptom-header-dark">
+            <span class="badge-tag">
+                <span class="live-dot"></span>
+                <i class="fas fa-robot text-cyan"></i> AI Clinical Assistant • Under Construction
+            </span>
+            <h2>Clinical AI Symptom Checker & Triage</h2>
+            <p>
+                An intelligent clinical intelligence assistant currently in active development. Designed to analyze patient-reported symptoms, estimate triage urgency, and recommend specialist departments.
+            </p>
         </div>
 
-    </div>
+        <!-- Coming Soon Hero Card -->
+        <div class="ai-coming-soon-card">
+            <div class="ai-orb-glow"></div>
+            
+            <div class="ai-card-top">
+                <div class="ai-chip-status">
+                    <span class="pulse-emerald"></span> SYSTEM STATUS: HOSPITAL TESTING & VALIDATION
+                </div>
+                <span class="ai-version">Release v2.0 • Coming Soon</span>
+            </div>
 
+            <div class="ai-main-announcement">
+                <div class="ai-hero-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Intelligent Clinical Triage is Coming Soon</h3>
+                <p>
+                    We are integrating medical NLP models and certified clinical guidelines to empower patients with preliminary health assessment before doctor visits.
+                </p>
+            </div>
+
+            <!-- Preview of upcoming features -->
+            <div class="ai-preview-grid">
+                <div class="ai-preview-box">
+                    <div class="box-icon bg-cyan-glow">
+                        <i class="fas fa-comment-medical"></i>
+                    </div>
+                    <h4>Natural Language Intake</h4>
+                    <p>Describe your discomfort in your own words, and the AI interprets anatomical locations and symptom duration.</p>
+                </div>
+
+                <div class="ai-preview-box">
+                    <div class="box-icon bg-purple-glow">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <h4>Red-Flag Emergency Detection</h4>
+                    <p>Immediate identification of critical symptoms (severe chest pain, stroke signs) prompting immediate emergency hotline intervention.</p>
+                </div>
+
+                <div class="ai-preview-box">
+                    <div class="box-icon bg-blue-glow">
+                        <i class="fas fa-hospital-user"></i>
+                    </div>
+                    <h4>Specialist Matching</h4>
+                    <p>Direct algorithmic routing to on-duty cardiologists, neurologists, dermatologists, or general physicians.</p>
+                </div>
+
+                <div class="ai-preview-box">
+                    <div class="box-icon bg-emerald-glow">
+                        <i class="fas fa-file-shield"></i>
+                    </div>
+                    <h4>EHR Vault Integration</h4>
+                    <p>Automatically summarize patient symptom history for doctors to review during clinical consultation.</p>
+                </div>
+            </div>
+
+            <!-- Under Construction Notice & Quick Redirect -->
+            <div class="construction-callout-box">
+                <div class="callout-content">
+                    <i class="fas fa-tools callout-icon"></i>
+                    <div>
+                        <strong>Need Medical Attention Right Now?</strong>
+                        <p>While the AI checker is being finalized, you can consult with verified doctors and schedule immediate appointments through our specialist directory.</p>
+                    </div>
+                </div>
+                <div class="callout-actions">
+                    <a href="/doctors" class="btn-glow-cyan">
+                        <i class="fas fa-user-md"></i> Browse Available Doctors
+                    </a>
+                    <a href="<%= currentUser ? '/dashboard' : '/login' %>" class="btn-dark-glass">
+                        <i class="fas fa-calendar-check"></i> Book Consultation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>

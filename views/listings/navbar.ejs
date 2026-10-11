@@ -1,29 +1,106 @@
-<nav class="navbar">
-  <div class="nav-left">
-    <div class="logo">
-      <a href="/">
-        <img src="/images/logo.png" class="logo-img">
+<header class="navbar-wrapper">
+  <nav class="navbar">
+    <div class="nav-brand-section">
+      <a href="/" class="brand-link" title="CareSync Medical Portal">
+        <img src="/images/logo.png" alt="CareSync" class="logo-img">
       </a>
     </div>
 
-    <ul class="nav-links" id="nav-menu">
-      <li><a href="/dashboard">Dashboard</a></li>
-      <li><a href="/doctors">Find Doctors</a></li>
-      <li><a href="/reports">Reports</a></li>
-      <li><a href="/symptom">Symptom Checker</a></li>
-    </ul>
-  </div>
+    <div class="nav-center-menu" id="nav-menu">
+      <ul class="nav-links">
+        <li>
+          <a href="/" class="nav-link" data-path="/">
+            <i class="fas fa-hospital"></i> Home
+          </a>
+        </li>
+        <li>
+          <a href="/doctors" class="nav-link" data-path="/doctors">
+            <i class="fas fa-user-md"></i> Doctors
+          </a>
+        </li>
+        <li>
+          <a href="/symptom" class="nav-link" data-path="/symptom">
+            <i class="fas fa-robot text-cyan"></i> AI Symptom Checker
+          </a>
+        </li>
 
-  <div class="nav-right">
-    <button type="button" class="menu-toggle" id="menu-toggle">&#9776;</button>
+        <!-- Role-specific dashboard links -->
+        <% if (currentUser) { %>
+          <% if (currentUser.role === 'admin') { %>
+            <li>
+              <a href="/admin" class="nav-link active-console" data-path="/admin">
+                <i class="fas fa-shield-alt text-purple"></i> Admin Console
+              </a>
+            </li>
+          <% } else if (currentUser.role === 'doctor' || currentUser.role === 'receptionist') { %>
+            <li>
+              <a href="/staff" class="nav-link active-console" data-path="/staff">
+                <i class="fas <%= currentUser.role === 'doctor' ? 'fa-stethoscope text-cyan' : 'fa-id-badge text-blue' %>"></i>
+                <%= currentUser.role === 'doctor' ? 'Doctor Console' : 'Staff Console' %>
+              </a>
+            </li>
+          <% } else { %>
+            <li>
+              <a href="/dashboard" class="nav-link active-console" data-path="/dashboard">
+                <i class="fas fa-th-large text-emerald"></i> My Dashboard
+              </a>
+            </li>
+          <% } %>
+        <% } %>
+      </ul>
 
-    <div class="nav-buttons">
-      <% if (currentUser) { %>
-        <a href="/logout" class="register-btn">Logout</a>
-      <% } else { %>
-        <a href="/login" class="login-btn">Login</a>
-        <a href="/register" class="register-btn">Register</a>
-      <% } %>
+      <!-- Mobile drawer auth -->
+      <div class="mobile-auth-block">
+        <% if (currentUser) { %>
+          <div class="mobile-user-info">
+            <div class="user-avatar-badge">
+              <%= (currentUser.fullname || 'U')[0].toUpperCase() %>
+            </div>
+            <div>
+              <strong><%= currentUser.fullname || 'User' %></strong>
+              <small class="role-subtext"><%= (currentUser.role || 'patient').toUpperCase() %></small>
+            </div>
+          </div>
+          <a href="/logout" class="mobile-btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        <% } else { %>
+          <a href="/login" class="nav-btn-secondary full-width">Sign In</a>
+          <a href="/register" class="nav-btn-primary full-width">Register</a>
+        <% } %>
+      </div>
     </div>
-  </div>
-</nav>
+
+    <div class="nav-actions-section">
+      <% if (currentUser) { %>
+        <div class="user-profile-badge">
+          <div class="user-avatar-circle">
+            <%= (currentUser.fullname || 'U')[0].toUpperCase() %>
+          </div>
+          <div class="user-meta-header">
+            <span class="user-greeting">
+              <strong><%= currentUser.fullname.split(' ')[0] %></strong>
+            </span>
+            <span class="role-pill-badge <%= currentUser.role %>">
+              <%= currentUser.role.toUpperCase() %>
+            </span>
+          </div>
+        </div>
+        <a href="/logout" class="btn-nav-logout" title="Log Out">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      <% } else { %>
+        <a href="/login" class="nav-btn-secondary">Sign In</a>
+        <a href="/register" class="nav-btn-primary">
+          <i class="fas fa-user-plus"></i> Register
+        </a>
+      <% } %>
+
+      <button type="button" class="menu-toggle-btn" id="menu-toggle" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+  <div class="nav-backdrop" id="nav-backdrop"></div>
+</header>

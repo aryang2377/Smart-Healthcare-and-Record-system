@@ -1,0 +1,161 @@
+<% layout('/layouts/boilerplate.ejs') %>
+
+<div class="reports-page">
+    <div class="reports-container">
+        <header class="section-header-block">
+            <span class="badge-pill"><i class="fas fa-file-medical-alt"></i> Electronic Health Records</span>
+            <h1 class="page-main-title">Patient Diagnostic Records & EHR Vault</h1>
+            <p class="page-main-subtitle">Access, review, and download clinical laboratory reports, radiology scans, and verified prescriptions.</p>
+        </header>
+
+        <div class="reports-stats-grid">
+            <div class="report-stat-card">
+                <div class="stat-icon-wrap blue"><i class="fas fa-file-pdf"></i></div>
+                <div>
+                    <h3>12</h3>
+                    <p>Total Patient Documents</p>
+                </div>
+            </div>
+            <div class="report-stat-card">
+                <div class="stat-icon-wrap green"><i class="fas fa-check-circle"></i></div>
+                <div>
+                    <h3>100%</h3>
+                    <p>Doctor Verified</p>
+                </div>
+            </div>
+            <div class="report-stat-card">
+                <div class="stat-icon-wrap purple"><i class="fas fa-shield-alt"></i></div>
+                <div>
+                    <h3>Centralized</h3>
+                    <p>EHR Archive</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="reports-content-card">
+            <div class="reports-table-header">
+                <h3><i class="fas fa-folder-open text-cyan"></i> Recent Clinical Records</h3>
+                <div class="reports-actions">
+                    <a href="/doctors" class="btn-sm-primary"><i class="fas fa-user-md"></i> Consult Doctor</a>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Patient & Document</th>
+                            <th>Clinical Department</th>
+                            <th>Attending Physician</th>
+                            <th>Date Issued</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="file-name-cell">
+                                    <i class="fas fa-file-alt file-icon"></i>
+                                    <div>
+                                        <strong>Comprehensive Blood Panel (CBC)</strong>
+                                        <small>Patient: Rahul Sharma • PDF (1.4 MB)</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>General Pathology</td>
+                            <td>Dr. Amit Verma</td>
+                            <td>Oct 04, 2026</td>
+                            <td><span class="status-badge success">Verified</span></td>
+                            <td>
+                                <button class="btn-table-action" onclick="alert('Viewing Comprehensive Blood Panel (CBC) for Rahul Sharma...')">
+                                    <i class="fas fa-file-download"></i> View File
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="file-name-cell">
+                                    <i class="fas fa-x-ray file-icon"></i>
+                                    <div>
+                                        <strong>Chest X-Ray Digital Radiology Scan</strong>
+                                        <small>Patient: Sunita Patel • DICOM / PDF (4.8 MB)</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Radiology</td>
+                            <td>Dr. Priya Mehta</td>
+                            <td>Sep 18, 2026</td>
+                            <td><span class="status-badge success">Verified</span></td>
+                            <td>
+                                <button class="btn-table-action" onclick="alert('Viewing Chest X-Ray Scan for Sunita Patel...')">
+                                    <i class="fas fa-file-download"></i> View File
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="file-name-cell">
+                                    <i class="fas fa-heartbeat file-icon"></i>
+                                    <div>
+                                        <strong>Electrocardiogram (ECG) Report</strong>
+                                        <small>Patient: Vikram Malhotra • PDF (850 KB)</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Cardiology</td>
+                            <td>Dr. Rajesh Sharma</td>
+                            <td>Aug 29, 2026</td>
+                            <td><span class="status-badge success">Verified</span></td>
+                            <td>
+                                <button class="btn-table-action" onclick="alert('Viewing Cardiology ECG Report for Vikram Malhotra...')">
+                                    <i class="fas fa-file-download"></i> View File
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="file-name-cell">
+                                    <i class="fas fa-prescription-bottle-alt file-icon"></i>
+                                    <div>
+                                        <strong>Pediatric Clinical Prescription & Notes</strong>
+                                        <small>Patient: Aarav Kapoor • PDF (420 KB)</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Pediatrics</td>
+                            <td>Dr. Neha Kapoor</td>
+                            <td>Aug 12, 2026</td>
+                            <td><span class="status-badge success">Verified</span></td>
+                            <td>
+                                <button class="btn-table-action" onclick="alert('Viewing Prescription Notes for Aarav Kapoor...')">
+                                    <i class="fas fa-file-download"></i> View File
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="file-name-cell">
+                                    <i class="fas fa-brain file-icon"></i>
+                                    <div>
+                                        <strong>Brain MRI Scan & Neurological Summary</strong>
+                                        <small>Patient: Meera Sen • PDF (6.2 MB)</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Neurology</td>
+                            <td>Dr. Rahul Singh</td>
+                            <td>Jul 30, 2026</td>
+                            <td><span class="status-badge success">Verified</span></td>
+                            <td>
+                                <button class="btn-table-action" onclick="alert('Viewing Neurological Summary for Meera Sen...')">
+                                    <i class="fas fa-file-download"></i> View File
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

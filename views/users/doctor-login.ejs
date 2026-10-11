@@ -1,0 +1,99 @@
+<% layout('/layouts/boilerplate.ejs') %>
+
+<div class="auth-container">
+    <div class="auth-box">
+        <div class="auth-header">
+            <a href="/">
+                <img src="/images/logo.png" alt="CareSync" class="auth-logo">
+            </a>
+            <span class="auth-tag doctor">
+                <i class="fas fa-stethoscope"></i> Unified Healthcare Staff Portal
+            </span>
+            <h2 class="auth-title">Staff Sign In</h2>
+            <p class="auth-subtitle">Operational & clinical console for attending physicians, specialists, and reception desk</p>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="auth-alert-error">
+                <i class="fas fa-exclamation-circle"></i> <%= error %>
+            </div>
+        <% } %>
+
+        <form action="/staff/login" method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="doctorEmail">Staff Email Address</label>
+                <input
+                    type="email"
+                    id="doctorEmail"
+                    name="email"
+                    placeholder="e.g. doctor@caresync.health or receptionist@caresync.health"
+                    required
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="doctorPassword">Password</label>
+                <div class="password-wrap">
+                    <input
+                        type="password"
+                        id="doctorPassword"
+                        name="password"
+                        placeholder="Enter your security password"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <button
+                        type="button"
+                        class="eye-btn"
+                        onclick="togglePwd('doctorPassword', this)"
+                        aria-label="Toggle password visibility"
+                    >
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="auth-btn doctor-btn">
+                <i class="fas fa-sign-in-alt"></i> Access Staff Console
+            </button>
+        </form>
+
+        <div style="margin-top: 18px; padding: 12px 14px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 8px; font-size: 12px;">
+            <div style="font-weight: 700; color: #38bdf8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-key"></i> Quick Review Accounts:
+            </div>
+            <div style="color: #cbd5e1; line-height: 1.6;">
+                • <strong>Attending Doctor:</strong> <code style="color: #34d399;">doctor@caresync.health</code> / <code style="color: #34d399;">Doctor123#</code><br>
+                • <strong>Reception Desk:</strong> <code style="color: #fbbf24;">receptionist@caresync.health</code> / <code style="color: #fbbf24;">Staff123#</code>
+            </div>
+        </div>
+
+        <div class="auth-links">
+            <p>
+                New healthcare professional?
+                <a href="/doctor/apply">Apply as Doctor</a>
+            </p>
+            <div class="auth-subnote">
+                Patient portal access: <a href="/login">Go to Patient Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePwd(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (!input || !icon) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>

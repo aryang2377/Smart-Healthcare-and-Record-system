@@ -1,216 +1,450 @@
 <% layout('/layouts/boilerplate.ejs') %>
 
-    <section class="dashboard" role="main">
-
-        <div class="dashboard-header">
-            <div>
-                <h2>
-                    Welcome,
-                    <%= currentUser ? currentUser.fullname || "User" : "User" %>!
-                </h2>
-                <p>Your health overview for today</p>
+<section class="dashboard-wrapper-dark">
+    <div class="dashboard-container">
+        <!-- Patient Header -->
+        <div class="dash-header-dark">
+            <div class="dash-user-info">
+                <div class="user-large-avatar">
+                    <%= (currentUser.fullname || 'P')[0].toUpperCase() %>
+                </div>
+                <div>
+                    <h2>Welcome, <%= currentUser.fullname %></h2>
+                    <p><i class="fas fa-id-card text-cyan"></i> Patient Portal • <%= currentUser.email %></p>
+                </div>
+            </div>
+            <div class="dash-quick-cta">
+                <button type="button" class="btn-book-quick" onclick="switchTab('appointments')">
+                    <i class="fas fa-calendar-plus"></i> Book Consultation
+                </button>
             </div>
         </div>
 
-        <div class="summary-row">
+        <!-- Metric Cards -->
+        <div class="metrics-row-dark">
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-cyan-glow">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                    <h3><%= patientAppointments.length %></h3>
+                    <span>Total Appointments</span>
+                </div>
+            </div>
 
-            <div class="summary-card blue">
-                <span>Next Appointment</span>
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-emerald-glow">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <h3>
+                        <% 
+                            const upcoming = patientAppointments.find(a => new Date(a.date) >= new Date() && a.status === 'Scheduled');
+                        %>
+                        <%= upcoming ? new Date(upcoming.date).toLocaleDateString() : 'None Scheduled' %>
+                    </h3>
+                    <span>Next Consultation</span>
+                </div>
+            </div>
 
-                <h3>
-                    <% if (nextAppointment) { %>
-                        <%= new Date(nextAppointment.date).toLocaleDateString() %>
-                            <%= nextAppointment.time %>
-                                <% } else { %>
-                                    No upcoming appointment
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-blue-glow">
+                    <i class="fas fa-file-medical-alt"></i>
+                </div>
+                <div>
+                    <h3><%= patientReports.length %></h3>
+                    <span>Medical Documents</span>
+                </div>
+            </div>
+
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-purple-glow">
+                    <i class="fas fa-prescription-bottle-alt"></i>
+                </div>
+                <div>
+                    <h3><%= prescriptions.length %></h3>
+                    <span>Active Prescriptions</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation Navigation Bar -->
+        <div class="dash-tabs-bar">
+            <button type="button" class="dash-tab-btn <%= activeTab === 'appointments' ? 'active' : '' %>" onclick="switchTab('appointments')">
+                <i class="fas fa-calendar-alt"></i> Appointments (<%= patientAppointments.length %>)
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'reports' ? 'active' : '' %>" onclick="switchTab('reports')">
+                <i class="fas fa-file-medical"></i> Medical Reports (<%= patientReports.length %>)
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'prescriptions' ? 'active' : '' %>" onclick="switchTab('prescriptions')">
+                <i class="fas fa-prescription"></i> Prescriptions (<%= prescriptions.length %>)
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'history' ? 'active' : '' %>" onclick="switchTab('history')">
+                <i class="fas fa-history"></i> Consultation History
+            </button>
+        </div>
+
+        <!-- TAB 1: APPOINTMENTS -->
+        <div id="tab-appointments" class="tab-pane-dark" style="<%= activeTab === 'appointments' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-grid-split">
+                <!-- Book Appointment Form -->
+                <div class="dash-card-dark">
+                    <div class="card-head">
+                        <h3><i class="fas fa-calendar-plus text-cyan"></i> Book New Consultation</h3>
+                        <small>Schedule an in-person or clinical visit</small>
+                    </div>
+
+                    <form action="/appointments" method="POST" class="dash-form">
+                        <input type="hidden" name="patientName" value="<%= currentUser.fullname %>">
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Patient Name</label>
+                                <input type="text" value="<%= currentUser.fullname %>" readonly class="dark-dash-input readonly">
+                            </div>
+                            <div class="form-group">
+                                <label>Age</label>
+                                <input type="number" name="age" min="1" max="120" placeholder="e.g. 28" required class="dark-dash-input">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select name="gender" required class="dark-dash-select">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Specialist</label>
+                                <select name="doctorName" required class="dark-dash-select">
+                                    <% if (availableDoctors && availableDoctors.length > 0) { %>
+                                        <% availableDoctors.forEach(doc => { %>
+                                            <option value="<%= doc.fullname %>">
+                                                <%= doc.fullname %> (<%= doc.specialization || 'Physician' %>)
+                                            </option>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <option value="Dr. Rajesh Sharma">Dr. Rajesh Sharma (Cardiology)</option>
+                                        <option value="Dr. Priya Mehta">Dr. Priya Mehta (Dermatology)</option>
+                                        <option value="Dr. Amit Verma">Dr. Amit Verma (General Physician)</option>
                                     <% } %>
-                </h3>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Consultation Date</label>
+                                <input type="date" name="date" required class="dark-dash-input" min="<%= new Date().toISOString().split('T')[0] %>">
+                            </div>
+                            <div class="form-group">
+                                <label>Protected Time Slot</label>
+                                <select name="time" required class="dark-dash-select">
+                                    <option value="09:00 AM">09:00 AM - 09:30 AM (Morning OPD)</option>
+                                    <option value="09:30 AM">09:30 AM - 10:00 AM (Morning OPD)</option>
+                                    <option value="10:00 AM">10:00 AM - 10:30 AM (Morning OPD)</option>
+                                    <option value="10:30 AM">10:30 AM - 11:00 AM (Morning OPD)</option>
+                                    <option value="11:00 AM">11:00 AM - 11:30 AM (Morning OPD)</option>
+                                    <option value="11:30 AM">11:30 AM - 12:00 PM (Morning OPD)</option>
+                                    <option value="12:00 PM">12:00 PM - 12:30 PM (Midday OPD)</option>
+                                    <option value="02:00 PM">02:00 PM - 02:30 PM (Afternoon OPD)</option>
+                                    <option value="02:30 PM">02:30 PM - 03:00 PM (Afternoon OPD)</option>
+                                    <option value="03:00 PM">03:00 PM - 03:30 PM (Afternoon OPD)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Reason for Visit / Symptoms</label>
+                            <input type="text" name="notes" placeholder="e.g. Routine checkup, chest discomfort..." class="dark-dash-input">
+                        </div>
+
+                        <button type="submit" class="btn-dash-primary">
+                            <i class="fas fa-check-circle"></i> Confirm Consultation
+                        </button>
+                    </form>
+                </div>
+
+                <!-- My Appointments Table -->
+                <div class="dash-card-dark">
+                    <div class="card-head">
+                        <h3><i class="fas fa-list-check text-blue"></i> Scheduled Appointments</h3>
+                        <small>Manage your ongoing, checked-in, and upcoming visits</small>
+                    </div>
+
+                    <% if (patientAppointments.length > 0) { %>
+                        <div class="table-scroll-wrap">
+                            <table class="dash-table-dark">
+                                <thead>
+                                    <tr>
+                                        <th>Doctor</th>
+                                        <th>Date & Slot</th>
+                                        <th>Status & Live Stage</th>
+                                        <th>Notes</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% patientAppointments.forEach(appt => { %>
+                                        <tr>
+                                            <td>
+                                                <strong><%= appt.doctorName %></strong>
+                                            </td>
+                                            <td>
+                                                <%= new Date(appt.date).toLocaleDateString() %><br>
+                                                <small class="text-cyan"><%= appt.slot || appt.time %></small>
+                                            </td>
+                                            <td>
+                                                <span class="status-pill <%= appt.status.toLowerCase().replace(/[^a-z]/g, '') %>">
+                                                    <%= appt.status %>
+                                                </span>
+                                                <% if (appt.status === 'Checked-In') { %>
+                                                    <small style="color: #fbbf24; display: block; font-size: 11px; margin-top: 3px;"><i class="fas fa-clock"></i> Checked In — In Lounge</small>
+                                                <% } else if (appt.status === 'In-Consultation') { %>
+                                                    <small style="color: #c084fc; display: block; font-size: 11px; margin-top: 3px;"><i class="fas fa-circle-notch fa-spin"></i> In Consultation</small>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <small><%= appt.notes || 'None recorded' %></small>
+                                            </td>
+                                            <td>
+                                                <% if (appt.status === 'Scheduled' || appt.status === 'Confirmed') { %>
+                                                    <form action="/appointments/<%= appt._id %>/cancel" method="POST" style="display:inline;" onsubmit="return confirm('Cancel this consultation?');">
+                                                        <button type="submit" class="btn-sm-action cancel" title="Cancel Appointment">
+                                                            <i class="fas fa-times"></i> Cancel
+                                                        </button>
+                                                    </form>
+                                                <% } else { %>
+                                                    <span style="color: #64748b; font-size: 12px;">—</span>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="empty-state-box">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>No appointments booked yet. Use the booking form on the left to schedule your first visit!</p>
+                        </div>
+                    <% } %>
+                </div>
             </div>
-
-            <div class="summary-card purple">
-                <span>Total Appointments</span>
-
-                <h3>
-                    <%= totalAppointments %>
-                </h3>
-            </div>
-
-            <div class="summary-card green">
-                <span>Last Visit</span>
-
-                <h3>
-                    <% if (lastVisit) { %>
-                        <%= new Date(lastVisit.date).toLocaleDateString() %>
-                            <% } else { %>
-                                No visits yet
-                                <% } %>
-                </h3>
-            </div>
-
         </div>
 
-        <div class="main-grid">
-
-            <div class="card">
-
-                <h3>Book Appointment</h3>
-
-                <form action="/appointments" method="POST">
-
-                    <label>Your Name</label>
-
-                    <input type="text" name="patientName" value="<%= currentUser ? currentUser.fullname : '' %>"
-                        required>
-
-                    <div class="row">
-
-                        <div>
-                            <label>Age</label>
-
-                            <input type="number" name="age" min="0" max="120" required>
-                        </div>
-
-                        <div>
-                            <label>Gender</label>
-
-                            <select name="gender" required>
-                                <option value="Male">
-                                    Male
-                                </option>
-
-                                <option value="Female">
-                                    Female
-                                </option>
-                            </select>
-                        </div>
-
+        <!-- TAB 2: MEDICAL REPORTS (DOCTOR-UPLOADED ONLY) -->
+        <div id="tab-reports" class="tab-pane-dark" style="<%= activeTab === 'reports' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-card-dark">
+                <div class="card-head">
+                    <div>
+                        <h3><i class="fas fa-file-medical-alt text-cyan"></i> Diagnostic Test Reports & Laboratory Findings</h3>
+                        <small>Reports authorized and uploaded by attending hospital doctors for your consultations</small>
                     </div>
-
-                    <div class="row">
-
-                        <div>
-                            <label>Date</label>
-
-                            <input type="date" name="date" required>
-                        </div>
-
-                        <div>
-                            <label>Time</label>
-
-                            <input type="time" name="time" required>
-                        </div>
-
-                    </div>
-
-                    <label>Select Doctor</label>
-
-                    <select name="doctorName" required>
-                        <option>
-                            Dr. Rajesh Sharma
-                        </option>
-
-                        <option>
-                            Dr. Priya Mehta
-                        </option>
-
-                        <option>
-                            Dr. Amit Verma
-                        </option>
-                    </select>
-
-                    <button type="submit" class="primary-btn">
-                        Confirm Appointment
-                    </button>
-
-                </form>
-
-                <div class="reminder-box">
-                    Upcoming Checkup Reminder
-                    <strong>
-                        Dental Cleaning — Next Week
-                    </strong>
+                    <span class="auth-tag patient" style="margin: 0;">
+                        <i class="fas fa-lock"></i> Doctor-Authorized Only
+                    </span>
                 </div>
 
-                <div class="quick-actions">
-
-                    <a href="/doctors" class="quick-card">
-                        Find Doctors
-                    </a>
-
-                    <div class="quick-card">
-                        Medical Records
-                    </div>
-
-                    <div class="quick-card">
-                        Download Reports
-                    </div>
-
+                <div class="auth-alert-info" style="margin: 16px 0 20px;">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Official medical records and lab test findings are verified and uploaded by your consulting physicians. Patients can view and download test documents below.</span>
                 </div>
 
+                <% if (patientReports.length > 0) { %>
+                    <div class="table-scroll-wrap">
+                        <table class="dash-table-dark">
+                            <thead>
+                                <tr>
+                                    <th>Diagnostic Test / Document</th>
+                                    <th>Test Category</th>
+                                    <th>Attending Physician</th>
+                                    <th>Date Issued</th>
+                                    <th>Doctor Remarks</th>
+                                    <th>Document Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% patientReports.forEach(rep => { %>
+                                    <tr>
+                                        <td>
+                                            <strong><%= rep.title %></strong><br>
+                                            <small class="text-dim"><%= rep.fileName || 'Report PDF' %> • <%= rep.fileSize || '' %></small>
+                                        </td>
+                                        <td><span class="category-pill"><%= rep.category %></span></td>
+                                        <td>
+                                            <strong class="text-cyan"><%= rep.doctorName || 'Attending Physician' %></strong>
+                                        </td>
+                                        <td><%= new Date(rep.createdAt).toLocaleDateString() %></td>
+                                        <td>
+                                            <small><%= rep.notes || 'Routine diagnostic evaluation' %></small>
+                                        </td>
+                                        <td>
+                                            <% if (rep.fileUrl) { %>
+                                                <a href="<%= rep.fileUrl %>" target="_blank" download class="btn-file-action">
+                                                    <i class="fas fa-download"></i> View / Download
+                                                </a>
+                                            <% } else { %>
+                                                <span class="text-dim">Digital Record</span>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state-box">
+                        <i class="fas fa-folder-open"></i>
+                        <p>No diagnostic reports issued yet. Once your attending doctor uploads laboratory or test results, they will appear here securely.</p>
+                    </div>
+                <% } %>
             </div>
+        </div>
 
-            <div class="card">
+        <!-- TAB 3: PRESCRIPTIONS -->
+        <div id="tab-prescriptions" class="tab-pane-dark" style="<%= activeTab === 'prescriptions' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-card-dark">
+                <div class="card-head">
+                    <h3><i class="fas fa-prescription-bottle-alt text-cyan"></i> Active Doctor Prescriptions</h3>
+                    <small>Access doctor-authorized medication instructions and digital scripts</small>
+                </div>
 
-                <h3>Today's Schedule</h3>
+                <% 
+                    const hasDigitalRx = typeof patientPrescriptions !== 'undefined' && patientPrescriptions && patientPrescriptions.length > 0;
+                    const hasLegacyRx = typeof prescriptions !== 'undefined' && prescriptions && prescriptions.length > 0;
+                %>
 
-                <% if (todaysSchedule.length> 0) { %>
+                <% if (hasDigitalRx || hasLegacyRx) { %>
+                    <div class="prescriptions-grid">
+                        <!-- Digital Prescriptions from Doctors -->
+                        <% if (hasDigitalRx) { %>
+                            <% patientPrescriptions.forEach(rx => { %>
+                                <div class="prescription-card" style="border-left: 3px solid #38bdf8;">
+                                    <div class="rx-header">
+                                        <span class="rx-badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                                            <i class="fas fa-file-prescription"></i> <%= rx.rxNumber %>
+                                        </span>
+                                        <small><%= new Date(rx.createdAt).toLocaleDateString() %></small>
+                                    </div>
+                                    <h4 style="margin: 6px 0 4px; color: #f8fafc; font-size: 16px;"><%= rx.diagnosis %></h4>
+                                    <p class="rx-doctor"><i class="fas fa-user-md text-cyan"></i> Prescribed by: <strong><%= rx.doctorName %></strong> (<%= rx.doctorSpecialization %>)</p>
+                                    
+                                    <div style="background: #080d1a; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; margin: 10px 0; font-size: 13px;">
+                                        <strong style="color: #fbbf24; display: block; font-size: 11.5px; text-transform: uppercase; margin-bottom: 3px;">
+                                            <i class="fas fa-comment-medical"></i> Your Symptoms Reported:
+                                        </strong>
+                                        <p style="margin: 0; color: #cbd5e1;"><%= rx.problem %></p>
+                                    </div>
 
-                    <% todaysSchedule.forEach(function(appt){ %>
+                                    <div class="rx-notes">
+                                        <strong style="color: #34d399;"><i class="fas fa-capsules"></i> Prescribed Medicines (℞):</strong>
+                                        <pre style="margin: 4px 0 0; font-family: inherit; font-size: 13px; color: #f1f5f9; white-space: pre-wrap; line-height: 1.5;"><%= rx.medicines %></pre>
+                                    </div>
 
-                        <div class="appointment-card">
+                                    <% if (rx.advice) { %>
+                                        <div style="font-size: 12.5px; color: #94a3b8; margin: 8px 0;">
+                                            <strong style="color: #e2e8f0;">Advice:</strong> <%= rx.advice %>
+                                        </div>
+                                    <% } %>
 
-                            <div class="avatar">
-                                <%= appt.doctorName.substring(0,2).toUpperCase() %>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid #1e293b;">
+                                        <small style="color: #64748b;">Follow-up: <strong style="color: #38bdf8;"><%= rx.followUp %></strong></small>
+                                        <a href="/prescriptions/<%= rx._id %>" target="_blank" class="btn-rx-download" style="padding: 6px 14px; font-size: 12px; margin: 0;">
+                                            <i class="fas fa-print"></i> View & Print Slip
+                                        </a>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        <% } %>
+
+                        <!-- Other Prescriptions / Reports -->
+                        <% if (hasLegacyRx) { %>
+                            <% prescriptions.forEach(rx => { %>
+                                <div class="prescription-card">
+                                    <div class="rx-header">
+                                        <span class="rx-badge"><i class="fas fa-capsules"></i> Digital Rx</span>
+                                        <small><%= new Date(rx.createdAt).toLocaleDateString() %></small>
+                                    </div>
+                                    <h4><%= rx.title %></h4>
+                                    <p class="rx-doctor"><i class="fas fa-user-md text-cyan"></i> Prescribed by: <strong><%= rx.doctorName %></strong></p>
+                                    <div class="rx-notes">
+                                        <strong>Instructions:</strong>
+                                        <p><%= rx.notes || 'Take medications as instructed during clinical consultation.' %></p>
+                                    </div>
+                                    <% if (rx.fileUrl) { %>
+                                        <a href="<%= rx.fileUrl %>" target="_blank" class="btn-rx-download">
+                                            <i class="fas fa-file-pdf"></i> Download Official Prescription
+                                        </a>
+                                    <% } %>
+                                </div>
+                            <% }) %>
+                        <% } %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state-box">
+                        <i class="fas fa-prescription"></i>
+                        <p>No prescriptions recorded yet. Any prescriptions authorized by your attending doctor will appear here automatically.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- TAB 4: CONSULTATION HISTORY -->
+        <div id="tab-history" class="tab-pane-dark" style="<%= activeTab === 'history' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-card-dark">
+                <div class="card-head">
+                    <h3><i class="fas fa-notes-medical text-emerald"></i> Past Consultation History</h3>
+                    <small>Record of completed hospital examinations and clinical summaries</small>
+                </div>
+
+                <% 
+                    const pastConsultations = patientAppointments.filter(a => a.status === 'Completed' || new Date(a.date) < new Date());
+                %>
+
+                <% if (pastConsultations.length > 0) { %>
+                    <div class="history-timeline">
+                        <% pastConsultations.forEach(c => { %>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <strong><%= c.doctorName %></strong>
+                                        <span class="timeline-date"><%= new Date(c.date).toLocaleDateString() %> at <%= c.time %></span>
+                                    </div>
+                                    <p class="timeline-reason"><strong>Visit Reason:</strong> <%= c.notes || 'Routine consultation' %></p>
+                                    <span class="status-pill completed">Completed Consultation</span>
+                                </div>
                             </div>
-
-                            <div>
-
-                                <strong>
-                                    <%= appt.doctorName %>
-                                </strong>
-
-                                <p>
-                                    <%= appt.time %>
-                                </p>
-
-                            </div>
-
-                            <span class="status scheduled">
-                                <%= appt.status %>
-                            </span>
-
-                        </div>
-
                         <% }) %>
-
-                            <% } else { %>
-
-                                <p>
-                                    No appointments today
-                                </p>
-
-                                <% } %>
-
+                    </div>
+                <% } else { %>
+                    <div class="empty-state-box">
+                        <i class="fas fa-history"></i>
+                        <p>No past consultation history recorded yet.</p>
+                    </div>
+                <% } %>
             </div>
-
         </div>
+    </div>
+</section>
 
-        <div class="card">
+<script>
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-pane-dark').forEach(pane => pane.style.display = 'none');
+        document.querySelectorAll('.dash-tab-btn').forEach(btn => btn.classList.remove('active'));
 
-            <h3>Recent Activity</h3>
+        const targetPane = document.getElementById('tab-' + tabName);
+        if (targetPane) targetPane.style.display = 'block';
 
-            <div class="activity-item">
-                Appointment booked successfully
-            </div>
+        const activeBtn = Array.from(document.querySelectorAll('.dash-tab-btn')).find(b => b.getAttribute('onclick').includes(tabName));
+        if (activeBtn) activeBtn.classList.add('active');
 
-            <div class="activity-item">
-                Dashboard updated from database
-            </div>
-
-            <div class="activity-item">
-                User logged in securely
-            </div>
-
-        </div>
-
-    </section>
+        // Update URL query without full reload
+        const newUrl = window.location.pathname + '?tab=' + tabName;
+        window.history.replaceState(null, '', newUrl);
+    }
+</script>

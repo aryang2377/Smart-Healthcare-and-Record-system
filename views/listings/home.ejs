@@ -1,75 +1,437 @@
 <% layout('/layouts/boilerplate.ejs') %>
-    <section class="hero">
-        <div class="hero-container">
 
-            <div class="hero-text">
+<!-- HERO SECTION -->
+<section class="hero-section">
+    <div class="hero-container">
+        <div class="hero-content">
+            <div class="project-pill">
+                <span class="live-dot"></span>
+                <i class="fas fa-hospital"></i> Multi-Specialty Hospital & Medical Center
+            </div>
 
-                <h1>Smart Healthcare System</h1>
-                <p>
-                    Book appointments easily and manage your
-                    medical records online.
-                </p>
+            <h1 class="hero-title">
+                Excellence in Healthcare & <br>
+                <span class="neon-text">Specialist Consultation</span>
+            </h1>
 
-                <div class="hero-buttons">
+            <p class="hero-subtitle">
+                Connecting patients with board-certified physicians and specialized medical faculties. Schedule clinical appointments, consult experienced doctors, and access modern healthcare services.
+            </p>
 
-                    <a href="/appointment" class="btn-primary">
-                        Book Appointment
+            <div class="hero-cta-group">
+                <% if (currentUser) { %>
+                    <% if (currentUser.role === 'admin') { %>
+                        <a href="/admin" class="btn-glow-cyan">
+                            <i class="fas fa-shield-alt"></i> Admin Console
+                        </a>
+                    <% } else if (currentUser.role === 'doctor' || currentUser.role === 'receptionist') { %>
+                        <a href="/staff" class="btn-glow-cyan">
+                            <i class="fas <%= currentUser.role === 'doctor' ? 'fa-user-md' : 'fa-id-badge' %>"></i> <%= currentUser.role === 'doctor' ? 'Doctor Console' : 'Staff Console' %>
+                        </a>
+                    <% } else { %>
+                        <a href="/dashboard" class="btn-glow-cyan">
+                            <i class="fas fa-th-large"></i> Patient Dashboard
+                        </a>
+                    <% } %>
+                <% } else { %>
+                    <a href="/login" class="btn-glow-cyan">
+                        <i class="fas fa-calendar-check"></i> Book Consultation
                     </a>
+                <% } %>
 
-                    <a href="/symptom" class="btn-secondary">
-                        Check Symptoms
-                    </a>
+                <a href="/doctors" class="btn-dark-glass">
+                    <i class="fas fa-user-md"></i> Doctor Directory
+                </a>
+                <a href="/doctor/apply" class="btn-dark-outline">
+                    <i class="fas fa-user-md text-cyan"></i> Join as Doctor
+                </a>
+            </div>
 
+            <!-- Public Clinical Highlights Strip -->
+            <div class="quick-stats-bar">
+                <div class="quick-stat-item">
+                    <i class="fas fa-user-md text-cyan"></i>
+                    <div>
+                        <strong>Expert Doctors</strong>
+                        <small>Senior consultants</small>
+                    </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="quick-stat-item">
+                    <i class="fas fa-clinic-medical text-blue"></i>
+                    <div>
+                        <strong>8 Departments</strong>
+                        <small>Specialized clinical care</small>
+                    </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="quick-stat-item">
+                    <i class="fas fa-heartbeat text-emerald"></i>
+                    <div>
+                        <strong>24/7 Emergency</strong>
+                        <small>On-call medical duty</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="hero-image-wrapper">
+                <div class="dark-glow-circle"></div>
+                <img src="/images/doctor.png" alt="CareSync Clinical Faculty" class="hero-doctor-img">
+
+                <!-- Floating Clinical Badges -->
+                <div class="dark-float-badge badge-pos-top">
+                    <div class="badge-icon-box bg-cyan-glow">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div>
+                        <strong>Board-Certified Specialists</strong>
+                        <small><span class="pulse-emerald"></span> Verified Faculty</small>
+                    </div>
                 </div>
 
-            </div>
+                <div class="dark-float-badge badge-pos-bottom-right">
+                    <div class="badge-icon-box bg-blue-glow">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <strong>Flexible Clinic Hours</strong>
+                        <small>Morning & Evening Slots</small>
+                    </div>
+                </div>
 
-            <div class="hero-image">
-                <img src="/images/doctor.png" alt="Doctors">
+                <div class="dark-float-badge badge-pos-bottom-left">
+                    <div class="badge-icon-box bg-emerald-glow">
+                        <i class="fas fa-shield-heart"></i>
+                    </div>
+                    <div>
+                        <strong>Patient-Centered Care</strong>
+                        <small>Comprehensive Diagnostics</small>
+                    </div>
+                </div>
             </div>
-
         </div>
-    </section>
-    <section class="features">
+    </div>
+</section>
 
-
-        <h2 class="section-title">Why Choose Us?</h2>
-
-        <div class="features-container">
-            <div class="feature-card">
-
-                <i class="fas fa-calendar-check feature-icon"></i>
-
-                <h3>Easy Appointment Booking</h3>
-
-                <p>
-                    Schedule doctor visits in just a few clicks.
-                </p>
-
-            </div>
-            <div class="feature-card">
-
-                <i class="fas fa-file-medical feature-icon"></i>
-
-                <h3>View Medical Reports</h3>
-
-                <p>
-                    Access your health records securely online.
-                </p>
-
-            </div>
-            <div class="feature-card">
-
-                <i class="fas fa-stethoscope feature-icon"></i>
-
-                <h3>Symptom Checker</h3>
-
-                <p>
-                    Check your symptoms and find related diseases.
-                </p>
-
-            </div>
-
+<!-- ENHANCED HOSPITAL DEPARTMENTS & SPECIALISTS SECTION -->
+<section class="departments-showcase-section" id="departments-section">
+    <div class="section-container">
+        <div class="section-header-center">
+            <span class="dark-section-tag"><i class="fas fa-hospital-alt"></i> Clinical Faculties</span>
+            <h2 class="section-heading">Hospital Departments & Medical Specialties</h2>
+            <p class="section-subheading">
+                Explore our specialized medical divisions staffed by experienced physicians, equipped with state-of-the-art diagnostic facilities.
+            </p>
         </div>
 
-    </section>
+        <div class="departments-cards-grid">
+            <!-- 1. Cardiology -->
+            <div class="dept-card-dark">
+                <div class="dept-card-header">
+                    <div class="dept-icon-box bg-cyan-glow">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <span class="dept-status-pill">Active Outpatient</span>
+                </div>
+                <h3>Cardiology & Heart Health</h3>
+                <p>
+                    Comprehensive cardiovascular evaluations including resting ECG, ambulatory blood pressure monitoring, heart failure management, and preventive cardiology.
+                </p>
+                <div class="dept-specialist-info">
+                    <div class="spec-avatar bg-blue">RS</div>
+                    <div>
+                        <strong>Dr. Rajesh Sharma</strong>
+                        <small>Senior Cardiologist • Mon-Fri (10 AM - 2 PM)</small>
+                    </div>
+                </div>
+                <div class="dept-card-footer">
+                    <a href="/doctors" class="dept-link">
+                        Consult Department <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. Dermatology -->
+            <div class="dept-card-dark">
+                <div class="dept-card-header">
+                    <div class="dept-icon-box bg-purple-glow">
+                        <i class="fas fa-allergies"></i>
+                    </div>
+                    <span class="dept-status-pill">Active Outpatient</span>
+                </div>
+                <h3>Dermatology & Skin Wellness</h3>
+                <p>
+                    Specialized diagnosis and treatment of complex dermatological conditions, allergic skin disorders, acne clinics, and trichology (hair health).
+                </p>
+                <div class="dept-specialist-info">
+                    <div class="spec-avatar bg-purple">PM</div>
+                    <div>
+                        <strong>Dr. Priya Mehta</strong>
+                        <small>Chief Dermatologist • Tue-Sat (12 PM - 4 PM)</small>
+                    </div>
+                </div>
+                <div class="dept-card-footer">
+                    <a href="/doctors" class="dept-link">
+                        Consult Department <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. General Medicine -->
+            <div class="dept-card-dark">
+                <div class="dept-card-header">
+                    <div class="dept-icon-box bg-blue-glow">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <span class="dept-status-pill">Primary Care</span>
+                </div>
+                <h3>General Medicine & Internal Care</h3>
+                <p>
+                    Primary medical evaluations for acute fevers, metabolic and endocrine disorders, respiratory infections, hypertension, and long-term wellness management.
+                </p>
+                <div class="dept-specialist-info">
+                    <div class="spec-avatar bg-cyan">AV</div>
+                    <div>
+                        <strong>Dr. Amit Verma</strong>
+                        <small>General Physician • Mon-Thu (9 AM - 1 PM)</small>
+                    </div>
+                </div>
+                <div class="dept-card-footer">
+                    <a href="/doctors" class="dept-link">
+                        Consult Department <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4. Pediatrics -->
+            <div class="dept-card-dark">
+                <div class="dept-card-header">
+                    <div class="dept-icon-box bg-emerald-glow">
+                        <i class="fas fa-baby"></i>
+                    </div>
+                    <span class="dept-status-pill">Child Care</span>
+                </div>
+                <h3>Pediatrics & Child Wellness</h3>
+                <p>
+                    Specialized infant and adolescent healthcare covering developmental milestones, vaccination schedules, pediatric infectious diseases, and pediatric nutrition.
+                </p>
+                <div class="dept-specialist-info">
+                    <div class="spec-avatar bg-emerald">NK</div>
+                    <div>
+                        <strong>Dr. Neha Kapoor</strong>
+                        <small>Pediatric Consultant • Mon-Fri (11 AM - 3 PM)</small>
+                    </div>
+                </div>
+                <div class="dept-card-footer">
+                    <a href="/doctors" class="dept-link">
+                        Consult Department <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 5. Neurology -->
+            <div class="dept-card-dark">
+                <div class="dept-card-header">
+                    <div class="dept-icon-box bg-blue-glow">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <span class="dept-status-pill">Specialized</span>
+                </div>
+                <h3>Neurology & Brain Sciences</h3>
+                <p>
+                    Comprehensive neurological consultations for chronic migraines, peripheral neuropathies, epilepsy management, sleep disturbances, and motor nerve assessments.
+                </p>
+                <div class="dept-specialist-info">
+                    <div class="spec-avatar bg-blue">RS</div>
+                    <div>
+                        <strong>Dr. Rahul Singh</strong>
+                        <small>Neurologist • Wed-Sun (2 PM - 6 PM)</small>
+                    </div>
+                </div>
+                <div class="dept-card-footer">
+                    <a href="/doctors" class="dept-link">
+                        Consult Department <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 6. Gynecology -->
+            <div class="dept-card-dark">
+                <div class="dept-card-header">
+                    <div class="dept-icon-box bg-purple-glow">
+                        <i class="fas fa-female"></i>
+                    </div>
+                    <span class="dept-status-pill">Women's Care</span>
+                </div>
+                <h3>Obstetrics & Women's Health</h3>
+                <p>
+                    Holistic care for women across all stages of life, including antenatal evaluations, reproductive endocrinology, routine screenings, and preventive gynecology.
+                </p>
+                <div class="dept-specialist-info">
+                    <div class="spec-avatar bg-purple">AG</div>
+                    <div>
+                        <strong>Dr. Ananya Gupta</strong>
+                        <small>Gynecologist • Mon-Sat (10 AM - 1 PM)</small>
+                    </div>
+                </div>
+                <div class="dept-card-footer">
+                    <a href="/doctors" class="dept-link">
+                        Consult Department <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 7. Orthopedics -->
+            <div class="dept-card-dark">
+                <div class="dept-card-header">
+                    <div class="dept-icon-box bg-emerald-glow">
+                        <i class="fas fa-bone"></i>
+                    </div>
+                    <span class="dept-status-pill">Bone & Joint</span>
+                </div>
+                <h3>Orthopedics & Joint Care</h3>
+                <p>
+                    Diagnostic management of musculoskeletal trauma, arthritis, sports injuries, ligament strains, and chronic joint and spine rehabilitation.
+                </p>
+                <div class="dept-specialist-info">
+                    <div class="spec-avatar bg-emerald">CS</div>
+                    <div>
+                        <strong>CareSync Orthopedic Faculty</strong>
+                        <small>Orthopedic Surgery & Sports Injury</small>
+                    </div>
+                </div>
+                <div class="dept-card-footer">
+                    <a href="/doctors" class="dept-link">
+                        Consult Department <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 8. ENT Specialist -->
+            <div class="dept-card-dark">
+                <div class="dept-card-header">
+                    <div class="dept-icon-box bg-cyan-glow">
+                        <i class="fas fa-head-side-cough"></i>
+                    </div>
+                    <span class="dept-status-pill">ENT Clinic</span>
+                </div>
+                <h3>ENT & Head-Neck Clinic</h3>
+                <p>
+                    Diagnostic endoscopy, treatment for chronic sinusitis, allergic rhinitis, middle ear disorders, voice disturbances, and hearing assessments.
+                </p>
+                <div class="dept-specialist-info">
+                    <div class="spec-avatar bg-cyan">CS</div>
+                    <div>
+                        <strong>CareSync ENT Faculty</strong>
+                        <small>Ear, Nose & Throat Services</small>
+                    </div>
+                </div>
+                <div class="dept-card-footer">
+                    <a href="/doctors" class="dept-link">
+                        Consult Department <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AI SYMPTOM CHECKER - UNDER CONSTRUCTION / COMING SOON -->
+<section class="ai-coming-soon-section" id="ai-symptom-section">
+    <div class="section-container">
+        <div class="ai-preview-card">
+            <div class="ai-card-glow"></div>
+            
+            <div class="ai-badge-row">
+                <span class="ai-status-pill">
+                    <span class="live-pulse-cyan"></span>
+                    <i class="fas fa-robot"></i> UNDER CONSTRUCTION • COMING SOON
+                </span>
+                <span class="ai-version-tag">AI Clinical Core v2.0 Beta</span>
+            </div>
+
+            <div class="ai-header-content">
+                <h2>Next-Generation AI Symptom Checker & Triage</h2>
+                <p>
+                    We are currently building an intelligent clinical diagnostic assistant powered by medical Natural Language Processing (NLP). The AI assistant will analyze reported symptoms, calculate triage risk scores, and connect patients with the right medical specialist.
+                </p>
+            </div>
+
+            <div class="ai-features-preview-grid">
+                <div class="ai-feature-preview">
+                    <div class="ai-feat-icon bg-cyan-glow">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h4>NLP Symptom Analysis</h4>
+                    <p>Conversational symptom intake understanding natural descriptions of patient discomfort and pain severity.</p>
+                </div>
+
+                <div class="ai-feature-preview">
+                    <div class="ai-feat-icon bg-purple-glow">
+                        <i class="fas fa-heart-pulse"></i>
+                    </div>
+                    <h4>Clinical Risk Triage</h4>
+                    <p>Immediate risk categorization identifying urgent critical conditions vs routine outpatient visits.</p>
+                </div>
+
+                <div class="ai-feature-preview">
+                    <div class="ai-feat-icon bg-blue-glow">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h4>Smart Specialist Matching</h4>
+                    <p>Automated recommendation of relevant hospital departments and on-duty doctors based on symptoms.</p>
+                </div>
+            </div>
+
+            <div class="ai-construction-banner">
+                <div class="banner-icon-box">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="banner-text">
+                    <strong>Feature Currently Under Active Development</strong>
+                    <p>Clinical neural models and medical datasets are undergoing validation. This feature will launch in an upcoming release.</p>
+                </div>
+                <a href="/doctors" class="btn-ai-preview">
+                    <i class="fas fa-user-md"></i> Consult Available Doctors
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PUBLIC CONSULTATION ACTION BANNER -->
+<section class="demo-cta-section">
+    <div class="section-container">
+        <div class="dark-cta-card">
+            <div class="cta-inner-content">
+                <span class="cta-tag"><i class="fas fa-calendar-check"></i> Outpatient & Specialist Care</span>
+                <h2>Schedule Your Medical Consultation Today</h2>
+                <p>
+                    Book an appointment with leading specialists across 8 medical departments with flexible clinic hours and dedicated patient care.
+                </p>
+            </div>
+            <div class="cta-inner-buttons">
+                <% if (currentUser) { %>
+                    <a href="/dashboard" class="btn-glow-cyan">
+                        <i class="fas fa-calendar-plus"></i> Book Consultation
+                    </a>
+                <% } else { %>
+                    <a href="/login" class="btn-glow-cyan">
+                        <i class="fas fa-calendar-plus"></i> Book Consultation
+                    </a>
+                    <a href="/register" class="btn-dark-glass">
+                        <i class="fas fa-user-plus"></i> New Patient Sign Up
+                    </a>
+                    <a href="/doctor/apply" class="btn-dark-outline">
+                        <i class="fas fa-stethoscope text-cyan"></i> Join as Doctor
+                    </a>
+                <% } %>
+                <a href="/doctors" class="btn-dark-outline">
+                    <i class="fas fa-user-md"></i> Doctor Directory
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

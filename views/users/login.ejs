@@ -1,57 +1,107 @@
 <% layout('/layouts/boilerplate.ejs') %>
 
-<div class="login-container">
+<div class="auth-container">
+    <div class="auth-box">
+        <div class="auth-header">
+            <a href="/">
+                <img src="/images/logo.png" alt="CareSync" class="auth-logo">
+            </a>
+            <span class="auth-tag patient">
+                <i class="fas fa-user"></i> Patient & User Portal
+            </span>
+            <h2 class="auth-title">Account Login</h2>
+            <p class="auth-subtitle">Sign in to manage appointments and medical records</p>
+        </div>
 
-  <div class="login-box">
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="auth-alert-error">
+                <i class="fas fa-exclamation-circle"></i> <%= error %>
+            </div>
+        <% } %>
 
-    <h2>
-      Login to
-      <span class="brand">
-        Smart Healthcare System
-      </span>
-    </h2>
+        <form action="/login" method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="loginEmail">Email Address</label>
+                <input
+                    type="email"
+                    id="loginEmail"
+                    name="email"
+                    placeholder="e.g. name@example.com"
+                    required
+                    autocomplete="email"
+                >
+            </div>
 
-    <form action="/login" method="POST">
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <div class="password-wrap">
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <button
+                        type="button"
+                        class="eye-btn"
+                        onclick="togglePwd('loginPassword', this)"
+                        aria-label="Toggle password visibility"
+                    >
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
 
-      <div class="input-group">
-        <label>Email</label>
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          required
-        >
-      </div>
-      <div class="input-group">
-        <label>Password</label>
-        <input
-          type="password"
-          name="password"
-          placeholder="Enter your password"
-          required
-        >
-      </div>
+            <div class="auth-extra-row">
+                <label class="auth-checkbox">
+                    <input type="checkbox" name="remember" checked>
+                    <span>Remember me</span>
+                </label>
+                <a href="/forgot">Forgot password?</a>
+            </div>
 
+            <button type="submit" class="auth-btn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
 
-      <button type="submit" class="login-btn">
-        Login
-      </button>
+        <div class="auth-switch-section">
+            <div class="auth-switch-item">
+                <p>Don't have an account?</p>
+                <a href="/register" class="btn-auth-outline patient">
+                    <i class="fas fa-user-plus"></i> Register as Patient
+                </a>
+            </div>
 
-    </form>
+            <div class="auth-switch-item">
+                <p>Are you a healthcare professional?</p>
+                <a href="/doctor/apply" class="btn-auth-outline doctor">
+                    <i class="fas fa-user-md"></i> Apply as Doctor
+                </a>
+            </div>
+        </div>
 
-    <div class="links">
-
-      <p>
-        <a href="/forgot">Forgot Password?</a>
-      </p>
-
-      <p>
-        Don't have an account?
-        <a href="/register">Register</a>
-      </p>
-
+        <div class="auth-subnote">
+            Doctor already verified? <a href="/doctor/login">Doctor Sign In</a>
+        </div>
     </div>
-
-  </div>
-
 </div>
+
+<script>
+function togglePwd(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (!input || !icon) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>

@@ -1,0 +1,376 @@
+<% layout('/layouts/boilerplate.ejs') %>
+
+<div class="auth-container">
+    <div class="doctor-apply-box">
+        <div class="auth-header">
+            <a href="/">
+                <img src="/images/logo.png" alt="CareSync" class="auth-logo">
+            </a>
+            <span class="auth-tag doctor">
+                <i class="fas fa-stethoscope"></i> Healthcare Professional Onboarding
+            </span>
+            <h2 class="auth-title">Apply as a Doctor</h2>
+            <p class="auth-subtitle">Submit your medical credentials for institutional verification and practice onboarding</p>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="auth-alert-error">
+                <i class="fas fa-exclamation-circle"></i> <%= error %>
+            </div>
+        <% } %>
+
+        <!-- Multi-Step Progress Bar -->
+        <div class="steps-progress-bar">
+            <div class="step-indicator active" id="stepIndicator1">
+                <div class="step-circle">1</div>
+                <span class="step-label">Personal</span>
+            </div>
+            <div class="step-indicator" id="stepIndicator2">
+                <div class="step-circle">2</div>
+                <span class="step-label">Professional</span>
+            </div>
+            <div class="step-indicator" id="stepIndicator3">
+                <div class="step-circle">3</div>
+                <span class="step-label">Documents</span>
+            </div>
+            <div class="step-indicator" id="stepIndicator4">
+                <div class="step-circle">4</div>
+                <span class="step-label">Schedule</span>
+            </div>
+        </div>
+
+        <form action="/doctor/apply" method="POST" enctype="multipart/form-data" class="auth-form" id="doctorApplyForm">
+            
+            <!-- STEP 1: PERSONAL INFORMATION -->
+            <div class="step-pane active" id="stepPane1">
+                <div class="step-heading">
+                    <i class="fas fa-user text-cyan"></i> Step 1: Personal Information
+                </div>
+
+                <div class="form-group">
+                    <label for="docFullname">Full Legal Name *</label>
+                    <input type="text" id="docFullname" name="fullname" placeholder="e.g. Dr. Rajesh Sharma" required>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="docDob">Date of Birth *</label>
+                        <input type="date" id="docDob" name="dob" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="docGender">Gender *</label>
+                        <select id="docGender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="docEmail">Official Email *</label>
+                        <input type="email" id="docEmail" name="email" placeholder="e.g. dr.rajesh@hospital.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="docPhone">Contact Phone *</label>
+                        <input type="tel" id="docPhone" name="phone" placeholder="e.g. +91 98765 43210" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="docProfilePhoto">Profile Photograph (Optional)</label>
+                    <input type="file" id="docProfilePhoto" name="profilePhoto" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                    <label for="docAddress">Clinic / Residential Address</label>
+                    <input type="text" id="docAddress" name="address" placeholder="e.g. Suite 402, Medical Enclave, New Delhi">
+                </div>
+
+                <div class="step-buttons-row">
+                    <div></div>
+                    <button type="button" class="btn-step-next" onclick="goToStep(2)">
+                        Next: Professional Info <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: PROFESSIONAL INFORMATION -->
+            <div class="step-pane" id="stepPane2">
+                <div class="step-heading">
+                    <i class="fas fa-briefcase text-emerald"></i> Step 2: Professional Information
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="docSpecialty">Medical Speciality *</label>
+                        <select id="docSpecialty" name="specialization" required>
+                            <option value="">Select Specialty</option>
+                            <option value="Cardiology">Cardiology</option>
+                            <option value="Dermatology">Dermatology</option>
+                            <option value="General Medicine">General Medicine</option>
+                            <option value="Pediatrics">Pediatrics</option>
+                            <option value="Neurology">Neurology</option>
+                            <option value="Obstetrics & Gynecology">Obstetrics & Gynecology</option>
+                            <option value="Orthopedics">Orthopedics</option>
+                            <option value="ENT Specialist">ENT Specialist</option>
+                            <option value="Psychiatry">Psychiatry</option>
+                            <option value="General Surgery">General Surgery</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="docQualifications">Medical Qualifications *</label>
+                        <input type="text" id="docQualifications" name="qualifications" placeholder="e.g. MBBS, MD (Cardiology)" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="docExperience">Years of Clinical Experience *</label>
+                        <input type="number" id="docExperience" name="experience" min="0" max="60" placeholder="e.g. 12" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="docFee">Consultation Fee (₹) *</label>
+                        <input type="number" id="docFee" name="consultationFee" min="0" step="50" value="500" placeholder="e.g. 500" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="docLicense">Registration / Licence Number *</label>
+                        <input type="text" id="docLicense" name="licenseNumber" placeholder="e.g. MCI-2024-8849" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="docAuthority">Registration Authority *</label>
+                        <input type="text" id="docAuthority" name="registrationAuthority" placeholder="e.g. National Medical Commission" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="docHospital">Current Hospital / Clinic Affiliation</label>
+                    <input type="text" id="docHospital" name="currentHospital" placeholder="e.g. CareSync Multispecialty Clinic">
+                </div>
+
+                <div class="form-group">
+                    <label for="docBio">Professional Bio & Focus Areas</label>
+                    <textarea id="docBio" name="bio" rows="2" placeholder="Brief summary of clinical expertise, patient care philosophy, and sub-specialties..."></textarea>
+                </div>
+
+                <div class="step-buttons-row">
+                    <button type="button" class="btn-step-prev" onclick="goToStep(1)">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button type="button" class="btn-step-next" onclick="goToStep(3)">
+                        Next: Verification Documents <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: VERIFICATION DOCUMENTS -->
+            <div class="step-pane" id="stepPane3">
+                <div class="step-heading">
+                    <i class="fas fa-file-shield text-purple"></i> Step 3: Verification Documents
+                </div>
+
+                <div class="auth-alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>College project simulation: please upload dummy PDF or image documents. Real medical documents are not required.</span>
+                </div>
+
+                <div class="doc-upload-item">
+                    <label><i class="fas fa-id-badge text-cyan"></i> Registration / License Document</label>
+                    <small>Upload official medical council license certificate (PDF, JPG, PNG)</small>
+                    <input type="file" name="licenseDoc" accept=".pdf,.png,.jpg,.jpeg">
+                </div>
+
+                <div class="doc-upload-item">
+                    <label><i class="fas fa-graduation-cap text-emerald"></i> Degree / Qualification Certificate</label>
+                    <small>Upload medical degree certificate (MBBS, MD, MS, etc.)</small>
+                    <input type="file" name="degreeDoc" accept=".pdf,.png,.jpg,.jpeg">
+                </div>
+
+                <div class="doc-upload-item">
+                    <label><i class="fas fa-passport text-blue"></i> Government Identity Document</label>
+                    <small>Upload government photo identity card or passport</small>
+                    <input type="file" name="idDoc" accept=".pdf,.png,.jpg,.jpeg">
+                </div>
+
+                <div class="step-buttons-row">
+                    <button type="button" class="btn-step-prev" onclick="goToStep(2)">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button type="button" class="btn-step-next" onclick="goToStep(4)">
+                        Next: Availability & Account <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 4: AVAILABILITY & ACCOUNT CREDENTIALS -->
+            <div class="step-pane" id="stepPane4">
+                <div class="step-heading">
+                    <i class="fas fa-calendar-check text-cyan"></i> Step 4: Practice Availability & Password
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="docDays">Working Days</label>
+                        <select id="docDays" name="workingDays">
+                            <option value="Mon - Fri">Monday - Friday</option>
+                            <option value="Mon - Sat">Monday - Saturday</option>
+                            <option value="Tue - Sun">Tuesday - Sunday</option>
+                            <option value="Weekends Only">Weekends Only</option>
+                            <option value="All 7 Days">All 7 Days</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="docHours">Working Hours</label>
+                        <input type="text" id="docHours" name="workingHours" value="09:00 AM - 02:00 PM" placeholder="e.g. 09:00 AM - 02:00 PM">
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="docDuration">Appointment Duration</label>
+                        <select id="docDuration" name="appointmentDuration">
+                            <option value="15 mins">15 Minutes</option>
+                            <option value="20 mins" selected>20 Minutes</option>
+                            <option value="30 mins">30 Minutes</option>
+                            <option value="45 mins">45 Minutes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="docBreaks">Lunch / Clinic Breaks</label>
+                        <input type="text" id="docBreaks" name="breaks" value="01:00 PM - 02:00 PM" placeholder="e.g. 01:00 PM - 02:00 PM">
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="docPass">Account Password *</label>
+                        <div class="password-wrap">
+                            <input type="password" id="docPass" name="password" minlength="6" placeholder="Min 6 characters" required autocomplete="new-password">
+                            <button type="button" class="eye-btn" onclick="togglePwd('docPass', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="docConfirmPass">Confirm Password *</label>
+                        <div class="password-wrap">
+                            <input type="password" id="docConfirmPass" name="confirmPassword" minlength="6" placeholder="Re-enter password" required autocomplete="new-password">
+                            <button type="button" class="eye-btn" onclick="togglePwd('docConfirmPass', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-alert-info" style="margin-top: 10px;">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Upon submission, your application status will be <strong>PENDING</strong>. Once hospital administrators review and approve your credentials, you will receive an account activation alert and can log in to your dashboard.</span>
+                </div>
+
+                <div class="step-buttons-row">
+                    <button type="button" class="btn-step-prev" onclick="goToStep(3)">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button type="submit" class="auth-btn doctor-btn" style="width: auto; padding: 10px 24px;">
+                        <i class="fas fa-paper-plane"></i> Submit Application for Verification
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="auth-links">
+            <p>
+                Already an approved doctor?
+                <a href="/doctor/login">Doctor Sign In</a>
+            </p>
+            <div class="auth-subnote">
+                Patient looking for portal? <a href="/login">Go to Patient Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentStep = 1;
+
+function goToStep(step) {
+    // Validate current step before advancing
+    if (step > currentStep) {
+        if (!validateStep(currentStep)) return;
+    }
+
+    // Hide all panes and remove active indicators
+    for (let i = 1; i <= 4; i++) {
+        const pane = document.getElementById('stepPane' + i);
+        const indicator = document.getElementById('stepIndicator' + i);
+        if (pane) pane.classList.remove('active');
+        if (indicator) {
+            indicator.classList.remove('active');
+            if (i < step) {
+                indicator.classList.add('completed');
+            } else {
+                indicator.classList.remove('completed');
+            }
+        }
+    }
+
+    // Activate selected pane and indicator
+    const targetPane = document.getElementById('stepPane' + step);
+    const targetIndicator = document.getElementById('stepIndicator' + step);
+    if (targetPane) targetPane.classList.add('active');
+    if (targetIndicator) targetIndicator.classList.add('active');
+
+    currentStep = step;
+    window.scrollTo({ top: 120, behavior: 'smooth' });
+}
+
+function validateStep(step) {
+    if (step === 1) {
+        const name = document.getElementById('docFullname');
+        const dob = document.getElementById('docDob');
+        const gender = document.getElementById('docGender');
+        const email = document.getElementById('docEmail');
+        const phone = document.getElementById('docPhone');
+
+        if (!name.value.trim()) { alert('Please enter your full legal name.'); name.focus(); return false; }
+        if (!dob.value) { alert('Please select your date of birth.'); dob.focus(); return false; }
+        if (!gender.value) { alert('Please select your gender.'); gender.focus(); return false; }
+        if (!email.value.trim() || !email.value.includes('@')) { alert('Please enter a valid official email address.'); email.focus(); return false; }
+        if (!phone.value.trim()) { alert('Please enter your contact phone number.'); phone.focus(); return false; }
+    } else if (step === 2) {
+        const spec = document.getElementById('docSpecialty');
+        const qual = document.getElementById('docQualifications');
+        const exp = document.getElementById('docExperience');
+        const lic = document.getElementById('docLicense');
+        const auth = document.getElementById('docAuthority');
+
+        if (!spec.value) { alert('Please select your medical specialty.'); spec.focus(); return false; }
+        if (!qual.value.trim()) { alert('Please enter your medical qualifications.'); qual.focus(); return false; }
+        if (exp.value === '') { alert('Please specify your years of experience.'); exp.focus(); return false; }
+        if (!lic.value.trim()) { alert('Please enter your medical license/registration number.'); lic.focus(); return false; }
+        if (!auth.value.trim()) { alert('Please enter your registration authority (e.g. Medical Council).'); auth.focus(); return false; }
+    }
+    return true;
+}
+
+function togglePwd(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (!input || !icon) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>

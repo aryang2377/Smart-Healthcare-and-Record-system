@@ -1,0 +1,856 @@
+<% layout('/layouts/boilerplate.ejs') %>
+
+<section class="dashboard-wrapper-dark">
+    <div class="dashboard-container">
+        <!-- Admin Header -->
+        <div class="dash-header-dark">
+            <div class="dash-user-info">
+                <div class="user-large-avatar admin-avatar">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h2><%= currentUser.fullname %></h2>
+                    <p>
+                        <span class="role-pill-badge admin">HOSPITAL SYSTEM ADMINISTRATOR</span>
+                        <span class="doc-email-text">• <%= currentUser.email %></span>
+                        <span style="color: #34d399; font-size: 12px; margin-left: 8px;"><i class="fas fa-circle" style="font-size: 8px;"></i> System Live</span>
+                    </p>
+                </div>
+            </div>
+            <div class="dash-quick-cta">
+                <button type="button" class="btn-book-quick" onclick="switchTab('staff')">
+                    <i class="fas fa-user-plus"></i> Invite / Add Staff
+                </button>
+            </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="metrics-row-dark">
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-cyan-glow">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <h3><%= totalPatients %></h3>
+                    <span>Total Patients</span>
+                </div>
+            </div>
+
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-emerald-glow">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div>
+                    <h3><%= totalDoctors %></h3>
+                    <span>Verified Doctors</span>
+                </div>
+            </div>
+
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-blue-glow">
+                    <i class="fas fa-id-badge"></i>
+                </div>
+                <div>
+                    <h3><%= typeof totalReceptionists !== 'undefined' ? totalReceptionists : 1 %></h3>
+                    <span>Front Desk Staff</span>
+                </div>
+            </div>
+
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-purple-glow">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                    <h3><%= totalAppointments %></h3>
+                    <span>Total Appointments</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation Bar -->
+        <div class="dash-tabs-bar" style="overflow-x: auto; flex-wrap: nowrap;">
+            <button type="button" class="dash-tab-btn <%= activeTab === 'overview' ? 'active' : '' %>" onclick="switchTab('overview')">
+                <i class="fas fa-chart-pie"></i> Overview & Analytics
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'verification' ? 'active' : '' %>" onclick="switchTab('verification')">
+                <i class="fas fa-user-check text-cyan"></i> Doctor Verification (<%= (typeof pendingDoctors !== 'undefined' ? pendingDoctors.length : 0) %>)
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'staff' ? 'active' : '' %>" onclick="switchTab('staff')">
+                <i class="fas fa-user-doctor"></i> Staff Management (<%= (typeof doctorsList !== 'undefined' ? doctorsList.length : 0) + (typeof receptionistsList !== 'undefined' ? receptionistsList.length : 0) %>)
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'patients' ? 'active' : '' %>" onclick="switchTab('patients')">
+                <i class="fas fa-hospital-user"></i> Patient Directory (<%= patientsList.length %>)
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'appointments' ? 'active' : '' %>" onclick="switchTab('appointments')">
+                <i class="fas fa-calendar-alt"></i> Master Appointments
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'departments' ? 'active' : '' %>" onclick="switchTab('departments')">
+                <i class="fas fa-hospital-alt"></i> Departments (<%= typeof departmentsList !== 'undefined' ? departmentsList.length : 8 %>)
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'audit' ? 'active' : '' %>" onclick="switchTab('audit')">
+                <i class="fas fa-history text-purple"></i> Audit Logs
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'settings' ? 'active' : '' %>" onclick="switchTab('settings')">
+                <i class="fas fa-cog"></i> Clinics & Settings
+            </button>
+        </div>
+
+        <!-- TAB 1: OVERVIEW & ANALYTICS -->
+        <div id="tab-overview" class="tab-pane-dark" style="<%= activeTab === 'overview' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-grid-split">
+                <div class="dash-card-dark">
+                    <div class="card-head">
+                        <h3><i class="fas fa-hospital text-cyan"></i> Hospital Operations Status</h3>
+                        <small>Key system and clinical performance indicators</small>
+                    </div>
+
+                    <div class="status-summary-grid">
+                        <div class="status-summary-box">
+                            <span class="box-lbl">System Uptime</span>
+                            <strong style="color: #34d399;">99.98%</strong>
+                            <small class="text-emerald"><i class="fas fa-check-circle"></i> Operational</small>
+                        </div>
+                        <div class="status-summary-box">
+                            <span class="box-lbl">Active Clinical Departments</span>
+                            <strong style="color: #38bdf8;"><%= typeof departmentsList !== 'undefined' ? departmentsList.length : 8 %> Units</strong>
+                            <small class="text-cyan">Cardio, Neuro, Peds, Ortho...</small>
+                        </div>
+                        <div class="status-summary-box">
+                            <span class="box-lbl">EHR Security & Confidentiality</span>
+                            <strong style="color: #c084fc;">Role-Enforced</strong>
+                            <small class="text-purple">Doctor/Patient Scoped</small>
+                        </div>
+                    </div>
+
+                    <div class="recent-audit-log" style="margin-top: 20px;">
+                        <h4><i class="fas fa-clipboard-list text-blue"></i> Recent Master Appointments</h4>
+                        <% if (masterAppointments.length > 0) { %>
+                            <div class="table-scroll-wrap">
+                                <table class="dash-table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th>Patient</th>
+                                            <th>Doctor</th>
+                                            <th>Date & Time</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% masterAppointments.slice(0, 5).forEach(appt => { %>
+                                            <tr>
+                                                <td><strong><%= appt.patientName %></strong></td>
+                                                <td><%= appt.doctorName %></td>
+                                                <td><%= new Date(appt.date).toLocaleDateString() %> <small class="text-dim"><%= appt.time %></small></td>
+                                                <td>
+                                                    <span class="status-pill <%= appt.status.toLowerCase().replace(/[^a-z]/g, '') %>">
+                                                        <%= appt.status %>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <% } else { %>
+                            <div class="empty-state-box">
+                                <i class="fas fa-calendar-times"></i>
+                                <p>No appointments recorded yet.</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="dash-card-dark">
+                    <div class="card-head">
+                        <h3><i class="fas fa-sliders-h text-emerald"></i> Quick System Controls</h3>
+                        <small>Manage medical teams, review applications, and audit logs</small>
+                    </div>
+                    <div class="quick-admin-actions">
+                        <button type="button" class="btn-admin-action" onclick="switchTab('verification')">
+                            <i class="fas fa-user-check text-cyan"></i>
+                            <div>
+                                <strong>Doctor Verification Desk</strong>
+                                <span><%= (typeof pendingDoctors !== 'undefined' ? pendingDoctors.length : 0) %> pending applications</span>
+                            </div>
+                        </button>
+                        <button type="button" class="btn-admin-action" onclick="switchTab('staff')">
+                            <i class="fas fa-user-plus text-emerald"></i>
+                            <div>
+                                <strong>Staff Management</strong>
+                                <span>Add doctor or front-desk receptionist</span>
+                            </div>
+                        </button>
+                        <button type="button" class="btn-admin-action" onclick="switchTab('departments')">
+                            <i class="fas fa-hospital-user text-blue"></i>
+                            <div>
+                                <strong>Departments & Specialties</strong>
+                                <span>Manage medical faculties and floors</span>
+                            </div>
+                        </button>
+                        <button type="button" class="btn-admin-action" onclick="switchTab('audit')">
+                            <i class="fas fa-history text-purple"></i>
+                            <div>
+                                <strong>Security & Audit Trail</strong>
+                                <span>Inspect platform events and actions</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Clinical Data Privacy Statement -->
+                    <div style="margin-top: 22px; padding: 14px; background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 8px;">
+                        <div style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                            <i class="fas fa-shield-halved text-cyan"></i> Medical Privacy Notice
+                        </div>
+                        <p style="font-size: 12px; color: #cbd5e1; margin: 0; line-height: 1.5;">
+                            Administration permissions are restricted to platform operations, credential validation, and facility logistics. Unrestricted access to private consultation notes and confidential medical records is strictly separated.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: DOCTOR VERIFICATION DESK -->
+        <div id="tab-verification" class="tab-pane-dark" style="<%= activeTab === 'verification' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-card-dark">
+                <div class="card-head">
+                    <h3><i class="fas fa-user-check text-cyan"></i> Doctor Credential Verification Desk</h3>
+                    <small>Review submitted medical licenses, qualifications, and onboarding details</small>
+                </div>
+
+                <% if (typeof pendingDoctors !== 'undefined' && pendingDoctors.length > 0) { %>
+                    <div style="display: flex; flex-direction: column; gap: 18px; margin-top: 18px;">
+                        <% pendingDoctors.forEach(doc => { %>
+                            <div style="background: #0a0f1d; border: 1px solid #1e293b; border-radius: 12px; padding: 22px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+                                    <div>
+                                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                            <h4 style="font-size: 17px; font-weight: 700; color: #f8fafc; margin: 0;"><%= doc.fullname %></h4>
+                                            <span class="dept-badge cyan"><%= doc.specialization %></span>
+                                            <% if (doc.approvalStatus === 'needs_info') { %>
+                                                <span style="font-size: 11px; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 12px;">
+                                                    INFO REQUESTED
+                                                </span>
+                                            <% } else { %>
+                                                <span style="font-size: 11px; font-weight: 700; color: #fbbf24; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); padding: 2px 8px; border-radius: 12px;">
+                                                    PENDING REVIEW
+                                                </span>
+                                            <% } %>
+                                        </div>
+                                        <small style="color: #94a3b8; display: block; margin-top: 4px;">
+                                            <%= doc.email %> • <%= doc.phone || 'No phone' %> • Applied: <%= new Date(doc.createdAt).toLocaleDateString() %>
+                                        </small>
+                                        <% if (doc.adminNotes) { %>
+                                            <div style="margin-top: 6px; font-size: 12px; color: #38bdf8; background: rgba(56, 189, 248, 0.08); padding: 4px 10px; border-radius: 4px; display: inline-block;">
+                                                <strong>Admin Remark:</strong> <%= doc.adminNotes %>
+                                            </div>
+                                        <% } %>
+                                    </div>
+
+                                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                        <!-- Approve -->
+                                        <form action="/admin/doctors/<%= doc._id %>/approve" method="POST" style="margin: 0;">
+                                            <button type="submit" class="auth-btn doctor-btn" style="width: auto; padding: 8px 16px; font-size: 13px;">
+                                                <i class="fas fa-check-circle"></i> Approve & Activate
+                                            </button>
+                                        </form>
+
+                                        <!-- Request Info -->
+                                        <button type="button" class="auth-btn" style="width: auto; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; padding: 8px 16px; font-size: 13px;" onclick="openInfoModal('<%= doc._id %>', '<%= doc.fullname %>')">
+                                            <i class="fas fa-question-circle"></i> Request Info
+                                        </button>
+
+                                        <!-- Reject -->
+                                        <button type="button" class="auth-btn" style="width: auto; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 8px 16px; font-size: 13px;" onclick="openRejectModal('<%= doc._id %>', '<%= doc.fullname %>')">
+                                            <i class="fas fa-times-circle"></i> Reject
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: #0f172a; padding: 14px; border-radius: 8px; margin-bottom: 14px; font-size: 13px;">
+                                    <div>
+                                        <span style="color: #94a3b8; display: block;">Qualifications:</span>
+                                        <strong style="color: #e2e8f0;"><%= doc.qualifications || 'MBBS / MD' %></strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: #94a3b8; display: block;">Experience:</span>
+                                        <strong style="color: #e2e8f0;"><%= doc.experience || '0' %> Years</strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: #94a3b8; display: block;">License / Registration #:</span>
+                                        <strong style="color: #38bdf8;"><%= doc.licenseNumber || 'MCI Pending' %></strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: #94a3b8; display: block;">Registration Authority:</span>
+                                        <strong style="color: #e2e8f0;"><%= doc.registrationAuthority || 'National Medical Commission' %></strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: #94a3b8; display: block;">Consultation Fee:</span>
+                                        <strong style="color: #34d399;">₹<%= doc.consultationFee || 500 %></strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: #94a3b8; display: block;">Working Schedule:</span>
+                                        <strong style="color: #e2e8f0;"><%= doc.workingDays || 'Mon - Fri' %> (<%= doc.workingHours || '09:00 AM - 02:00 PM' %>)</strong>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">
+                                        Uploaded Verification Documents:
+                                    </span>
+                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                        <% if (doc.licenseDoc) { %>
+                                            <a href="<%= doc.licenseDoc %>" target="_blank" class="btn-file-action" style="font-size: 12px; padding: 6px 12px;">
+                                                <i class="fas fa-file-pdf text-cyan"></i> View License Document
+                                            </a>
+                                        <% } else { %>
+                                            <span style="font-size: 12px; color: #64748b; background: rgba(255,255,255,0.03); padding: 4px 10px; border-radius: 4px;">License Document Pending</span>
+                                        <% } %>
+
+                                        <% if (doc.degreeDoc) { %>
+                                            <a href="<%= doc.degreeDoc %>" target="_blank" class="btn-file-action" style="font-size: 12px; padding: 6px 12px;">
+                                                <i class="fas fa-graduation-cap text-emerald"></i> View Degree Certificate
+                                            </a>
+                                        <% } %>
+
+                                        <% if (doc.idDoc) { %>
+                                            <a href="<%= doc.idDoc %>" target="_blank" class="btn-file-action" style="font-size: 12px; padding: 6px 12px;">
+                                                <i class="fas fa-id-card text-purple"></i> View Government ID
+                                            </a>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state-box" style="margin-top: 20px;">
+                        <i class="fas fa-check-double text-emerald"></i>
+                        <p>All submitted doctor applications have been processed. No pending verifications at this time.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- TAB 3: STAFF MANAGEMENT (DOCTORS & RECEPTIONISTS) -->
+        <div id="tab-staff" class="tab-pane-dark" style="<%= activeTab === 'staff' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-grid-split">
+                <!-- Add Staff Form -->
+                <div class="dash-card-dark">
+                    <div class="card-head">
+                        <h3><i class="fas fa-user-plus text-cyan"></i> Provision Staff Member</h3>
+                        <small>Create doctor or front-desk receptionist account</small>
+                    </div>
+
+                    <form action="/admin/staff/add" method="POST" class="dash-form">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="fullname" placeholder="e.g. Dr. Rohan Saxena or Sarah Jenkins" required class="dark-dash-input">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Institutional Email</label>
+                                <input type="email" name="email" placeholder="e.g. staff@caresync.health" required class="dark-dash-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Staff Role</label>
+                                <select name="role" required class="dark-dash-select">
+                                    <option value="doctor">Medical Doctor</option>
+                                    <option value="receptionist">Front Desk Receptionist</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Department / Desk</label>
+                                <input type="text" name="specialization" placeholder="e.g. Cardiology, Outpatient Desk" required class="dark-dash-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Contact Phone</label>
+                                <input type="text" name="phone" placeholder="e.g. +91 98765 00000" class="dark-dash-input">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Temporary Password</label>
+                            <input type="password" name="password" placeholder="Create secure password (min 6 chars)" required class="dark-dash-input">
+                        </div>
+
+                        <button type="submit" class="btn-dash-primary">
+                            <i class="fas fa-user-shield"></i> Provision Account
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Active Staff Table -->
+                <div class="dash-card-dark">
+                    <div class="card-head">
+                        <h3><i class="fas fa-user-doctor text-emerald"></i> Healthcare Staff Directory</h3>
+                        <small>Active physicians, specialists, and front-desk personnel</small>
+                    </div>
+
+                    <% 
+                        const allStaff = [...(typeof doctorsList !== 'undefined' ? doctorsList : []), ...(typeof receptionistsList !== 'undefined' ? receptionistsList : [])];
+                    %>
+                    <% if (allStaff.length > 0) { %>
+                        <div class="table-scroll-wrap">
+                            <table class="dash-table-dark">
+                                <thead>
+                                    <tr>
+                                        <th>Name & Email</th>
+                                        <th>Role</th>
+                                        <th>Specialty / Unit</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% allStaff.forEach(s => { %>
+                                        <tr>
+                                            <td>
+                                                <strong><%= s.fullname %></strong><br>
+                                                <small class="text-dim"><%= s.email %></small>
+                                            </td>
+                                            <td>
+                                                <span class="role-pill-badge <%= s.role %>"><%= s.role.toUpperCase() %></span>
+                                            </td>
+                                            <td><small><%= s.specialization || 'Clinical Services' %></small></td>
+                                            <td>
+                                                <span style="font-size: 11px; font-weight: 700; color: <%= s.isActive !== false ? '#34d399' : '#f87171' %>;">
+                                                    <%= s.isActive !== false ? '● ACTIVE' : '○ INACTIVE' %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div style="display: flex; gap: 6px;">
+                                                    <form action="/admin/staff/<%= s._id %>/toggle-active" method="POST" style="display:inline;">
+                                                        <button type="submit" class="btn-sm-action checkin" title="Toggle Active Status">
+                                                            <i class="fas fa-power-off"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form action="/admin/staff/<%= s._id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Remove staff member <%= s.fullname %>?');">
+                                                        <button type="submit" class="btn-sm-action cancel" title="Delete Account">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="empty-state-box">
+                            <i class="fas fa-users-slash"></i>
+                            <p>No staff accounts currently on file.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: PATIENT MANAGEMENT -->
+        <div id="tab-patients" class="tab-pane-dark" style="<%= activeTab === 'patients' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-card-dark">
+                <div class="card-head">
+                    <h3><i class="fas fa-hospital-user text-cyan"></i> Hospital Patient Registry</h3>
+                    <small>Registered patients with verified CareSync profile credentials</small>
+                </div>
+
+                <% if (patientsList.length > 0) { %>
+                    <div class="table-scroll-wrap">
+                        <table class="dash-table-dark">
+                            <thead>
+                                <tr>
+                                    <th>Patient Full Name</th>
+                                    <th>Registered Email</th>
+                                    <th>Contact Phone</th>
+                                    <th>Account Status</th>
+                                    <th>Registered Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% patientsList.forEach(p => { %>
+                                    <tr>
+                                        <td><strong><%= p.fullname %></strong></td>
+                                        <td><%= p.email %></td>
+                                        <td><%= p.phone || 'N/A' %></td>
+                                        <td><span class="status-pill scheduled">Active</span></td>
+                                        <td><%= new Date(p.createdAt).toLocaleDateString() %></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state-box">
+                        <i class="fas fa-user-injured"></i>
+                        <p>No patients currently registered in the database.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- TAB 5: MASTER APPOINTMENTS LEDGER -->
+        <div id="tab-appointments" class="tab-pane-dark" style="<%= activeTab === 'appointments' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-card-dark">
+                <div class="card-head">
+                    <h3><i class="fas fa-calendar-alt text-blue"></i> Master Hospital Appointments Ledger</h3>
+                    <small>Operational overview of scheduled, completed, and cancelled visits</small>
+                </div>
+
+                <% if (masterAppointments.length > 0) { %>
+                    <div class="table-scroll-wrap">
+                        <table class="dash-table-dark">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Attending Doctor</th>
+                                    <th>Date & Slot</th>
+                                    <th>Current Status</th>
+                                    <th>Notes</th>
+                                    <th>Admin Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% masterAppointments.forEach(appt => { %>
+                                    <tr>
+                                        <td><strong><%= appt.patientName %></strong></td>
+                                        <td><%= appt.doctorName %></td>
+                                        <td>
+                                            <%= new Date(appt.date).toLocaleDateString() %><br>
+                                            <small class="text-cyan"><%= appt.slot || appt.time %></small>
+                                        </td>
+                                        <td>
+                                            <span class="status-pill <%= appt.status.toLowerCase().replace(/[^a-z]/g, '') %>">
+                                                <%= appt.status %>
+                                            </span>
+                                        </td>
+                                        <td><small class="text-dim"><%= appt.notes || 'Routine consultation' %></small></td>
+                                        <td>
+                                            <% if (appt.status !== 'Completed' && appt.status !== 'Cancelled') { %>
+                                                <div style="display: flex; gap: 6px;">
+                                                    <form action="/admin/appointments/<%= appt._id %>/status" method="POST" style="display:inline;">
+                                                        <input type="hidden" name="status" value="No-Show">
+                                                        <button type="submit" class="btn-sm-action cancel" style="font-size: 11px; padding: 4px 8px;" title="Mark No-Show">
+                                                            No-Show
+                                                        </button>
+                                                    </form>
+                                                    <form action="/admin/appointments/<%= appt._id %>/status" method="POST" style="display:inline;" onsubmit="return confirm('Cancel appointment?');">
+                                                        <input type="hidden" name="status" value="Cancelled">
+                                                        <button type="submit" class="btn-sm-action cancel" style="font-size: 11px; padding: 4px 8px;" title="Cancel">
+                                                            Cancel
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            <% } else { %>
+                                                <span class="text-dim">—</span>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state-box">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>No appointments recorded across the hospital ledger.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- TAB 6: DEPARTMENTS & SPECIALTIES -->
+        <div id="tab-departments" class="tab-pane-dark" style="<%= activeTab === 'departments' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-grid-split">
+                <!-- Add Department Form -->
+                <div class="dash-card-dark">
+                    <div class="card-head">
+                        <h3><i class="fas fa-plus-circle text-cyan"></i> Add Clinical Department</h3>
+                        <small>Expand hospital specialties and floor allocations</small>
+                    </div>
+
+                    <form action="/admin/departments/add" method="POST" class="dash-form">
+                        <div class="form-group">
+                            <label>Department Name</label>
+                            <input type="text" name="name" placeholder="e.g. Ophthalmology, Oncology" required class="dark-dash-input">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Department Code</label>
+                                <input type="text" name="code" placeholder="e.g. OPHTH, ONCO" required class="dark-dash-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Floor / Wing</label>
+                                <input type="text" name="floor" placeholder="e.g. Wing B, 3rd Floor" required class="dark-dash-input">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Head of Department / Senior Consultant</label>
+                            <input type="text" name="headDoctor" placeholder="e.g. Dr. S. Ramanathan" class="dark-dash-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Scope & Description</label>
+                            <textarea name="description" rows="3" placeholder="Brief summary of clinical care and diagnostic facilities provided..." class="dark-dash-textarea"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-dash-primary">
+                            <i class="fas fa-hospital"></i> Create Department
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Departments List -->
+                <div class="dash-card-dark">
+                    <div class="card-head">
+                        <h3><i class="fas fa-hospital-alt text-emerald"></i> Active Hospital Departments</h3>
+                        <small>Specialized clinical centers and facility units</small>
+                    </div>
+
+                    <% if (typeof departmentsList !== 'undefined' && departmentsList && departmentsList.length > 0) { %>
+                        <div class="table-scroll-wrap">
+                            <table class="dash-table-dark">
+                                <thead>
+                                    <tr>
+                                        <th>Department</th>
+                                        <th>Code</th>
+                                        <th>Location</th>
+                                        <th>Head Consultant</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% departmentsList.forEach(dept => { %>
+                                        <tr>
+                                            <td>
+                                                <i class="fas <%= dept.icon || 'fa-stethoscope' %> text-cyan"></i>
+                                                <strong><%= dept.name %></strong>
+                                            </td>
+                                            <td><span class="dept-badge cyan"><%= dept.code %></span></td>
+                                            <td><small><%= dept.floor %></small></td>
+                                            <td><small><%= dept.headDoctor %></small></td>
+                                            <td>
+                                                <form action="/admin/departments/<%= dept._id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete department <%= dept.name %>?');">
+                                                    <button type="submit" class="btn-sm-action cancel" title="Delete">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="empty-state-box">
+                            <i class="fas fa-hospital-symbol"></i>
+                            <p>No custom departments registered yet.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 7: AUDIT LOGS -->
+        <div id="tab-audit" class="tab-pane-dark" style="<%= activeTab === 'audit' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-card-dark">
+                <div class="card-head">
+                    <h3><i class="fas fa-history text-purple"></i> Institutional Security & Operational Audit Trail</h3>
+                    <small>Immutable chronological log of administrative and clinical events</small>
+                </div>
+
+                <% if (typeof auditLogs !== 'undefined' && auditLogs && auditLogs.length > 0) { %>
+                    <div class="table-scroll-wrap">
+                        <table class="dash-table-dark">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Action</th>
+                                    <th>Category</th>
+                                    <th>Actor</th>
+                                    <th>Target / Reference</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% auditLogs.forEach(log => { %>
+                                    <tr>
+                                        <td>
+                                            <span style="font-size: 12px; color: #94a3b8;">
+                                                <%= new Date(log.timestamp).toLocaleDateString() %><br>
+                                                <%= new Date(log.timestamp).toLocaleTimeString() %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <strong style="color: #f1f5f9;"><%= log.action %></strong>
+                                        </td>
+                                        <td>
+                                            <span class="dept-badge <%= log.category === 'VERIFICATION' ? 'cyan' : log.category === 'APPOINTMENT' ? 'blue' : log.category === 'AUTH' ? 'purple' : 'emerald' %>">
+                                                <%= log.category %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <strong><%= log.actorName %></strong><br>
+                                            <small class="role-pill-badge <%= log.actorRole %>" style="font-size: 9px;"><%= log.actorRole.toUpperCase() %></small>
+                                        </td>
+                                        <td><span class="text-cyan"><%= log.target || '—' %></span></td>
+                                        <td><small style="color: #cbd5e1;"><%= log.details || '—' %></small></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state-box">
+                        <i class="fas fa-shield-alt"></i>
+                        <p>No audit events logged yet.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- TAB 8: CLINICS & SETTINGS -->
+        <div id="tab-settings" class="tab-pane-dark" style="<%= activeTab === 'settings' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-grid-split">
+                <div class="dash-card-dark">
+                    <div class="card-head">
+                        <h3><i class="fas fa-hospital-symbol text-cyan"></i> Hospital & Clinic Facility Profile</h3>
+                        <small>CareSync institutional identity and public contact desk</small>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px;">
+                        <div style="background: #0f172a; padding: 14px; border-radius: 8px;">
+                            <span style="color: #94a3b8; display: block; font-size: 12px;">Healthcare Institution:</span>
+                            <strong style="color: #f8fafc; font-size: 16px;">CareSync Multispecialty Center & Hospital</strong>
+                        </div>
+                        <div style="background: #0f172a; padding: 14px; border-radius: 8px;">
+                            <span style="color: #94a3b8; display: block; font-size: 12px;">Physical Address:</span>
+                            <strong style="color: #e2e8f0;">CareSync Tower, Sector 62, Institutional Medical Hub, New Delhi</strong>
+                        </div>
+                        <div style="background: #0f172a; padding: 14px; border-radius: 8px;">
+                            <span style="color: #94a3b8; display: block; font-size: 12px;">Emergency Clinical Hotline:</span>
+                            <strong style="color: #38bdf8;">+91 (800) 227-3796 • clinical@caresync.health</strong>
+                        </div>
+                        <div style="background: #0f172a; padding: 14px; border-radius: 8px;">
+                            <span style="color: #94a3b8; display: block; font-size: 12px;">Operating Hours:</span>
+                            <strong style="color: #34d399;">Outpatient Care: 08:00 AM - 08:00 PM • Emergency Care: 24/7</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-card-dark">
+                    <div class="card-head">
+                        <h3><i class="fas fa-lock text-purple"></i> Security & Governance Policies</h3>
+                        <small>System architecture configuration and compliance summary</small>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13px;">
+                        <div style="background: #0f172a; padding: 14px; border-radius: 8px;">
+                            <span style="color: #94a3b8; display: block;">Authentication Framework:</span>
+                            <strong style="color: #e2e8f0;">JWT HTTP-Only Cookies • bcrypt 10 Rounds Salt Hashing</strong>
+                        </div>
+                        <div style="background: #0f172a; padding: 14px; border-radius: 8px;">
+                            <span style="color: #94a3b8; display: block;">Authorization Architecture:</span>
+                            <strong style="color: #38bdf8;">Role-Based Access Control (RBAC): Patient • Doctor • Receptionist • Admin</strong>
+                        </div>
+                        <div style="background: #0f172a; padding: 14px; border-radius: 8px;">
+                            <span style="color: #94a3b8; display: block;">Clinical Record Protection:</span>
+                            <strong style="color: #34d399;">Attending Doctor & Scoped Patient EHR Confidentiality</strong>
+                        </div>
+                        <div style="background: #0f172a; padding: 14px; border-radius: 8px;">
+                            <span style="color: #94a3b8; display: block;">Database Cluster:</span>
+                            <strong style="color: #c084fc;">MongoDB Atlas Encrypted Cluster (TLS 1.3)</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MODAL: REQUEST MORE INFO FROM DOCTOR -->
+<div id="requestInfoModal" class="modal-backdrop-dark" style="display: none;">
+    <div class="modal-box-dark">
+        <div class="modal-header">
+            <h3><i class="fas fa-question-circle text-cyan"></i> Request Additional Documentation</h3>
+            <button type="button" class="close-btn" onclick="closeInfoModal()">&times;</button>
+        </div>
+        <form id="infoForm" method="POST" class="modal-form">
+            <div class="input-field">
+                <label>Applicant Doctor</label>
+                <input type="text" id="infoDocName" readonly class="modal-input readonly">
+            </div>
+            <div class="input-field">
+                <label>Administrative Remarks / Required Information *</label>
+                <textarea name="adminNotes" rows="4" class="dark-dash-textarea" placeholder="Specify required information: e.g. Please re-upload a clear copy of your state council license and degree certificate." required></textarea>
+            </div>
+            <button type="submit" class="btn-modal-submit">
+                <i class="fas fa-paper-plane"></i> Send Request to Doctor
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: REJECT DOCTOR APPLICATION -->
+<div id="rejectModal" class="modal-backdrop-dark" style="display: none;">
+    <div class="modal-box-dark">
+        <div class="modal-header">
+            <h3><i class="fas fa-times-circle text-rose" style="color: #f87171;"></i> Reject Doctor Application</h3>
+            <button type="button" class="close-btn" onclick="closeRejectModal()">&times;</button>
+        </div>
+        <form id="rejectForm" method="POST" class="modal-form">
+            <div class="input-field">
+                <label>Applicant Doctor</label>
+                <input type="text" id="rejectDocName" readonly class="modal-input readonly">
+            </div>
+            <div class="input-field">
+                <label>Reason for Rejection *</label>
+                <textarea name="adminNotes" rows="4" class="dark-dash-textarea" placeholder="Specify reason: e.g. Qualifications could not be verified against the National Medical Commission registry." required></textarea>
+            </div>
+            <button type="submit" class="btn-modal-submit" style="background: #dc2626;">
+                <i class="fas fa-ban"></i> Confirm Rejection
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-pane-dark').forEach(pane => pane.style.display = 'none');
+        document.querySelectorAll('.dash-tab-btn').forEach(btn => btn.classList.remove('active'));
+
+        const targetPane = document.getElementById('tab-' + tabName);
+        if (targetPane) targetPane.style.display = 'block';
+
+        const activeBtn = Array.from(document.querySelectorAll('.dash-tab-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(tabName));
+        if (activeBtn) activeBtn.classList.add('active');
+
+        const newUrl = window.location.pathname + '?tab=' + tabName;
+        window.history.replaceState(null, '', newUrl);
+    }
+
+    function openInfoModal(docId, docName) {
+        document.getElementById('infoForm').action = '/admin/doctors/' + docId + '/request-info';
+        document.getElementById('infoDocName').value = docName;
+        document.getElementById('requestInfoModal').style.display = 'flex';
+    }
+
+    function closeInfoModal() {
+        document.getElementById('requestInfoModal').style.display = 'none';
+    }
+
+    function openRejectModal(docId, docName) {
+        document.getElementById('rejectForm').action = '/admin/doctors/' + docId + '/reject';
+        document.getElementById('rejectDocName').value = docName;
+        document.getElementById('rejectModal').style.display = 'flex';
+    }
+
+    function closeRejectModal() {
+        document.getElementById('rejectModal').style.display = 'none';
+    }
+</script>

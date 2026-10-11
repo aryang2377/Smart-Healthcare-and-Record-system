@@ -1,138 +1,341 @@
 <% layout('/layouts/boilerplate.ejs') %>
 
-<section class="find-doctors">
-
-    <div class="page-header">
-        <h2>Available Doctors</h2>
-        <p>Search doctors, check availability, and book appointments instantly</p>
-    </div>
-
-    <div class="stats-container">
-
-        <div class="stat-card">
-            <div class="stat-number">10</div>
-            <div class="stat-label">Total Doctors</div>
+<section class="find-doctors-dark">
+    <div class="doctor-page-container">
+        <div class="dark-page-header">
+            <span class="badge-tag"><i class="fas fa-user-md"></i> Medical Staff Directory</span>
+            <h2>Available Doctors & Clinical Schedules</h2>
+            <p>Search doctors, review departmental availability, and coordinate patient appointments.</p>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-number">7</div>
-            <div class="stat-label">Available Today</div>
+        <div class="dark-stats-grid">
+            <div class="dark-stat-card">
+                <div class="stat-num text-cyan"><%= typeof dbDoctors !== 'undefined' ? dbDoctors.length : 7 %></div>
+                <div class="stat-lbl">Active Specialists</div>
+            </div>
+            <div class="dark-stat-card">
+                <div class="stat-num text-emerald"><%= typeof dbDoctors !== 'undefined' ? dbDoctors.length : 7 %></div>
+                <div class="stat-lbl">On Duty Today</div>
+            </div>
+            <div class="dark-stat-card">
+                <div class="stat-num text-blue">8</div>
+                <div class="stat-lbl">Departments</div>
+            </div>
+            <div class="dark-stat-card">
+                <div class="stat-num text-amber">100%</div>
+                <div class="stat-lbl">Verified Faculty</div>
+            </div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-number">8</div>
-            <div class="stat-label">Specializations</div>
+        <div class="table-controls-bar">
+            <div class="search-wrap">
+                <i class="fas fa-search search-icon"></i>
+                <input 
+                    type="text" 
+                    id="doctorSearchInput"
+                    placeholder="Search doctor name or specialization..."
+                    class="dark-input"
+                >
+            </div>
+
+            <div class="filter-wrap">
+                <i class="fas fa-filter filter-icon"></i>
+                <select id="doctorFilterSelect" class="dark-select">
+                    <option value="">All Specializations</option>
+                    <option value="cardio">Cardiology</option>
+                    <option value="dermat">Dermatology</option>
+                    <option value="general">General Physician</option>
+                    <option value="pediatric">Pediatrics</option>
+                    <option value="neuro">Neurology</option>
+                    <option value="gynec">Gynecology</option>
+                    <option value="ent">ENT Specialist</option>
+                    <option value="ortho">Orthopedics</option>
+                </select>
+            </div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-number">24</div>
-            <div class="stat-label">Appointments</div>
+        <div class="doctor-table-wrapper">
+            <table class="doctor-dark-table" id="doctorsTable">
+                <thead>
+                    <tr>
+                        <th>Doctor Name</th>
+                        <th>Specialization</th>
+                        <th>Available Days</th>
+                        <th>Consultation Timing</th>
+                        <th>Consultation Fee</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (typeof dbDoctors !== 'undefined' && dbDoctors && dbDoctors.length > 0) { %>
+                        <% dbDoctors.forEach((doc, idx) => { 
+                            const colors = ['blue', 'emerald', 'cyan', 'purple', 'amber'];
+                            const color = colors[idx % colors.length];
+                        %>
+                            <tr>
+                                <td>
+                                    <div class="doc-cell">
+                                        <div class="doc-avatar bg-<%= color %>">
+                                            <%= (doc.fullname.replace('Dr. ', '').trim() || 'D')[0].toUpperCase() %>
+                                        </div>
+                                        <div>
+                                            <strong><%= doc.fullname.startsWith('Dr.') ? doc.fullname : 'Dr. ' + doc.fullname %></strong>
+                                            <small><%= doc.phone ? doc.phone : 'Hospital Specialist' %></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dept-badge <%= color %>"><%= doc.specialization || 'General Physician' %></span></td>
+                                <td><%= doc.workingDays || 'Mon - Fri' %></td>
+                                <td><%= doc.workingHours || '10:00 AM - 03:00 PM' %></td>
+                                <td><strong style="color: #34d399;">₹<%= doc.consultationFee || 500 %></strong></td>
+                                <td>
+                                    <button class="btn-table-book" onclick="openBookModal('<%= doc.fullname %>', '<%= doc.specialization || 'General Physician' %>', '<%= doc.consultationFee || 500 %>')">
+                                        <i class="fas fa-calendar-plus"></i> Book
+                                    </button>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                    <tr>
+                        <td>
+                            <div class="doc-cell">
+                                <div class="doc-avatar bg-blue">RS</div>
+                                <div>
+                                    <strong>Dr. Rajesh Sharma</strong>
+                                    <small>Senior Consultant</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="dept-badge blue">Cardiologist</span></td>
+                        <td>Mon - Fri</td>
+                        <td>10:00 AM - 02:00 PM</td>
+                        <td><strong style="color: #34d399;">₹800</strong></td>
+                        <td>
+                            <button class="btn-table-book" onclick="openBookModal('Dr. Rajesh Sharma', 'Cardiologist', '800')">
+                                <i class="fas fa-calendar-plus"></i> Book
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="doc-cell">
+                                <div class="doc-avatar bg-emerald">PM</div>
+                                <div>
+                                    <strong>Dr. Priya Mehta</strong>
+                                    <small>Chief Dermatologist</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="dept-badge emerald">Dermatologist</span></td>
+                        <td>Tue - Sat</td>
+                        <td>12:00 PM - 04:00 PM</td>
+                        <td><strong style="color: #34d399;">₹700</strong></td>
+                        <td>
+                            <button class="btn-table-book" onclick="openBookModal('Dr. Priya Mehta', 'Dermatologist', '700')">
+                                <i class="fas fa-calendar-plus"></i> Book
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="doc-cell">
+                                <div class="doc-avatar bg-cyan">AV</div>
+                                <div>
+                                    <strong>Dr. Amit Verma</strong>
+                                    <small>Physician In-Charge</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="dept-badge cyan">General Physician</span></td>
+                        <td>Mon - Thu</td>
+                        <td>09:00 AM - 01:00 PM</td>
+                        <td><strong style="color: #34d399;">₹500</strong></td>
+                        <td>
+                            <button class="btn-table-book" onclick="openBookModal('Dr. Amit Verma', 'General Physician', '500')">
+                                <i class="fas fa-calendar-plus"></i> Book
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="doc-cell">
+                                <div class="doc-avatar bg-purple">NK</div>
+                                <div>
+                                    <strong>Dr. Neha Kapoor</strong>
+                                    <small>Pediatric Specialist</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="dept-badge purple">Pediatrician</span></td>
+                        <td>Mon - Fri</td>
+                        <td>11:00 AM - 03:00 PM</td>
+                        <td><strong style="color: #34d399;">₹600</strong></td>
+                        <td>
+                            <button class="btn-table-book" onclick="openBookModal('Dr. Neha Kapoor', 'Pediatrician', '600')">
+                                <i class="fas fa-calendar-plus"></i> Book
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="doc-cell">
+                                <div class="doc-avatar bg-amber">RS</div>
+                                <div>
+                                    <strong>Dr. Rahul Singh</strong>
+                                    <small>Lead Neurologist</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="dept-badge amber">Neurologist</span></td>
+                        <td>Wed - Sun</td>
+                        <td>02:00 PM - 06:00 PM</td>
+                        <td><strong style="color: #34d399;">₹900</strong></td>
+                        <td>
+                            <button class="btn-table-book" onclick="openBookModal('Dr. Rahul Singh', 'Neurologist', '900')">
+                                <i class="fas fa-calendar-plus"></i> Book
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="doc-cell">
+                                <div class="doc-avatar bg-blue">AG</div>
+                                <div>
+                                    <strong>Dr. Ananya Gupta</strong>
+                                    <small>Consultant Gynecologist</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="dept-badge blue">Gynecologist</span></td>
+                        <td>Mon - Sat</td>
+                        <td>10:00 AM - 01:00 PM</td>
+                        <td><strong style="color: #34d399;">₹750</strong></td>
+                        <td>
+                            <button class="btn-table-book" onclick="openBookModal('Dr. Ananya Gupta', 'Gynecologist', '750')">
+                                <i class="fas fa-calendar-plus"></i> Book
+                            </button>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <div id="noMatchMsg" class="no-match-box" style="display: none;">
+                <i class="fas fa-user-slash"></i>
+                <p>No doctors matched your search criteria.</p>
+            </div>
         </div>
-
     </div>
-
-    <div class="controls">
-
-        <input 
-            type="text" 
-            placeholder="Search doctor..."
-            class="search-box"
-        >
-
-        <select class="filter-box">
-            <option>All Specializations</option>
-            <option>Cardiologist</option>
-            <option>Dermatologist</option>
-            <option>General Physician</option>
-            <option>Pediatrician</option>
-            <option>Neurologist</option>
-            <option>Gynecologist</option>
-            <option>ENT Specialist</option>
-            <option>Dentist</option>
-        </select>
-
-    </div>
-
-    <div class="doctor-card">
-
-        <table class="doctor-table">
-
-            <thead>
-                <tr>
-                    <th>Doctor Name</th>
-                    <th>Specialization</th>
-                    <th>Available Days</th>
-                    <th>Timing</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                <tr>
-                    <td>Dr. Rajesh Sharma</td>
-                    <td>Cardiologist</td>
-                    <td>Mon - Fri</td>
-                    <td>10 AM - 2 PM</td>
-                    <td>
-                        <button class="book-btn">
-                            Book
-                        </button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Dr. Priya Mehta</td>
-                    <td>Dermatologist</td>
-                    <td>Tue - Sat</td>
-                    <td>12 PM - 4 PM</td>
-                    <td>
-                        <button class="book-btn">
-                            Book
-                        </button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Dr. Amit Verma</td>
-                    <td>General Physician</td>
-                    <td>Mon - Thu</td>
-                    <td>9 AM - 1 PM</td>
-                    <td>
-                        <button class="book-btn">
-                            Book
-                        </button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Dr. Neha Kapoor</td>
-                    <td>Pediatrician</td>
-                    <td>Mon - Fri</td>
-                    <td>11 AM - 3 PM</td>
-                    <td>
-                        <button class="book-btn">
-                            Book
-                        </button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Dr. Rahul Singh</td>
-                    <td>Neurologist</td>
-                    <td>Wed - Sun</td>
-                    <td>2 PM - 6 PM</td>
-                    <td>
-                        <button class="book-btn">
-                            Book
-                        </button>
-                    </td>
-                </tr>
-
-            </tbody>
-
-        </table>
-
-    </div>
-
 </section>
+
+<!-- Simple Booking Modal -->
+<div id="quickBookModal" class="modal-backdrop-dark" style="display: none;">
+    <div class="modal-box-dark">
+        <div class="modal-header">
+            <h3><i class="fas fa-calendar-check text-cyan"></i> Schedule Consultation</h3>
+            <button type="button" class="close-btn" onclick="closeBookModal()">&times;</button>
+        </div>
+        <form action="/appointments" method="POST" class="modal-form">
+            <div class="input-row">
+                <div class="input-field">
+                    <label>Doctor Selected</label>
+                    <input type="text" id="modalDoctorName" name="doctorName" readonly class="modal-input readonly">
+                </div>
+                <div class="input-field">
+                    <label>Consultation Fee</label>
+                    <input type="text" id="modalDoctorFee" readonly class="modal-input readonly" style="color: #34d399; font-weight: 700;">
+                </div>
+            </div>
+            <div class="input-field">
+                <label>Patient Full Name</label>
+                <input type="text" name="patientName" placeholder="Enter patient name" required class="modal-input" value="<%= currentUser ? currentUser.fullname : '' %>">
+            </div>
+            <div class="input-row">
+                <div class="input-field">
+                    <label>Age</label>
+                    <input type="number" name="age" min="1" max="120" placeholder="e.g. 32" class="modal-input" required>
+                </div>
+                <div class="input-field">
+                    <label>Gender</label>
+                    <select name="gender" class="modal-input" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-row">
+                <div class="input-field">
+                    <label>Consultation Date</label>
+                    <input type="date" name="date" required class="modal-input" min="<%= new Date().toISOString().split('T')[0] %>">
+                </div>
+                <div class="input-field">
+                    <label>Preferred Time Slot</label>
+                    <select name="time" required class="modal-input">
+                        <option value="09:00 AM">09:00 AM - 09:30 AM (Morning)</option>
+                        <option value="09:30 AM">09:30 AM - 10:00 AM (Morning)</option>
+                        <option value="10:00 AM">10:00 AM - 10:30 AM (Morning)</option>
+                        <option value="10:30 AM">10:30 AM - 11:00 AM (Morning)</option>
+                        <option value="11:00 AM">11:00 AM - 11:30 AM (Morning)</option>
+                        <option value="11:30 AM">11:30 AM - 12:00 PM (Morning)</option>
+                        <option value="12:00 PM">12:00 PM - 12:30 PM (Midday)</option>
+                        <option value="02:00 PM">02:00 PM - 02:30 PM (Afternoon)</option>
+                        <option value="02:30 PM">02:30 PM - 03:00 PM (Afternoon)</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-modal-submit">
+                Confirm & Record Appointment
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openBookModal(doctorName, specialty, fee) {
+        document.getElementById('modalDoctorName').value = doctorName;
+        if (document.getElementById('modalDoctorFee')) {
+            document.getElementById('modalDoctorFee').value = fee ? '₹' + fee : '₹500';
+        }
+        document.getElementById('quickBookModal').style.display = 'flex';
+    }
+
+    function closeBookModal() {
+        document.getElementById('quickBookModal').style.display = 'none';
+    }
+
+    // Live filtering
+    const searchInput = document.getElementById('doctorSearchInput');
+    const filterSelect = document.getElementById('doctorFilterSelect');
+    const table = document.getElementById('doctorsTable');
+    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    const noMatch = document.getElementById('noMatchMsg');
+
+    function filterDoctors() {
+        const query = searchInput.value.toLowerCase().trim();
+        const specialty = filterSelect.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const rowText = rows[i].textContent.toLowerCase();
+            const matchesQuery = !query || rowText.includes(query);
+            const matchesSpecialty = !specialty || rowText.includes(specialty);
+
+            if (matchesQuery && matchesSpecialty) {
+                rows[i].style.display = '';
+                visibleCount++;
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+
+        noMatch.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterDoctors);
+    if (filterSelect) filterSelect.addEventListener('change', filterDoctors);
+</script>

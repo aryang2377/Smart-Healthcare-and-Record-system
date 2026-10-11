@@ -1,83 +1,132 @@
 <% layout('/layouts/boilerplate.ejs') %>
 
-<div class="register-container">
+<div class="auth-container">
+    <div class="auth-box register-box">
+        <div class="auth-header">
+            <a href="/">
+                <img src="/images/logo.png" alt="CareSync" class="auth-logo">
+            </a>
+            <span class="auth-tag patient">
+                <i class="fas fa-user-plus"></i> Patient Registration
+            </span>
+            <h2 class="auth-title">Register as Patient</h2>
+            <p class="auth-subtitle">Create your personal account to schedule visits and view doctor test reports</p>
+        </div>
 
-  <div class="register-box">
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="auth-alert-error">
+                <i class="fas fa-exclamation-circle"></i> <%= error %>
+            </div>
+        <% } %>
 
-    <h2>
-      Create Account for
-      <span class="brand">
-        Smart Healthcare System
-      </span>
-    </h2>
+        <form action="/register" method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="regFullname">Full Name</label>
+                <input
+                    type="text"
+                    id="regFullname"
+                    name="fullname"
+                    placeholder="e.g. John Doe"
+                    required
+                    autocomplete="name"
+                >
+            </div>
 
-    <form action="/register" method="POST">
+            <div class="form-group">
+                <label for="regEmail">Email Address</label>
+                <input
+                    type="email"
+                    id="regEmail"
+                    name="email"
+                    placeholder="e.g. john@example.com"
+                    required
+                    autocomplete="email"
+                >
+            </div>
 
-      <!-- Full Name -->
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <div class="password-wrap">
+                        <input
+                            type="password"
+                            id="regPassword"
+                            name="password"
+                            placeholder="At least 6 chars"
+                            required
+                            minlength="6"
+                            autocomplete="new-password"
+                        >
+                        <button
+                            type="button"
+                            class="eye-btn"
+                            onclick="togglePwd('regPassword', this)"
+                            aria-label="Toggle password"
+                        >
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
 
-      <div class="input-group">
-        <label>Full Name</label>
-        <input
-          type="text"
-          name="fullname"
-          placeholder="Enter your full name"
-          required
-        >
-      </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">Confirm Password</label>
+                    <div class="password-wrap">
+                        <input
+                            type="password"
+                            id="regConfirmPassword"
+                            name="confirmPassword"
+                            placeholder="Re-enter password"
+                            required
+                            autocomplete="new-password"
+                        >
+                        <button
+                            type="button"
+                            class="eye-btn"
+                            onclick="togglePwd('regConfirmPassword', this)"
+                            aria-label="Toggle password"
+                        >
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-      <!-- Email -->
+            <button type="submit" class="auth-btn">
+                <i class="fas fa-user-check"></i> Complete Patient Registration
+            </button>
+        </form>
 
-      <div class="input-group">
-        <label>Email</label>
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          required
-        >
-      </div>
+        <div class="auth-switch-section">
+            <div class="auth-switch-item">
+                <p>Already have an account?</p>
+                <a href="/login" class="btn-auth-outline patient">
+                    <i class="fas fa-sign-in-alt"></i> Login to Account
+                </a>
+            </div>
 
-      <!-- Password -->
-
-      <div class="input-group">
-        <label>Password</label>
-        <input
-          type="password"
-          name="password"
-          placeholder="Create password"
-          required
-        >
-      </div>
-
-      <!-- Confirm Password -->
-
-      <div class="input-group">
-        <label>Confirm Password</label>
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm password"
-          required
-        >
-      </div>
-
-      <!-- Button -->
-
-      <button type="submit" class="register-btn">
-        Register
-      </button>
-
-    </form>
-
-    <div class="links">
-
-      <p>
-        Already have an account?
-        <a href="/login">Login</a>
-      </p>
-
+            <div class="auth-switch-item">
+                <p>Are you a healthcare professional?</p>
+                <a href="/doctor/apply" class="btn-auth-outline doctor">
+                    <i class="fas fa-user-md"></i> Apply as Doctor
+                </a>
+            </div>
+        </div>
     </div>
-
-  </div>
-
 </div>
+
+<script>
+function togglePwd(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (!input || !icon) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>

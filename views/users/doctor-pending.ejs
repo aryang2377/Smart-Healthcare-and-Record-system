@@ -1,0 +1,60 @@
+<% layout('/layouts/boilerplate.ejs') %>
+
+<div class="auth-container">
+    <div class="auth-box" style="width: 520px; text-align: center;">
+        <div class="auth-header">
+            <a href="/">
+                <img src="/images/logo.png" alt="CareSync" class="auth-logo">
+            </a>
+            <span class="auth-tag" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">
+                <i class="fas fa-hourglass-half"></i> Status: PENDING VERIFICATION
+            </span>
+            <h2 class="auth-title" style="margin-top: 10px;">Application Submitted</h2>
+            <p class="auth-subtitle">
+                Thank you, <strong><%= doctor.fullname %></strong>. Your medical credentials have been forwarded to the hospital administration.
+            </p>
+        </div>
+
+        <div style="background: #0a0f1d; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 22px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px;">
+                <span style="color: #94a3b8;">Medical Specialty:</span>
+                <strong style="color: #38bdf8;"><%= doctor.specialization %></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px;">
+                <span style="color: #94a3b8;">Registration / License #:</span>
+                <strong style="color: #f1f5f9;"><%= doctor.licenseNumber %></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px;">
+                <span style="color: #94a3b8;">Authority:</span>
+                <span style="color: #cbd5e1;"><%= doctor.registrationAuthority %></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px;">
+                <span style="color: #94a3b8;">Consultation Fee:</span>
+                <strong style="color: #34d399;">₹<%= doctor.consultationFee %></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13.5px; padding-top: 10px; border-top: 1px solid #1e293b;">
+                <span style="color: #94a3b8;">Account Status:</span>
+                <span style="color: #fbbf24; font-weight: 700;">AWAITING ADMIN APPROVAL</span>
+            </div>
+        </div>
+
+        <div class="auth-alert-info" style="text-align: left; margin-bottom: 24px;">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>What happens next?</strong>
+                <p style="margin: 4px 0 0; font-size: 12px; line-height: 1.45;">
+                    The hospital administrative team is reviewing your credentials. Once your application is approved, your Healthcare Staff Dashboard will be activated and you can sign in to manage consultations.
+                </p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <a href="/doctor/login" class="auth-btn doctor-btn" style="width: auto; text-decoration: none; padding: 10px 20px;">
+                <i class="fas fa-sign-in-alt"></i> Doctor Sign In Portal
+            </a>
+            <a href="/" class="auth-btn" style="width: auto; background: #1e293b; color: #cbd5e1; text-decoration: none; padding: 10px 20px;">
+                <i class="fas fa-home"></i> Return Home
+            </a>
+        </div>
+    </div>
+</div>
