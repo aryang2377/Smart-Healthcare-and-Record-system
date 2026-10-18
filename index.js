@@ -18,9 +18,11 @@ import Prescription from "./models/Prescription.js";
 import AuditLog from "./models/AuditLog.js";
 import Department from "./models/Department.js";
 import { seedDefaultUsers } from "./db/seed.js";
+import { analyzeSymptoms } from "./services/symptomChecker.js";
 
 dotenv.config({
   path: "./.env",
+  override: true,
 });
 
 const app = express();
@@ -177,9 +179,84 @@ app.get("/doctors", async (req, res) => {
   }
 });
 
-// Symptom Checker: KEEP UNCHANGED
 app.get("/symptom", (req, res) => {
   res.render("listings/symptom");
+});
+
+// AI Symptom Analyzer — ML-powered triage endpoint
+app.post("/symptom/analyze", async (req, res) => {
+  try {
+    if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY.trim() === "your_groq_api_key_here") {
+      return res.status(503).json({ error: "AI service not configured. Add your GROQ_API_KEY to .env" });
+    }
+
+    const { symptoms, description } = req.body;
+    const symptomList = Array.isArray(symptoms) ? symptoms : (symptoms ? [symptoms] : []);
+
+    if (symptomList.length === 0 && (!description || !description.trim())) {
+      return res.status(400).json({ error: "Please select at least one symptom or describe your condition." });
+    }
+
+    const analysis = await analyzeSymptoms(symptomList, description);
+
+    // Match doctors by recommended specialties
+    const specialtyRegexes = (analysis.recommendedSpecialties || []).map(
+      (s) => new RegExp(s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i")
+    );
+
+    let doctors = [];
+    if (specialtyRegexes.length > 0) {
+      doctors = await User.find({
+        role: "doctor",
+        approvalStatus: "approved",
+        isActive: { $ne: false },
+        specialization: { $in: specialtyRegexes },
+      })
+        .select("fullname specialization consultationFee workingDays workingHours experience")
+        .limit(4);
+    }
+
+    // Fallback: show general medicine doctors if no specialty match
+    if (doctors.length === 0) {
+      doctors = await User.find({
+        role: "doctor",
+        approvalStatus: "approved",
+        isActive: { $ne: false },
+      })
+        .select("fullname specialization consultationFee workingDays workingHours experience")
+        .limit(3);
+    }
+
+    if (req.user) {
+      await logAudit(
+        "AI Symptom Check",
+        "CONSULTATION",
+        req.user,
+        "AI Triage Engine",
+        `Symptoms: ${symptomList.join(", ")} | Urgency: ${analysis.urgency}`,
+        req
+      );
+    }
+
+    res.json({ success: true, analysis, doctors });
+  } catch (err) {
+    console.error("Symptom analysis error:", err);
+
+    const status = err?.status || err?.statusCode || 500;
+    let userMsg = "Analysis service is temporarily unavailable. Please try again.";
+
+    if (status === 401) {
+      userMsg = "AI service authentication failed — the GROQ_API_KEY in .env is invalid. Generate a fresh key at console.groq.com.";
+    } else if (status === 429) {
+      userMsg = "AI service rate limit reached. Please wait a moment and try again.";
+    } else if (status === 503 || status === 502) {
+      userMsg = "AI service is temporarily down. Please try again in a few seconds.";
+    } else if (err?.message?.includes("JSON")) {
+      userMsg = "AI returned an unexpected response. Please try again.";
+    }
+
+    res.status(503).json({ error: userMsg });
+  }
 });
 
 // Medical records privacy protection

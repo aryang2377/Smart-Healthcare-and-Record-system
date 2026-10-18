@@ -1,93 +1,410 @@
 <% layout('/layouts/boilerplate.ejs') %>
 
 <section class="symptom-page-dark">
-    <div class="symptom-container-dark">
-        <!-- AI Under Construction Header -->
-        <div class="symptom-header-dark">
-            <span class="badge-tag">
-                <span class="live-dot"></span>
-                <i class="fas fa-robot text-cyan"></i> AI Clinical Assistant • Under Construction
-            </span>
-            <h2>Clinical AI Symptom Checker & Triage</h2>
-            <p>
-                An intelligent clinical intelligence assistant currently in active development. Designed to analyze patient-reported symptoms, estimate triage urgency, and recommend specialist departments.
-            </p>
-        </div>
+  <div class="symptom-container-dark">
 
-        <!-- Coming Soon Hero Card -->
-        <div class="ai-coming-soon-card">
-            <div class="ai-orb-glow"></div>
-            
-            <div class="ai-card-top">
-                <div class="ai-chip-status">
-                    <span class="pulse-emerald"></span> SYSTEM STATUS: HOSPITAL TESTING & VALIDATION
-                </div>
-                <span class="ai-version">Release v2.0 • Coming Soon</span>
-            </div>
-
-            <div class="ai-main-announcement">
-                <div class="ai-hero-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <h3>Intelligent Clinical Triage is Coming Soon</h3>
-                <p>
-                    We are integrating medical NLP models and certified clinical guidelines to empower patients with preliminary health assessment before doctor visits.
-                </p>
-            </div>
-
-            <!-- Preview of upcoming features -->
-            <div class="ai-preview-grid">
-                <div class="ai-preview-box">
-                    <div class="box-icon bg-cyan-glow">
-                        <i class="fas fa-comment-medical"></i>
-                    </div>
-                    <h4>Natural Language Intake</h4>
-                    <p>Describe your discomfort in your own words, and the AI interprets anatomical locations and symptom duration.</p>
-                </div>
-
-                <div class="ai-preview-box">
-                    <div class="box-icon bg-purple-glow">
-                        <i class="fas fa-triangle-exclamation"></i>
-                    </div>
-                    <h4>Red-Flag Emergency Detection</h4>
-                    <p>Immediate identification of critical symptoms (severe chest pain, stroke signs) prompting immediate emergency hotline intervention.</p>
-                </div>
-
-                <div class="ai-preview-box">
-                    <div class="box-icon bg-blue-glow">
-                        <i class="fas fa-hospital-user"></i>
-                    </div>
-                    <h4>Specialist Matching</h4>
-                    <p>Direct algorithmic routing to on-duty cardiologists, neurologists, dermatologists, or general physicians.</p>
-                </div>
-
-                <div class="ai-preview-box">
-                    <div class="box-icon bg-emerald-glow">
-                        <i class="fas fa-file-shield"></i>
-                    </div>
-                    <h4>EHR Vault Integration</h4>
-                    <p>Automatically summarize patient symptom history for doctors to review during clinical consultation.</p>
-                </div>
-            </div>
-
-            <!-- Under Construction Notice & Quick Redirect -->
-            <div class="construction-callout-box">
-                <div class="callout-content">
-                    <i class="fas fa-tools callout-icon"></i>
-                    <div>
-                        <strong>Need Medical Attention Right Now?</strong>
-                        <p>While the AI checker is being finalized, you can consult with verified doctors and schedule immediate appointments through our specialist directory.</p>
-                    </div>
-                </div>
-                <div class="callout-actions">
-                    <a href="/doctors" class="btn-glow-cyan">
-                        <i class="fas fa-user-md"></i> Browse Available Doctors
-                    </a>
-                    <a href="<%= currentUser ? '/dashboard' : '/login' %>" class="btn-dark-glass">
-                        <i class="fas fa-calendar-check"></i> Book Consultation
-                    </a>
-                </div>
-            </div>
-        </div>
+    <!-- Header -->
+    <div class="symptom-header-dark">
+      <span class="badge-tag">
+        <span class="live-dot-green"></span>
+        <i class="fas fa-robot text-cyan"></i> AI Clinical Assistant &bull; Live
+      </span>
+      <h2>Clinical AI Symptom Checker &amp; Triage</h2>
+      <p>Select your symptoms or describe them in your own words. Our AI analyzes your condition, estimates urgency, and routes you to the right specialist from our verified doctor network.</p>
     </div>
+
+    <!-- Emergency Alert (shown only when high urgency detected) -->
+    <div id="emergencyAlert" class="emergency-alert-banner" style="display:none">
+      <div class="emergency-icon-wrap">
+        <i class="fas fa-triangle-exclamation"></i>
+      </div>
+      <div class="emergency-content">
+        <strong>&#9888; EMERGENCY DETECTED &mdash; Seek Immediate Medical Attention</strong>
+        <p class="emergency-reason">Critical symptoms identified. Please call emergency services or go to the nearest Emergency Department immediately.</p>
+      </div>
+      <a href="tel:112" class="btn-call-emergency">
+        <i class="fas fa-phone"></i> Call 112
+      </a>
+    </div>
+
+    <!-- Main 2-column Grid -->
+    <div class="symptom-main-grid">
+
+      <!-- LEFT: Symptom Input -->
+      <div class="symptom-card-dark">
+        <h3><i class="fas fa-notes-medical" style="color:#38bdf8"></i> Select Your Symptoms</h3>
+        <p class="section-desc">Click all that apply, then add a description for better accuracy.</p>
+
+        <!-- Head & Neuro -->
+        <div class="symptom-cat-label">Head &amp; Neurological</div>
+        <div class="symptom-chips-container">
+          <span class="symptom-chip" data-symptom="Headache"><i class="fas fa-head-side-virus"></i> Headache</span>
+          <span class="symptom-chip" data-symptom="Dizziness"><i class="fas fa-circle-exclamation"></i> Dizziness</span>
+          <span class="symptom-chip" data-symptom="Migraine"><i class="fas fa-bolt"></i> Migraine</span>
+          <span class="symptom-chip" data-symptom="Confusion"><i class="fas fa-brain"></i> Confusion</span>
+          <span class="symptom-chip" data-symptom="Vision Changes"><i class="fas fa-eye"></i> Vision Changes</span>
+          <span class="symptom-chip" data-symptom="Fainting"><i class="fas fa-person-falling"></i> Fainting</span>
+          <span class="symptom-chip" data-symptom="Memory Issues"><i class="fas fa-circle-question"></i> Memory Issues</span>
+        </div>
+
+        <!-- Chest & Cardiac -->
+        <div class="symptom-cat-label">Chest &amp; Cardiovascular</div>
+        <div class="symptom-chips-container">
+          <span class="symptom-chip" data-symptom="Chest Pain"><i class="fas fa-heart-pulse"></i> Chest Pain</span>
+          <span class="symptom-chip" data-symptom="Shortness of Breath"><i class="fas fa-lungs"></i> Shortness of Breath</span>
+          <span class="symptom-chip" data-symptom="Heart Palpitations"><i class="fas fa-heart"></i> Palpitations</span>
+          <span class="symptom-chip" data-symptom="Severe Fatigue"><i class="fas fa-battery-quarter"></i> Severe Fatigue</span>
+          <span class="symptom-chip" data-symptom="Leg Swelling"><i class="fas fa-person-walking"></i> Leg Swelling</span>
+        </div>
+
+        <!-- Digestive -->
+        <div class="symptom-cat-label">Digestive System</div>
+        <div class="symptom-chips-container">
+          <span class="symptom-chip" data-symptom="Nausea"><i class="fas fa-face-dizzy"></i> Nausea</span>
+          <span class="symptom-chip" data-symptom="Vomiting"><i class="fas fa-droplet"></i> Vomiting</span>
+          <span class="symptom-chip" data-symptom="Abdominal Pain"><i class="fas fa-stethoscope"></i> Abdominal Pain</span>
+          <span class="symptom-chip" data-symptom="Diarrhea"><i class="fas fa-toilet"></i> Diarrhea</span>
+          <span class="symptom-chip" data-symptom="Constipation"><i class="fas fa-circle-dot"></i> Constipation</span>
+          <span class="symptom-chip" data-symptom="Bloating"><i class="fas fa-circle"></i> Bloating</span>
+          <span class="symptom-chip" data-symptom="Loss of Appetite"><i class="fas fa-utensils"></i> No Appetite</span>
+        </div>
+
+        <!-- Respiratory -->
+        <div class="symptom-cat-label">Respiratory</div>
+        <div class="symptom-chips-container">
+          <span class="symptom-chip" data-symptom="Cough"><i class="fas fa-wind"></i> Cough</span>
+          <span class="symptom-chip" data-symptom="Sore Throat"><i class="fas fa-viruses"></i> Sore Throat</span>
+          <span class="symptom-chip" data-symptom="Runny Nose"><i class="fas fa-face-sad-tear"></i> Runny Nose</span>
+          <span class="symptom-chip" data-symptom="Wheezing"><i class="fas fa-wave-square"></i> Wheezing</span>
+          <span class="symptom-chip" data-symptom="Nasal Congestion"><i class="fas fa-triangle-exclamation"></i> Congestion</span>
+          <span class="symptom-chip" data-symptom="Sneezing"><i class="fas fa-cloud"></i> Sneezing</span>
+        </div>
+
+        <!-- Musculoskeletal -->
+        <div class="symptom-cat-label">Muscles &amp; Joints</div>
+        <div class="symptom-chips-container">
+          <span class="symptom-chip" data-symptom="Joint Pain"><i class="fas fa-bone"></i> Joint Pain</span>
+          <span class="symptom-chip" data-symptom="Back Pain"><i class="fas fa-person-walking"></i> Back Pain</span>
+          <span class="symptom-chip" data-symptom="Muscle Weakness"><i class="fas fa-dumbbell"></i> Muscle Weakness</span>
+          <span class="symptom-chip" data-symptom="Swelling"><i class="fas fa-arrows-to-dot"></i> Swelling</span>
+          <span class="symptom-chip" data-symptom="Muscle Cramps"><i class="fas fa-rotate"></i> Muscle Cramps</span>
+          <span class="symptom-chip" data-symptom="Stiffness"><i class="fas fa-lock"></i> Stiffness</span>
+        </div>
+
+        <!-- Skin -->
+        <div class="symptom-cat-label">Skin</div>
+        <div class="symptom-chips-container">
+          <span class="symptom-chip" data-symptom="Skin Rash"><i class="fas fa-hand-dots"></i> Rash</span>
+          <span class="symptom-chip" data-symptom="Itching"><i class="fas fa-hand-sparkles"></i> Itching</span>
+          <span class="symptom-chip" data-symptom="Skin Discoloration"><i class="fas fa-palette"></i> Discoloration</span>
+          <span class="symptom-chip" data-symptom="Hives"><i class="fas fa-circle-dot"></i> Hives</span>
+          <span class="symptom-chip" data-symptom="Dry Skin"><i class="fas fa-droplet-slash"></i> Dry Skin</span>
+        </div>
+
+        <!-- General -->
+        <div class="symptom-cat-label">General Symptoms</div>
+        <div class="symptom-chips-container">
+          <span class="symptom-chip" data-symptom="Fever"><i class="fas fa-thermometer"></i> Fever</span>
+          <span class="symptom-chip" data-symptom="Chills"><i class="fas fa-snowflake"></i> Chills</span>
+          <span class="symptom-chip" data-symptom="Weight Loss"><i class="fas fa-weight-scale"></i> Weight Loss</span>
+          <span class="symptom-chip" data-symptom="Night Sweats"><i class="fas fa-moon"></i> Night Sweats</span>
+          <span class="symptom-chip" data-symptom="Swollen Lymph Nodes"><i class="fas fa-circle-nodes"></i> Swollen Nodes</span>
+          <span class="symptom-chip" data-symptom="General Weakness"><i class="fas fa-battery-empty"></i> General Weakness</span>
+          <span class="symptom-chip" data-symptom="Frequent Urination"><i class="fas fa-droplet"></i> Frequent Urination</span>
+          <span class="symptom-chip" data-symptom="Excessive Thirst"><i class="fas fa-glass-water"></i> Excessive Thirst</span>
+        </div>
+
+        <!-- Free text -->
+        <div class="custom-notes-block">
+          <label>
+            <i class="fas fa-comment-medical" style="color:#38bdf8"></i>
+            Describe your condition in more detail (optional but recommended)
+          </label>
+          <textarea id="descText" class="dark-textarea" rows="3"
+            placeholder="e.g. I have had a severe headache for 3 days with neck stiffness and sensitivity to light..."></textarea>
+        </div>
+
+        <div id="formError" class="form-error-msg" style="display:none"></div>
+
+        <div class="symptom-form-actions">
+          <button class="btn-evaluate" id="analyzeBtn">
+            <i class="fas fa-robot"></i>
+            Analyze Symptoms
+            <span id="selCountBadge" class="sel-count-badge" style="display:none">
+              <span id="selectedCount">0</span> selected
+            </span>
+          </button>
+          <button class="btn-reset" id="resetBtn" type="button">
+            <i class="fas fa-rotate-left"></i> Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Results Panel -->
+      <div class="symptom-card-dark results-card">
+        <h3><i class="fas fa-brain" style="color:#38bdf8"></i> AI Clinical Analysis</h3>
+        <p class="section-desc">Your triage assessment will appear here after analysis.</p>
+
+        <!-- Idle State -->
+        <div id="resultsIdle" class="results-idle" style="display:flex">
+          <div class="idle-icon-wrap"><i class="fas fa-robot"></i></div>
+          <h4>Awaiting Symptom Input</h4>
+          <p>Select symptoms from the panel and click "Analyze Symptoms" to receive your AI-powered clinical triage assessment.</p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="resultsLoading" class="results-loading-state" style="display:none">
+          <div class="ai-loading-wrap">
+            <div class="ai-spinner"></div>
+            <p>Analyzing clinical data&hellip;</p>
+            <small>Consulting AI medical model</small>
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="resultsError" class="results-error-state" style="display:none">
+          <div class="idle-icon-wrap" style="background:rgba(239,68,68,0.08)">
+            <i class="fas fa-triangle-exclamation" style="color:#f87171"></i>
+          </div>
+          <p class="error-msg" style="color:#f87171;font-size:14px;text-align:center;margin-top:12px"></p>
+          <p style="color:#64748b;font-size:13px;text-align:center;margin-top:6px">Please retry or contact hospital reception.</p>
+        </div>
+
+        <!-- Active Results -->
+        <div id="resultsActive" class="results-active" style="display:none">
+          <div class="triage-status-bar">
+            <span id="urgencyPill" class="urgency-pill moderate">&#9888; MODERATE</span>
+          </div>
+
+          <div id="conditionsList" class="conditions-pills-wrap"></div>
+
+          <p id="resultsSummary" class="results-summary-text"></p>
+
+          <div class="triage-details-box">
+            <div class="triage-detail-row">
+              <span><i class="fas fa-stethoscope"></i> Key Symptoms</span>
+              <strong id="keySymptoms" style="font-size:13px;text-align:right;max-width:60%"></strong>
+            </div>
+            <div class="triage-detail-row">
+              <span><i class="fas fa-user-doctor"></i> Recommended Specialist</span>
+              <div id="recommendedSpecialties" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"></div>
+            </div>
+          </div>
+
+          <div id="homeRemedy" class="home-remedy-box" style="display:none">
+            <i class="fas fa-house-medical"></i>
+            <p></p>
+          </div>
+
+          <div class="clinical-disclaimer">
+            <i class="fas fa-circle-info"></i>
+            <small>This AI assessment is for informational purposes only and does not constitute medical advice. Always consult a licensed physician for diagnosis and treatment.</small>
+          </div>
+
+          <div class="results-actions">
+            <a href="<%= currentUser ? '/dashboard?tab=appointments' : '/login' %>" class="btn-consult-doctor">
+              <i class="fas fa-calendar-check"></i> Book a Consultation
+            </a>
+            <% if (currentUser) { %>
+            <a href="/dashboard?tab=reports" class="btn-check-records">
+              <i class="fas fa-file-medical"></i> View My Medical Records
+            </a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Matched Doctors Section -->
+    <div id="matchedDoctors" class="matched-doctors-section" style="display:none">
+      <div class="matched-doctors-header">
+        <h3><i class="fas fa-user-doctor"></i> Recommended Specialists Available Now</h3>
+        <p>Based on your symptoms, these verified doctors from our network are best suited for your consultation.</p>
+      </div>
+      <div id="doctorMatchGrid" class="doctor-match-grid"></div>
+      <div class="matched-doctors-footer">
+        <a href="/doctors" class="btn-view-all-docs">
+          <i class="fas fa-arrow-right"></i> View All Available Doctors
+        </a>
+      </div>
+    </div>
+
+  </div>
 </section>
+
+<script>
+  const BOOK_URL = '<%= currentUser ? "/dashboard?tab=appointments" : "/login" %>';
+
+  // Chip toggling
+  const chips = document.querySelectorAll('.symptom-chip[data-symptom]');
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('active');
+      updateBadge();
+    });
+  });
+
+  function updateBadge() {
+    const n = document.querySelectorAll('.symptom-chip.active').length;
+    const badge = document.getElementById('selCountBadge');
+    badge.style.display = n > 0 ? 'inline-flex' : 'none';
+    document.getElementById('selectedCount').textContent = n;
+  }
+
+  // Reset
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    chips.forEach(c => c.classList.remove('active'));
+    document.getElementById('descText').value = '';
+    updateBadge();
+    showIdle();
+    hideEmergency();
+    document.getElementById('matchedDoctors').style.display = 'none';
+    document.getElementById('formError').style.display = 'none';
+  });
+
+  // Analyze
+  document.getElementById('analyzeBtn').addEventListener('click', runAnalysis);
+
+  async function runAnalysis() {
+    const symptoms = Array.from(document.querySelectorAll('.symptom-chip.active'))
+      .map(c => c.dataset.symptom);
+    const description = document.getElementById('descText').value;
+
+    if (symptoms.length === 0 && !description.trim()) {
+      const err = document.getElementById('formError');
+      err.textContent = 'Please select at least one symptom or describe your condition.';
+      err.style.display = 'block';
+      return;
+    }
+    document.getElementById('formError').style.display = 'none';
+
+    showLoading();
+    hideEmergency();
+    document.getElementById('matchedDoctors').style.display = 'none';
+
+    try {
+      const res = await fetch('/symptom/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms, description }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        showErrorState(data.error || 'Analysis failed. Please try again.');
+        return;
+      }
+
+      renderAnalysis(data.analysis);
+      if (data.doctors && data.doctors.length > 0) renderDoctors(data.doctors);
+
+    } catch (e) {
+      showErrorState('Network error. Please check your connection and retry.');
+    }
+  }
+
+  function showIdle() {
+    document.getElementById('resultsIdle').style.display = 'flex';
+    document.getElementById('resultsLoading').style.display = 'none';
+    document.getElementById('resultsActive').style.display = 'none';
+    document.getElementById('resultsError').style.display = 'none';
+  }
+
+  function showLoading() {
+    document.getElementById('resultsIdle').style.display = 'none';
+    document.getElementById('resultsLoading').style.display = 'flex';
+    document.getElementById('resultsActive').style.display = 'none';
+    document.getElementById('resultsError').style.display = 'none';
+  }
+
+  function showErrorState(msg) {
+    document.getElementById('resultsIdle').style.display = 'none';
+    document.getElementById('resultsLoading').style.display = 'none';
+    document.getElementById('resultsActive').style.display = 'none';
+    const el = document.getElementById('resultsError');
+    el.querySelector('.error-msg').textContent = msg;
+    el.style.display = 'flex';
+  }
+
+  function renderAnalysis(a) {
+    document.getElementById('resultsLoading').style.display = 'none';
+
+    if (a.emergencyFlag) showEmergency(a.emergencyReason);
+
+    const urgency = a.urgency || 'moderate';
+    const pill = document.getElementById('urgencyPill');
+    pill.className = 'urgency-pill ' + urgency;
+    const labels = {
+      high: '🚨 HIGH URGENCY — Seek Emergency Care',
+      moderate: '⚠ MODERATE — Schedule Soon',
+      low: '✓ LOW URGENCY — Monitor at Home',
+    };
+    pill.textContent = labels[urgency] || urgency.toUpperCase();
+
+    const cEl = document.getElementById('conditionsList');
+    cEl.innerHTML = (a.primaryConditions || []).map(c =>
+      `<span class="condition-pill"><i class="fas fa-stethoscope"></i> ${c}</span>`
+    ).join('');
+
+    document.getElementById('resultsSummary').textContent = a.summary || '';
+    document.getElementById('keySymptoms').textContent = (a.keySymptoms || []).join(', ') || 'As reported';
+
+    const sEl = document.getElementById('recommendedSpecialties');
+    sEl.innerHTML = (a.recommendedSpecialties || []).map(s =>
+      `<span class="specialty-tag"><i class="fas fa-user-doctor"></i> ${s}</span>`
+    ).join('');
+
+    const remedyEl = document.getElementById('homeRemedy');
+    if (a.homeRemedyNote && urgency === 'low') {
+      remedyEl.querySelector('p').textContent = a.homeRemedyNote;
+      remedyEl.style.display = 'flex';
+    } else {
+      remedyEl.style.display = 'none';
+    }
+
+    document.getElementById('resultsActive').style.display = 'block';
+
+    if (window.innerWidth <= 992) {
+      setTimeout(() => document.getElementById('resultsActive').scrollIntoView({ behavior: 'smooth' }), 100);
+    }
+  }
+
+  function renderDoctors(doctors) {
+    const section = document.getElementById('matchedDoctors');
+    const grid = document.getElementById('doctorMatchGrid');
+    grid.innerHTML = doctors.map(doc => `
+      <div class="doctor-match-card">
+        <div class="dmc-top-row">
+          <div class="dmc-avatar"><i class="fas fa-user-doctor"></i></div>
+          <span class="dmc-availability-badge">Available</span>
+        </div>
+        <div class="dmc-body">
+          <h4>${doc.fullname}</h4>
+          <span class="dmc-specialty-badge">${doc.specialization || 'General Medicine'}</span>
+          <div class="dmc-meta">
+            <span><i class="fas fa-clock"></i> ${doc.workingHours || '09:00 AM - 05:00 PM'}</span>
+            <span><i class="fas fa-calendar-days"></i> ${doc.workingDays || 'Mon - Fri'}</span>
+            ${doc.experience ? `<span><i class="fas fa-briefcase-medical"></i> ${doc.experience} yrs experience</span>` : ''}
+            ${doc.consultationFee ? `<span><i class="fas fa-indian-rupee-sign"></i> &#8377;${doc.consultationFee} per visit</span>` : ''}
+          </div>
+        </div>
+        <a href="${BOOK_URL}" class="btn-book-match">
+          <i class="fas fa-calendar-check"></i> Book Consultation
+        </a>
+      </div>
+    `).join('');
+    section.style.display = 'block';
+    setTimeout(() => section.scrollIntoView({ behavior: 'smooth' }), 200);
+  }
+
+  function showEmergency(reason) {
+    const el = document.getElementById('emergencyAlert');
+    if (reason) el.querySelector('.emergency-reason').textContent = reason;
+    el.style.display = 'flex';
+    el.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function hideEmergency() {
+    document.getElementById('emergencyAlert').style.display = 'none';
+  }
+</script>
