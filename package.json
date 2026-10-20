@@ -11,7 +11,7 @@
     "url": "git+https://github.com/aryang2377/Smart-Healthcare-and-Record-system.git"
   },
   "license": "ISC",
-  "author": "Aryan Gupta",
+  "author": "Aryan Gupta & Kasharika Uppal",
   "type": "module",
   "main": "index.js",
   "scripts": {

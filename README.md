@@ -21,12 +21,12 @@
 - [Prerequisites](#-prerequisites)
 - [Quick Start & Installation](#-quick-start--installation)
 - [Environment Variables (.env)](#-environment-variables-env)
-- [Default Test Credentials](#-default-test-credentials)
+- [Master Test & Evaluation Credentials](#-master-test--evaluation-credentials)
 - [Project Directory Structure](#-project-directory-structure)
 - [Route & Endpoint Reference](#-route--endpoint-reference)
 - [Security & Data Governance](#-security--data-governance)
 - [Troubleshooting & FAQ](#-troubleshooting--faq)
-- [License & Author](#-license--author)
+- [License & Authors](#-license--authors)
 
 ---
 
@@ -51,18 +51,19 @@
     - Manages live outpatient queue and marks `No-Show` or `Cancelled`.
     - Schedules walk-in consultations directly from the front desk.
     - Inspects dispatched prescriptions ledger and patient directories.
-    - *Clinical restrictions*: Operational access only; cannot start consultations or issue prescriptions.
+    - *Clinical restrictions*: Operational access only; cannot start consultations, issue prescriptions, or access AI clinical symptom triage.
   - **Attending Doctor (Clinical Authority)**:
     - Calls patient in to begin consultation (`In-Consultation` with automated timestamp).
     - Concludes consultation (`Completed`) with diagnostic findings and remarks.
     - Generates electronic prescriptions via the interactive **Digital Rx Pad** (`/staff/prescriptions/create`).
     - Uploads official diagnostic lab reports and radiology files directly into patient EHR files.
+    - **AI Symptom Triage Leads (`/staff?tab=triage`)**: Real-time incoming patient inquiries where AI triage recommended this doctor's specialty, complete with reported symptoms, urgency score, emergency flags, and direct conversion to outpatient appointment or prescription.
     - Manages practice schedule: working days, OPD hours, slot duration, and consultation fees (`/staff/availability/update`).
 * **Legacy Compatibility**: Accessing `/doctor`, `/doctor/login`, or `/doctor/apply` automatically routes to `/staff` endpoints with backward compatibility.
 
 ### 3. Hospital Administration Console (`/admin`)
 * **Separation of Operational Governance vs Private EHR**: Administrative access is restricted to system operations, verification, and facility logistics; private doctor-patient consultation notes remain confidential.
-* **8 Modular Consoles**:
+* **9 Modular Consoles**:
   1. **Overview & Analytics**: Live system uptime, total patients, verified doctors, front-desk staff counts, appointment metrics, and EHR security audit.
   2. **Doctor Verification Desk**: Comprehensive credential review for pending applicants (`approvalStatus: "pending"` or `"needs_info"`). Actions:
      - **Approve & Activate**: Grants staff portal access; doctor becomes visible on public directory.
@@ -73,11 +74,12 @@
   5. **Master Appointments Ledger**: Hospital-wide ledger with status filtering and administrative status overrides.
   6. **Departments & Specialties Management**: Create and manage clinical units (Cardiology, Dermatology, Orthopedics, etc.) with codes, floor locations, and senior consultants.
   7. **Security & Audit Logs**: Immutable chronological security and operational audit trail with timestamps, actions, actor names/roles, targets, and details.
-  8. **Clinics & Settings**: Facility identity, emergency helpline contacts, operating hours, and data governance policies.
+  8. **AI Symptom Triage Inquiries (`/admin?tab=triage`)**: Hospital-wide audit of all patient AI symptom checks, emergency red-flags, requested specialties, and recommended doctor logs.
+  9. **Clinics & Settings**: Facility identity, emergency helpline contacts, operating hours, and data governance policies.
 
 ### 4. Public Portals
 * **Verified Doctor Directory (`/doctors`)**: Real-time directory displaying **only verified (`approved`) and active doctors** with consultation fees, experience, working hours, and department filters.
-* **Clinical AI Symptom Checker (`/symptom`)**: Interactive intelligent triage and red-flag emergency detection preview.
+* **Clinical AI Symptom Checker (`/symptom`)**: Interactive intelligent triage, red-flag emergency detection, and real-time verified specialist matching across 14 clinical departments.
 * **Digital Prescription Slip (`/prescriptions/:id`)**: Formal hospital-branded clinical slip formatted for digital viewing and physical `@media print` PDF generation.
 
 ---
@@ -167,16 +169,132 @@ The application uses `dotenv` to load environment configurations from `.env`:
 
 ---
 
-## 👥 Default Test Credentials
+## 👥 Master Test & Evaluation Credentials
 
-The database is pre-seeded with verified test accounts across all roles for immediate testing and grading:
+The database is automatically pre-seeded and synchronized on startup with verified, production-ready credentials across all clinical roles, departments, and user tiers.
 
-| Role | Portal URL | Email Address | Password | Permissions |
+---
+
+### 1. 🛡️ Hospital Administration Console
+Administrative governance is isolated to facility logistics, credential vetting, and audit trails.
+
+| Field | Institutional Value |
+| :--- | :--- |
+| **Portal URL** | [`/admin/login`](http://localhost:4000/admin/login) |
+| **Administrator Name** | `Hospital Administrator` |
+| **Email Address** | `admin@caresync.health` |
+| **Password** | `AdminCareSync@2026` |
+| **Primary Phone** | `+91 98765 43210` |
+| **Role Assignment** | `admin` *(System Administrator)* |
+| **Designation** | Chief Administrative Officer & System Controller |
+| **Administrative Powers** | • Full system telemetry, user registries, and facility analytics.<br>• **Doctor Verification Desk**: Review medical licenses, approve doctors (`approved`), request information (`needs_info`), or reject applications (`rejected`).<br>• **Staff Provisioning**: Create, toggle active/inactive status, or remove Doctor and Receptionist accounts.<br>• **Patient Registry**: Hospital-wide directory of all registered outpatient accounts.<br>• **Master Appointments Ledger**: Hospital-wide audit with status overrides.<br>• **Departments & Floors**: Provision and manage clinical wings, floor codes, and heads of departments.<br>• **AI Symptom Triage Console (`/admin?tab=triage`)**: Full audit of patient symptom inquiries, red-flag emergency detection, and complete patient dossier modals.<br>• **Security & Audit Logs**: Immutable chronological security and operational audit trail. |
+
+---
+
+### 2. 👩‍💼 Front-Desk Receptionists (Unified Staff Portal)
+Receptionists manage patient admissions, walk-in scheduling, and outpatient lounge check-ins via **[`/staff/login`](http://localhost:4000/staff/login)**.
+
+| Desk / Shift | Receptionist Name | Email Address | Password | Shift Timing & Days | Contact Phone | Key Duties & Permissions |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Clinical Admissions & Check-in (Day)** | `Sarah Jenkins (Front Desk)` | `receptionist@caresync.health` | `Staff#Sarah26` | Mon - Sat<br>(08:00 AM - 03:00 PM) | `+91 98765 11223` | Patient check-ins (`Checked-In`), walk-in scheduling, live outpatient lounge queue, hospital-wide patient search. |
+| **Outpatient Queue & Triage Desk (Evening)** | `David Miller (Front Desk)` | `reception@caresync.health` | `Staff#David26` | Mon - Sat<br>(02:00 PM - 09:00 PM) | `+91 98666 77788` | Queue triage, mark no-shows (`No-Show`) or cancellations, check walk-ins, verify prescription dispatch status. |
+
+*Operational Boundaries: Receptionists retain hospital-wide patient directory visibility for registration, but cannot start medical consultations, issue digital prescriptions, upload clinical reports, or access doctor-only AI symptom triage leads.*
+
+---
+
+### 3. 🧑‍⚕️ Verified Attending Physicians (1 Specialist Per Department)
+All doctors log in via the Unified Staff Portal at **[`/staff/login`](http://localhost:4000/staff/login)**.
+
+#### Quick-Reference Physician Credentials
+| Department / Speciality | Attending Doctor | Email Address | Password | Consultation Fee | OPD Timings & Days |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Cardiology** | `Dr. Rajesh Sharma` | `doctor@caresync.health` | `Cardio#Sharma26` | ₹800 | Mon - Fri (09:00 AM - 02:00 PM) |
+| **Dermatology** | `Dr. Priya Mehta` | `dr.priya@caresync.health` | `Derma#Mehta26` | ₹600 | Mon - Sat (10:00 AM - 04:00 PM) |
+| **General Medicine** | `Dr. Amit Verma` | `dr.verma@caresync.health` | `GenMed#Verma26` | ₹500 | Mon - Sat (08:30 AM - 03:00 PM) |
+| **Pediatrics** | `Dr. Neha Kapoor` | `dr.kapoor@caresync.health` | `Pedia#Kapoor26` | ₹650 | Mon - Fri (09:30 AM - 02:30 PM) |
+| **Neurology** | `Dr. Rahul Singh` | `dr.singh@caresync.health` | `Neuro#Singh26` | ₹900 | Mon - Thu (10:00 AM - 03:30 PM) |
+| **Orthopedics** | `Dr. Karan Malhotra` | `dr.malhotra@caresync.health` | `Ortho#Malhotra26` | ₹750 | Mon - Sat (09:00 AM - 02:00 PM) |
+| **Gynecology & Obstetrics** | `Dr. Ananya Gupta` | `dr.ananya@caresync.health` | `Gynec#Gupta26` | ₹700 | Mon - Fri (10:00 AM - 04:00 PM) |
+| **ENT (Otolaryngology)** | `Dr. Vikram Nair` | `dr.nair@caresync.health` | `Ent#Nair26` | ₹600 | Mon - Sat (11:00 AM - 05:00 PM) |
+| **Gastroenterology** | `Dr. Alok Bansal` | `dr.bansal@caresync.health` | `Gastro#Bansal26` | ₹850 | Mon - Fri (09:00 AM - 03:00 PM) |
+| **Pulmonology** | `Dr. Ritu Saxena` | `dr.saxena@caresync.health` | `Pulmo#Saxena26` | ₹750 | Mon - Fri (10:00 AM - 04:00 PM) |
+| **Psychiatry** | `Dr. Sameer Joshi` | `dr.joshi@caresync.health` | `Psych#Joshi26` | ₹800 | Mon - Sat (12:00 PM - 06:00 PM) |
+| **Ophthalmology** | `Dr. Meenakshi Sundaram` | `dr.sundaram@caresync.health` | `Eye#Sundaram26` | ₹650 | Mon - Sat (09:00 AM - 02:00 PM) |
+| **Endocrinology** | `Dr. Sanjay Deshmukh` | `dr.deshmukh@caresync.health` | `Endo#Deshmukh26` | ₹850 | Tue - Sat (10:00 AM - 03:30 PM) |
+| **Urology** | `Dr. Deepak Aggarwal` | `dr.aggarwal@caresync.health` | `Uro#Aggarwal26` | ₹900 | Mon - Fri (09:30 AM - 03:30 PM) |
+
+---
+
+#### Comprehensive Clinical Faculty Directory
+| Doctor Name | Department & Location | Qualifications & Experience | Medical License & Authority | Consultation Details | Contact Phone |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Dr. Rajesh Sharma** | **Cardiology** (`CARD`)<br>Wing A, 2nd Floor | MBBS, MD (Cardiology), FACC<br>• *14 Years Experience* | `MCI-CARD-2024-8849`<br>National Medical Commission | Fee: **₹800**<br>Duration: 20 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43210` |
+| **Dr. Priya Mehta** | **Dermatology** (`DERM`)<br>Wing B, 1st Floor | MBBS, MD (Dermatology & Venereology)<br>• *10 Years Experience* | `MCI-DERM-2023-4102`<br>Delhi Medical Council | Fee: **₹600**<br>Duration: 20 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43211` |
+| **Dr. Amit Verma** | **General Medicine** (`GENMED`)<br>Outpatient Block, Ground Floor | MBBS, MD (Internal Medicine)<br>• *15 Years Experience* | `MCI-GENMED-2022-1984`<br>National Medical Commission | Fee: **₹500**<br>Duration: 20 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43212` |
+| **Dr. Neha Kapoor** | **Pediatrics** (`PED`)<br>Wing C, 1st Floor | MBBS, MD (Pediatrics), DCH<br>• *9 Years Experience* | `MCI-PED-2024-6721`<br>Maharashtra Medical Council | Fee: **₹650**<br>Duration: 20 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43213` |
+| **Dr. Rahul Singh** | **Neurology** (`NEUR`)<br>Wing A, 3rd Floor | MBBS, DM (Neurology)<br>• *12 Years Experience* | `MCI-NEUR-2021-3310`<br>National Medical Commission | Fee: **₹900**<br>Duration: 30 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43214` |
+| **Dr. Karan Malhotra** | **Orthopedics** (`ORTH`)<br>Wing B, Ground Floor | MBBS, MS (Orthopedic Surgery), MCh<br>• *16 Years Experience* | `MCI-ORTH-2020-5542`<br>National Medical Commission | Fee: **₹750**<br>Duration: 20 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43215` |
+| **Dr. Ananya Gupta** | **Gynecology & Obstetrics** (`OBGYN`)<br>Maternity Block, 2nd Floor | MBBS, MS (Obstetrics & Gynecology), DGO<br>• *11 Years Experience* | `MCI-GYN-2023-7891`<br>Delhi Medical Council | Fee: **₹700**<br>Duration: 20 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43216` |
+| **Dr. Vikram Nair** | **ENT (Otolaryngology)** (`ENT`)<br>Wing C, 2nd Floor | MBBS, MS (ENT / Otorhinolaryngology)<br>• *13 Years Experience* | `MCI-ENT-2022-9012`<br>National Medical Commission | Fee: **₹600**<br>Duration: 20 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43217` |
+| **Dr. Alok Bansal** | **Gastroenterology** (`GASTRO`)<br>Wing D, 1st Floor | MBBS, MD (Medicine), DM (Gastroenterology)<br>• *14 Years Experience* | `MCI-GASTRO-2021-4478`<br>National Medical Commission | Fee: **₹850**<br>Duration: 25 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43218` |
+| **Dr. Ritu Saxena** | **Pulmonology** (`PULM`)<br>Wing D, 2nd Floor | MBBS, MD (Pulmonary Medicine), FCCP<br>• *12 Years Experience* | `MCI-PULM-2023-2289`<br>National Medical Commission | Fee: **₹750**<br>Duration: 20 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43219` |
+| **Dr. Sameer Joshi** | **Psychiatry** (`PSYCH`)<br>Wing E, 3rd Floor | MBBS, MD (Psychiatry), DPM<br>• *10 Years Experience* | `MCI-PSYCH-2024-1134`<br>National Medical Commission | Fee: **₹800**<br>Duration: 30 mins<br>Break: 02:00 PM - 03:00 PM | `+91 98765 43220` |
+| **Dr. Meenakshi Sundaram** | **Ophthalmology** (`OPHTH`)<br>Wing A, Ground Floor | MBBS, MS (Ophthalmology), FICO<br>• *15 Years Experience* | `MCI-OPHTH-2020-6677`<br>Tamil Nadu Medical Council | Fee: **₹650**<br>Duration: 20 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43221` |
+| **Dr. Sanjay Deshmukh** | **Endocrinology** (`ENDO`)<br>Wing B, 2nd Floor | MBBS, MD (Medicine), DM (Endocrinology)<br>• *13 Years Experience* | `MCI-ENDO-2022-8820`<br>Maharashtra Medical Council | Fee: **₹850**<br>Duration: 20 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43222` |
+| **Dr. Deepak Aggarwal** | **Urology** (`UROL`)<br>Wing C, Ground Floor | MBBS, MS (Surgery), MCh (Urology)<br>• *16 Years Experience* | `MCI-UROL-2021-3901`<br>Delhi Medical Council | Fee: **₹900**<br>Duration: 25 mins<br>Break: 01:00 PM - 02:00 PM | `+91 98765 43223` |
+
+---
+
+### 4. 👤 Registered Patient Account
+Patients sign in via the Patient Portal at **[`/login`](http://localhost:4000/login)** to schedule consultations and view confidential health records.
+
+| Field | Registered Outpatient Details |
+| :--- | :--- |
+| **Portal URL** | [`/login`](http://localhost:4000/login) |
+| **Patient Full Name** | `John Doe` |
+| **Email Address** | `john@gmail.com` |
+| **Password** | `john12` |
+| **Primary Phone** | `+91 98765 00001` |
+| **Account Status** | Active Verified Outpatient |
+| **Patient Features** | • Book appointments across all 14 clinical specialties with doctor selection and protected time slots.<br>• Real-time visit lifecycle tracking (`Scheduled` ➔ `Checked-In` ➔ `In-Consultation` ➔ `Completed`).<br>• Access private Electronic Health Records (EHR) diagnostic reports.<br>• Review doctor-issued digital prescriptions with one-click printable PDF slips (`/prescriptions/:id`).<br>• Complete chronological medical consultation history. |
+
+---
+
+### 5. 🏥 Hospital Departments & Clinical Units
+The system maintains 14 standardized clinical departments synchronized with senior attending consultants and physical hospital wings:
+
+| Code | Department Name | Head of Department | Floor / Location | Clinical Scope |
 | :--- | :--- | :--- | :--- | :--- |
-| **System Administrator** | [`/admin/login`](http://localhost:4000/admin/login) | `admin@caresync.health` | `AdminCareSync@2026` | Full system operations, staff provisioning, doctor verification desk, audit logs. |
-| **Attending Doctor** | [`/staff/login`](http://localhost:4000/staff/login) | `doctor@caresync.health` | `Doctor123#` | Clinical consultations, Digital Rx Pad, lab report uploads, schedule management. |
-| **Front-Desk Receptionist** | [`/staff/login`](http://localhost:4000/staff/login) | `receptionist@caresync.health` | `Staff123#` | Patient check-ins, outpatient lounge queue, walk-in appointment booking, no-show/cancellation. |
-| **Registered Patient** | [`/login`](http://localhost:4000/login) | `john@example.com` | `patient123` | Protected slot booking, status tracking, visit cancellation, EHR access, digital prescriptions. |
+| `CARD` | **Cardiology** | Dr. Rajesh Sharma | Wing A, 2nd Floor | Cardiovascular diagnostics, ECG, echocardiography, hypertension clinics. |
+| `DERM` | **Dermatology** | Dr. Priya Mehta | Wing B, 1st Floor | Clinical skin evaluations, allergy management, medical dermatological therapies. |
+| `GENMED` | **General Medicine** | Dr. Amit Verma | Outpatient Block, Ground Floor | Primary healthcare, preventive evaluations, infection control, routine consultations. |
+| `PED` | **Pediatrics** | Dr. Neha Kapoor | Wing C, 1st Floor | Child wellness, developmental screenings, pediatric infectious disease management. |
+| `NEUR` | **Neurology** | Dr. Rahul Singh | Wing A, 3rd Floor | Neurological evaluations, headache disorders, stroke prevention, neuro-rehab. |
+| `ORTH` | **Orthopedics** | Dr. Karan Malhotra | Wing B, Ground Floor | Musculoskeletal trauma, arthritis management, joint care, physical mobility support. |
+| `OBGYN` | **Gynecology & Obstetrics** | Dr. Ananya Gupta | Maternity Block, 2nd Floor | Maternal care, women's wellness, prenatal screenings, reproductive health. |
+| `ENT` | **ENT (Otolaryngology)** | Dr. Vikram Nair | Wing C, 2nd Floor | Ear, nose, throat diagnostics, audiology screening, sinus disease clinics. |
+| `GASTRO` | **Gastroenterology** | Dr. Alok Bansal | Wing D, 1st Floor | Digestive health, liver disorders, endoscopy, acid peptic diseases, colon wellness. |
+| `PULM` | **Pulmonology** | Dr. Ritu Saxena | Wing D, 2nd Floor | Respiratory health, asthma management, COPD therapies, pulmonary function testing. |
+| `PSYCH` | **Psychiatry** | Dr. Sameer Joshi | Wing E, 3rd Floor | Behavioral health, anxiety management, mood disorders, psychiatric counseling. |
+| `OPHTH` | **Ophthalmology** | Dr. Meenakshi Sundaram | Wing A, Ground Floor | Vision testing, retinal evaluation, corneal health, ocular medicine. |
+| `ENDO` | **Endocrinology** | Dr. Sanjay Deshmukh | Wing B, 2nd Floor | Diabetology, thyroid dysfunctions, endocrine hormone balance, metabolic health. |
+| `UROL` | **Urology** | Dr. Deepak Aggarwal | Wing C, Ground Floor | Urinary disorders, renal calculi evaluation, prostate clinics, bladder health. |
+
+---
+
+### 6. 🔐 Essential Clinical Access & Privacy Rules
+
+> [!IMPORTANT]
+> **Doctor Panel Patient Access Scoping**:
+> In accordance with medical data privacy principles, a patient's records appear in an attending doctor's dashboard ([`/staff`](http://localhost:4000/staff)) Patient Directory, Digital Rx Pad dropdown, and Diagnostic Report Upload modal **if and only if** that patient has scheduled a consultation with that specific attending physician.
+> Front-desk receptionists and System Administrators retain hospital-wide directory access for facility registration and emergency desk operations.
+
+> [!TIP]
+> **AI Symptom Triage Navigation**:
+> The **AI Symptom Triage** console is integrated directly into the top navigation bar for both Attending Doctors (`/staff?tab=triage`) and Hospital Administrators (`/admin?tab=triage`).
+> - **Doctor Triage View**: Displays only real incoming patient inquiries where AI triage recommended that doctor's clinical specialty, enabling instant 1-click consultation scheduling or digital prescription drafting.
+> - **Admin Triage View**: Provides a hospital-wide audit of all patient triage submissions, emergency red-flags, matched doctors, and an interactive **Patient Clinical Dossier Modal** with zero fake test data.
 
 ---
 
@@ -186,7 +304,7 @@ The database is pre-seeded with verified test accounts across all roles for imme
 smart-health/
 ├── db/
 │   ├── sample.js                 # Mongoose connection initialization
-│   └── seed.js                   # Startup seeder (Admin, Doctor, Receptionist, Departments)
+│   └── seed.js                   # Startup seeder (Admin, Doctors, Receptionists, Departments)
 ├── models/
 │   ├── appointment.js            # Appointments schema (statuses, time slots, clinical notes)
 │   ├── AuditLog.js               # Immutable audit trail schema (action, category, actor, target)
@@ -194,6 +312,7 @@ smart-health/
 │   ├── Notification.js           # Real-time in-app notification schema
 │   ├── Prescription.js           # Digital Rx schema (symptoms, diagnosis, regimen, advice)
 │   ├── Report.js                 # Private EHR diagnostic reports schema
+│   ├── SymptomTriage.js          # Clinical AI symptom triage schema (symptoms, urgency, matched doctors)
 │   └── user.js                   # Users schema (Patient, Doctor, Receptionist, Admin)
 ├── public/
 │   ├── css/
@@ -247,7 +366,8 @@ smart-health/
 ### Public Routes
 * `GET /` — Clinical home portal
 * `GET /doctors` — Directory of verified (`approved`) and active medical specialists
-* `GET /symptom` — Clinical AI Symptom Checker preview
+* `GET /symptom` — Clinical AI Symptom Checker & Triage page
+* `POST /api/symptom-check` — Intelligent clinical AI triage evaluation endpoint (urgency, emergency flags, matched specialists, database persistence)
 * `GET /prescriptions/:id` — Official printable prescription slip (PDF & print view)
 * `GET /forgot` — Credential recovery assistance
 
@@ -264,6 +384,8 @@ smart-health/
 * `GET /doctor/login` — Redirects to `/staff/login`
 * `GET /doctor/apply` & `POST /doctor/apply` — Multi-step Doctor onboarding application
 * `GET /staff` (or `/doctor`) — Unified Staff Dashboard
+* `GET /staff?tab=triage` — Doctor AI Symptom Triage inquiries console *(Doctor only)*
+* `POST /staff/triage/:id/status` — Update triage review status (`New`, `Reviewed`, `Archived`) *(Doctor only)*
 * `POST /staff/appointments/:id/status` — Status transitions: `Checked-In`, `In-Consultation` *(Doctor only)*, `Completed` *(Doctor only)*, `Cancelled`, `No-Show`
 * `POST /staff/prescriptions/create` — Issue prescription via Digital Rx Pad *(Doctor only)*
 * `POST /staff/reports/upload` — Upload diagnostic document to patient file
@@ -272,6 +394,8 @@ smart-health/
 ### Administrator Routes (`/admin`)
 * `GET /admin/login` & `POST /admin/login` — Administrator authentication
 * `GET /admin` — 8-module Hospital Administration Console
+* `GET /admin?tab=triage` — Hospital-wide AI Symptom Triage Inquiries ledger with patient dossier modal
+* `POST /admin/triage/:id/status` — Update triage lead status (`New`, `Reviewed`, `Archived`)
 * `POST /admin/doctors/:id/approve` — Approve doctor application & activate public visibility
 * `POST /admin/doctors/:id/request-info` — Request additional documents (`needs_info`)
 * `POST /admin/doctors/:id/reject` — Reject doctor application (`rejected`)
@@ -317,9 +441,9 @@ Stop-Process -Id (Get-NetTCPConnection -LocalPort 4000).OwningProcess -Force
 
 ---
 
-## 👨‍💻 License & Author
+## 👨‍💻 License & Authors
 
 * **Project**: CareSync — Smart Healthcare & Record System
-* **Author / Developer**: **Aryan Gupta**
+* **Authors / Developers**: **Aryan Gupta** & **Kasharika Uppal**
 * **Repository**: [GitHub Repository](https://github.com/aryang2377/Smart-Healthcare-and-Record-system)
 * **License**: [ISC License](https://opensource.org/licenses/ISC)

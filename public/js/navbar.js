@@ -41,17 +41,34 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Highlight active link based on current path
-  const currentPath = window.location.pathname;
-  navLinks.forEach((link) => {
-    const linkPath = link.getAttribute("data-path") || link.getAttribute("href");
-    if (
-      linkPath === currentPath ||
-      (linkPath !== "/" && currentPath.startsWith(linkPath))
-    ) {
-      link.classList.add("active");
-    }
-  });
+  // Highlight active link based on current path and active query/tab
+  const updateActiveNavLinks = () => {
+    const currentPath = window.location.pathname;
+    const currentSearch = window.location.search;
+    const isTriage = currentSearch.includes("tab=triage");
+
+    navLinks.forEach((link) => {
+      const linkPath = link.getAttribute("data-path") || link.getAttribute("href") || "";
+      link.classList.remove("active");
+
+      if (isTriage) {
+        if (linkPath.includes("tab=triage")) {
+          link.classList.add("active");
+        }
+      } else {
+        if (
+          !linkPath.includes("tab=triage") &&
+          (linkPath === currentPath ||
+            (linkPath !== "/" && currentPath.startsWith(linkPath)))
+        ) {
+          link.classList.add("active");
+        }
+      }
+    });
+  };
+
+  window.updateActiveNavLinks = updateActiveNavLinks;
+  updateActiveNavLinks();
 
   // Sticky navbar shadow on scroll
   window.addEventListener("scroll", () => {

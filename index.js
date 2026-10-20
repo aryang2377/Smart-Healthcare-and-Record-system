@@ -17,6 +17,7 @@ import Notification from "./models/Notification.js";
 import Prescription from "./models/Prescription.js";
 import AuditLog from "./models/AuditLog.js";
 import Department from "./models/Department.js";
+import SymptomTriage from "./models/SymptomTriage.js";
 import { seedDefaultUsers } from "./db/seed.js";
 import { analyzeSymptoms } from "./services/symptomChecker.js";
 
@@ -180,6 +181,9 @@ app.get("/doctors", async (req, res) => {
 });
 
 app.get("/symptom", (req, res) => {
+  if (req.user && req.user.role === "receptionist") {
+    return res.redirect("/staff");
+  }
   res.render("listings/symptom");
 });
 
@@ -190,7 +194,7 @@ app.post("/symptom/analyze", async (req, res) => {
       return res.status(503).json({ error: "AI service not configured. Add your GROQ_API_KEY to .env" });
     }
 
-    const { symptoms, description } = req.body;
+    const { symptoms, description, patientName, patientEmail, patientPhone } = req.body;
     const symptomList = Array.isArray(symptoms) ? symptoms : (symptoms ? [symptoms] : []);
 
     if (symptomList.length === 0 && (!description || !description.trim())) {
@@ -199,9 +203,34 @@ app.post("/symptom/analyze", async (req, res) => {
 
     const analysis = await analyzeSymptoms(symptomList, description);
 
-    // Match doctors by recommended specialties
-    const specialtyRegexes = (analysis.recommendedSpecialties || []).map(
-      (s) => new RegExp(s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i")
+    // Match doctors by recommended specialties with smart alias expansions
+    const specialtyAliases = {
+      "General Medicine": ["General Medicine", "General Physician", "Internal Medicine", "Physician"],
+      "ENT": ["ENT", "Otolaryngology", "Ear Nose Throat", "Otorhinolaryngology"],
+      "Gynecology": ["Gynecology", "Obstetrics", "OBGYN", "Gynecologist"],
+      "Orthopedics": ["Orthopedics", "Orthopedic", "Orthopedist"],
+      "Pulmonology": ["Pulmonology", "Pulmonary", "Respiratory", "Chest"],
+      "Gastroenterology": ["Gastroenterology", "Gastro", "Gastrologist"],
+      "Psychiatry": ["Psychiatry", "Psychiatrist", "Mental Health"],
+      "Ophthalmology": ["Ophthalmology", "Ophthalmologist", "Eye"],
+      "Endocrinology": ["Endocrinology", "Endocrinologist", "Diabetology"],
+      "Urology": ["Urology", "Urologist", "Urinary"],
+      "Neurology": ["Neurology", "Neurologist"],
+      "Dermatology": ["Dermatology", "Dermatologist"],
+      "Cardiology": ["Cardiology", "Cardiologist"],
+      "Pediatrics": ["Pediatrics", "Pediatrician", "Child"],
+    };
+
+    const searchTerms = [];
+    (analysis.recommendedSpecialties || []).forEach((spec) => {
+      searchTerms.push(spec);
+      if (specialtyAliases[spec]) {
+        searchTerms.push(...specialtyAliases[spec]);
+      }
+    });
+
+    const specialtyRegexes = [...new Set(searchTerms)].map(
+      (s) => new RegExp(`\\b${s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i")
     );
 
     let doctors = [];
@@ -225,6 +254,43 @@ app.post("/symptom/analyze", async (req, res) => {
       })
         .select("fullname specialization consultationFee workingDays workingHours experience")
         .limit(3);
+    }
+
+    const finalPatientName = req.user?.fullname || (patientName && patientName.trim()) || "Walk-in Guest Visitor";
+    const finalPatientEmail = req.user?.email || (patientEmail && patientEmail.trim()) || "";
+    const finalPatientPhone = req.user?.phone || (patientPhone && patientPhone.trim()) || "";
+
+    // Persist triage inquiry linked to recommended doctors
+    try {
+      await SymptomTriage.create({
+        patientId: req.user?._id || null,
+        patientName: finalPatientName,
+        patientEmail: finalPatientEmail,
+        patientPhone: finalPatientPhone,
+        symptoms: symptomList,
+        description: description?.trim() || "",
+        urgency: analysis.urgency || "moderate",
+        emergencyFlag: !!analysis.emergencyFlag,
+        emergencyReason: analysis.emergencyReason || "",
+        primaryConditions: analysis.primaryConditions || [],
+        recommendedSpecialties: analysis.recommendedSpecialties || [],
+        summary: analysis.summary || "",
+        homeRemedyNote: analysis.homeRemedyNote || "",
+        suggestedDoctors: doctors.map((d) => d._id),
+        suggestedDoctorNames: doctors.map((d) => d.fullname),
+      });
+
+      // Dispatch clinical notification to all suggested doctors
+      for (const doc of doctors) {
+        await Notification.create({
+          userId: doc._id,
+          title: "AI Triage Patient Match",
+          message: `A patient (${finalPatientName}) was recommended your consultation by AI Triage for symptoms: ${symptomList.slice(0, 3).join(", ")}. Urgency: ${(analysis.urgency || "MODERATE").toUpperCase()}.`,
+          type: "CONSULTATION",
+        });
+      }
+    } catch (saveErr) {
+      console.error("Error logging SymptomTriage inquiry:", saveErr.message);
     }
 
     if (req.user) {
@@ -646,9 +712,37 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
       (a) => a.status === "Completed"
     );
 
-    const patientRoster = await User.find({ role: "patient" }).select(
-      "fullname email phone createdAt"
-    );
+    // Patients appear in doctor's panel IF AND ONLY IF they have booked an appointment with this doctor
+    let patientRoster = [];
+    if (req.user.role === "doctor") {
+      const docAppts = await Appointment.find({
+        $or: [{ doctorId: req.user._id }, { doctorName: req.user.fullname }],
+      }).select("patientId patientName");
+
+      const patientIds = docAppts
+        .map((a) => a.patientId)
+        .filter((id) => id != null);
+      const patientNames = docAppts
+        .map((a) => a.patientName)
+        .filter((n) => Boolean(n && n.trim()));
+
+      if (patientIds.length > 0 || patientNames.length > 0) {
+        patientRoster = await User.find({
+          role: "patient",
+          $or: [
+            ...(patientIds.length > 0 ? [{ _id: { $in: patientIds } }] : []),
+            ...(patientNames.length > 0 ? [{ fullname: { $in: patientNames } }] : []),
+          ],
+        }).select("fullname email phone createdAt");
+      } else {
+        patientRoster = [];
+      }
+    } else {
+      // Receptionists have facility-wide outpatient visibility
+      patientRoster = await User.find({ role: "patient" }).select(
+        "fullname email phone createdAt"
+      );
+    }
 
     const doctorReports = await Report.find(reportFilter).sort({ createdAt: -1 });
     const doctorPrescriptions = await Prescription.find(rxFilter).sort({ createdAt: -1 });
@@ -659,6 +753,18 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
       isActive: { $ne: false },
     }).select("fullname specialization consultationFee");
 
+    let doctorTriageLeads = [];
+    if (req.user.role === "doctor") {
+      const specPattern = (req.user.specialization || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      doctorTriageLeads = await SymptomTriage.find({
+        $or: [
+          { suggestedDoctors: req.user._id },
+          { suggestedDoctorNames: req.user.fullname },
+          ...(specPattern ? [{ recommendedSpecialties: new RegExp(`\\b${specPattern}\\b`, "i") }] : []),
+        ],
+      }).sort({ createdAt: -1 });
+    }
+
     res.render("listings/doctor-dashboard", {
       allAppointments,
       todayQueue,
@@ -667,6 +773,7 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
       doctorReports,
       doctorPrescriptions,
       activeDoctors,
+      doctorTriageLeads,
       activeTab: req.query.tab || "queue",
     });
   } catch (err) {
@@ -679,8 +786,23 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
       doctorReports: [],
       doctorPrescriptions: [],
       activeDoctors: [],
+      doctorTriageLeads: [],
       activeTab: "queue",
     });
+  }
+});
+
+// Update status of AI Triage Lead (Doctor only)
+app.post("/staff/triage/:id/status", isStaffLoggedIn, isDoctorOnly, async (req, res) => {
+  try {
+    const { status } = req.body;
+    await SymptomTriage.findByIdAndUpdate(req.params.id, {
+      status: status || "Reviewed",
+    });
+    res.redirect("/staff?tab=triage");
+  } catch (err) {
+    console.error("Error updating triage status:", err.message);
+    res.redirect("/staff?tab=triage");
   }
 });
 
@@ -1184,6 +1306,8 @@ app.get("/admin", isAdminLoggedIn, async (req, res) => {
     const masterAppointments = await Appointment.find().sort({ date: -1 }).limit(40);
     const departmentsList = await Department.find().sort({ name: 1 });
     const auditLogs = await AuditLog.find().sort({ timestamp: -1 }).limit(50);
+    const allTriageLogs = await SymptomTriage.find().sort({ createdAt: -1 }).limit(100);
+    const highUrgencyTriageCount = await SymptomTriage.countDocuments({ urgency: "high" });
 
     res.render("listings/admin-dashboard", {
       totalPatients,
@@ -1198,6 +1322,8 @@ app.get("/admin", isAdminLoggedIn, async (req, res) => {
       masterAppointments,
       departmentsList,
       auditLogs,
+      allTriageLogs,
+      highUrgencyTriageCount,
       activeTab: req.query.tab || "overview",
     });
   } catch (err) {
@@ -1215,8 +1341,23 @@ app.get("/admin", isAdminLoggedIn, async (req, res) => {
       masterAppointments: [],
       departmentsList: [],
       auditLogs: [],
+      allTriageLogs: [],
+      highUrgencyTriageCount: 0,
       activeTab: "overview",
     });
+  }
+});
+
+// Admin update status of AI Triage Inquiry
+app.post("/admin/triage/:id/status", isAdminLoggedIn, async (req, res) => {
+  try {
+    const { status } = req.body;
+    await SymptomTriage.findByIdAndUpdate(req.params.id, {
+      status: status || "Reviewed",
+    });
+    res.redirect("/admin?tab=triage");
+  } catch (err) {
+    res.redirect("/admin?tab=triage");
   }
 });
 

@@ -18,23 +18,37 @@
             <i class="fas fa-user-md"></i> Doctors
           </a>
         </li>
-        <li>
-          <a href="/symptom" class="nav-link" data-path="/symptom">
-            <i class="fas fa-robot text-cyan"></i> AI Symptom Checker
-          </a>
-        </li>
+        <% if (!currentUser || currentUser.role === 'patient') { %>
+          <li>
+            <a href="/symptom" class="nav-link" data-path="/symptom">
+              <i class="fas fa-robot text-cyan"></i> AI Symptom Checker
+            </a>
+          </li>
+        <% } else if (currentUser.role === 'doctor') { %>
+          <li>
+            <a href="/staff?tab=triage" class="nav-link <%= (typeof activeTab !== 'undefined' && activeTab === 'triage') ? 'active' : '' %>" data-path="/staff?tab=triage" onclick="if (typeof switchTab === 'function') { switchTab('triage'); return false; }">
+              <i class="fas fa-robot text-purple"></i> AI Symptom Triage
+            </a>
+          </li>
+        <% } else if (currentUser.role === 'admin') { %>
+          <li>
+            <a href="/admin?tab=triage" class="nav-link <%= (typeof activeTab !== 'undefined' && activeTab === 'triage') ? 'active' : '' %>" data-path="/admin?tab=triage" onclick="if (typeof switchTab === 'function') { switchTab('triage'); return false; }">
+              <i class="fas fa-robot text-cyan"></i> AI Symptom Triage
+            </a>
+          </li>
+        <% } %>
 
         <!-- Role-specific dashboard links -->
         <% if (currentUser) { %>
           <% if (currentUser.role === 'admin') { %>
             <li>
-              <a href="/admin" class="nav-link active-console" data-path="/admin">
+              <a href="/admin" class="nav-link <%= (typeof activeTab !== 'undefined' && activeTab === 'triage') ? '' : 'active-console' %>" data-path="/admin">
                 <i class="fas fa-shield-alt text-purple"></i> Admin Console
               </a>
             </li>
           <% } else if (currentUser.role === 'doctor' || currentUser.role === 'receptionist') { %>
             <li>
-              <a href="/staff" class="nav-link active-console" data-path="/staff">
+              <a href="/staff" class="nav-link <%= (typeof activeTab !== 'undefined' && activeTab === 'triage') ? '' : 'active-console' %>" data-path="/staff">
                 <i class="fas <%= currentUser.role === 'doctor' ? 'fa-stethoscope text-cyan' : 'fa-id-badge text-blue' %>"></i>
                 <%= currentUser.role === 'doctor' ? 'Doctor Console' : 'Staff Console' %>
               </a>
