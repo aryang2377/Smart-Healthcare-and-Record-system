@@ -20,7 +20,6 @@
 - [Clinical Workflow Architecture](#-clinical-workflow-architecture)
 - [Prerequisites](#-prerequisites)
 - [Quick Start & Installation](#-quick-start--installation)
-- [Environment Variables (.env)](#-environment-variables-env)
 - [Master Test & Evaluation Credentials](#-master-test--evaluation-credentials)
 - [Project Directory Structure](#-project-directory-structure)
 - [Route & Endpoint Reference](#-route--endpoint-reference)
@@ -132,7 +131,7 @@ Copy-Item .env.example .env
 # On Linux / macOS:
 cp .env.example .env
 ```
-Open `.env` and adjust the variables as required (see [Environment Variables](#-environment-variables-env) below).
+Open `.env` and configure your local environment (such as `PORT` and `MONGODB_URI`).
 
 ### Step 4: Start the Server
 For development with auto-reloading:
@@ -150,60 +149,17 @@ Open your browser and navigate to:
 ```
 http://localhost:4000
 ```
-*(On first startup, the server automatically synchronizes default admin credentials, verified medical faculty, receptionist accounts, standard hospital departments, and directory upload paths).*
-
----
-
-## 🔑 Environment Variables (.env)
-
-The application uses `dotenv` to load environment configurations from `.env`:
-
-| Variable | Description | Example / Default |
-| :--- | :--- | :--- |
-| `PORT` | Local HTTP port for the Express application | `4000` |
-| `MONGODB_URI` | MongoDB Atlas cluster or local MongoDB connection URI | `mongodb://localhost:27017/CareSync` |
-| `JWT_SECRET` | Cryptographic secret key used to sign HTTP-only JWT auth cookies | `Secret12@34` |
-| `ADMIN_EMAIL` | Single institutional administrator email (synced on startup) | `admin@caresync.health` |
-| `ADMIN_PASSWORD` | Administrator password (bcrypt-hashed on startup) | `AdminCareSync@2026` |
-| `ADMIN_NAME` | Administrator display name | `Hospital Administrator` |
+*(On first startup, the server automatically synchronizes verified medical faculty, receptionist accounts, standard hospital departments, and directory upload paths).*
 
 ---
 
 ## 👥 Master Test & Evaluation Credentials
 
-The database is automatically pre-seeded and synchronized on startup with verified, production-ready credentials across all clinical roles, departments, and user tiers.
+The database is automatically pre-seeded and synchronized on startup with verified test credentials for attending physicians, front-desk receptionists, and outpatient accounts across all 14 clinical departments.
 
 ---
 
-### 1. 🛡️ Hospital Administration Console
-Administrative governance is isolated to facility logistics, credential vetting, and audit trails.
-
-| Field | Institutional Value |
-| :--- | :--- |
-| **Portal URL** | [`/admin/login`](http://localhost:4000/admin/login) |
-| **Administrator Name** | `Hospital Administrator` |
-| **Email Address** | `admin@caresync.health` |
-| **Password** | `AdminCareSync@2026` |
-| **Primary Phone** | `+91 98765 43210` |
-| **Role Assignment** | `admin` *(System Administrator)* |
-| **Designation** | Chief Administrative Officer & System Controller |
-| **Administrative Powers** | • Full system telemetry, user registries, and facility analytics.<br>• **Doctor Verification Desk**: Review medical licenses, approve doctors (`approved`), request information (`needs_info`), or reject applications (`rejected`).<br>• **Staff Provisioning**: Create, toggle active/inactive status, or remove Doctor and Receptionist accounts.<br>• **Patient Registry**: Hospital-wide directory of all registered outpatient accounts.<br>• **Master Appointments Ledger**: Hospital-wide audit with status overrides.<br>• **Departments & Floors**: Provision and manage clinical wings, floor codes, and heads of departments.<br>• **AI Symptom Triage Console (`/admin?tab=triage`)**: Full audit of patient symptom inquiries, red-flag emergency detection, and complete patient dossier modals.<br>• **Security & Audit Logs**: Immutable chronological security and operational audit trail. |
-
----
-
-### 2. 👩‍💼 Front-Desk Receptionists (Unified Staff Portal)
-Receptionists manage patient admissions, walk-in scheduling, and outpatient lounge check-ins via **[`/staff/login`](http://localhost:4000/staff/login)**.
-
-| Desk / Shift | Receptionist Name | Email Address | Password | Shift Timing & Days | Contact Phone | Key Duties & Permissions |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Clinical Admissions & Check-in (Day)** | `Sarah Jenkins (Front Desk)` | `receptionist@caresync.health` | `Staff#Sarah26` | Mon - Sat<br>(08:00 AM - 03:00 PM) | `+91 98765 11223` | Patient check-ins (`Checked-In`), walk-in scheduling, live outpatient lounge queue, hospital-wide patient search. |
-| **Outpatient Queue & Triage Desk (Evening)** | `David Miller (Front Desk)` | `reception@caresync.health` | `Staff#David26` | Mon - Sat<br>(02:00 PM - 09:00 PM) | `+91 98666 77788` | Queue triage, mark no-shows (`No-Show`) or cancellations, check walk-ins, verify prescription dispatch status. |
-
-*Operational Boundaries: Receptionists retain hospital-wide patient directory visibility for registration, but cannot start medical consultations, issue digital prescriptions, upload clinical reports, or access doctor-only AI symptom triage leads.*
-
----
-
-### 3. 🧑‍⚕️ Verified Attending Physicians (1 Specialist Per Department)
+### 1. 🧑‍⚕️ Verified Attending Physicians (1 Specialist Per Department)
 All doctors log in via the Unified Staff Portal at **[`/staff/login`](http://localhost:4000/staff/login)**.
 
 #### Quick-Reference Physician Credentials
@@ -246,7 +202,19 @@ All doctors log in via the Unified Staff Portal at **[`/staff/login`](http://loc
 
 ---
 
-### 4. 👤 Registered Patient Account
+### 2. 👩‍💼 Front-Desk Receptionists (Unified Staff Portal)
+Receptionists manage patient admissions, walk-in scheduling, and outpatient lounge check-ins via **[`/staff/login`](http://localhost:4000/staff/login)**.
+
+| Desk / Shift | Receptionist Name | Email Address | Password | Shift Timing & Days | Contact Phone | Key Duties & Permissions |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Clinical Admissions & Check-in (Day)** | `Sarah Jenkins (Front Desk)` | `receptionist@caresync.health` | `Staff#Sarah26` | Mon - Sat<br>(08:00 AM - 03:00 PM) | `+91 98765 11223` | Patient check-ins (`Checked-In`), walk-in scheduling, live outpatient lounge queue, hospital-wide patient search. |
+| **Outpatient Queue & Triage Desk (Evening)** | `David Miller (Front Desk)` | `reception@caresync.health` | `Staff#David26` | Mon - Sat<br>(02:00 PM - 09:00 PM) | `+91 98666 77788` | Queue triage, mark no-shows (`No-Show`) or cancellations, check walk-ins, verify prescription dispatch status. |
+
+*Operational Boundaries: Receptionists retain hospital-wide patient directory visibility for registration, but cannot start medical consultations, issue digital prescriptions, upload clinical reports, or access doctor-only AI symptom triage leads.*
+
+---
+
+### 3. 👤 Registered Patient Account
 Patients sign in via the Patient Portal at **[`/login`](http://localhost:4000/login)** to schedule consultations and view confidential health records.
 
 | Field | Registered Outpatient Details |
@@ -261,7 +229,7 @@ Patients sign in via the Patient Portal at **[`/login`](http://localhost:4000/lo
 
 ---
 
-### 5. 🏥 Hospital Departments & Clinical Units
+### 4. 🏥 Hospital Departments & Clinical Units
 The system maintains 14 standardized clinical departments synchronized with senior attending consultants and physical hospital wings:
 
 | Code | Department Name | Head of Department | Floor / Location | Clinical Scope |
@@ -283,7 +251,7 @@ The system maintains 14 standardized clinical departments synchronized with seni
 
 ---
 
-### 6. 🔐 Essential Clinical Access & Privacy Rules
+### 5. 🔐 Essential Clinical Access & Privacy Rules
 
 > [!IMPORTANT]
 > **Doctor Panel Patient Access Scoping**:
