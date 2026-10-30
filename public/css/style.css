@@ -187,26 +187,59 @@ body {
   gap: 10px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
-  padding: 5px 14px 5px 6px;
+  padding: 5px 12px 5px 6px;
   border-radius: 50px;
 }
 
 .user-avatar-circle {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
-  color: #090d16;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   font-size: 13px;
+  flex-shrink: 0;
+}
+
+.user-avatar-circle.doctor {
+  background: linear-gradient(135deg, #059669, #10b981);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+}
+
+.user-avatar-circle.admin {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.35);
+}
+
+.user-avatar-circle.receptionist {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+}
+
+.user-avatar-circle.patient {
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.35);
+}
+
+.user-meta-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .user-greeting {
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--text-white);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 .btn-nav-logout {
@@ -1604,12 +1637,32 @@ body {
     height: 38px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
-    color: #090d16;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
     font-size: 15px;
+  }
+
+  .user-avatar-badge.doctor {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+  }
+
+  .user-avatar-badge.admin {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #ffffff;
+  }
+
+  .user-avatar-badge.receptionist {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #ffffff;
+  }
+
+  .user-avatar-badge.patient {
+    background: linear-gradient(135deg, #0284c7, #38bdf8);
+    color: #ffffff;
   }
 
   .mobile-btn-logout {

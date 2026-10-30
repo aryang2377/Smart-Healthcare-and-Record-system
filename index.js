@@ -18,6 +18,15 @@ import Prescription from "./models/Prescription.js";
 import AuditLog from "./models/AuditLog.js";
 import Department from "./models/Department.js";
 import SymptomTriage from "./models/SymptomTriage.js";
+import Vital from "./models/Vital.js";
+import {
+  evaluateBloodPressure,
+  evaluateBloodSugar,
+  evaluateHeartRate,
+  evaluateBmi,
+  evaluateOxygen,
+  evaluateTemperature,
+} from "./services/vitalsRules.js";
 import { seedDefaultUsers } from "./db/seed.js";
 import { analyzeSymptoms } from "./services/symptomChecker.js";
 
@@ -765,6 +774,10 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
       }).sort({ createdAt: -1 });
     }
 
+    if (req.query.tab === "triage" && req.user.role === "doctor") {
+      return res.redirect("/doctor/triage");
+    }
+
     res.render("listings/doctor-dashboard", {
       allAppointments,
       todayQueue,
@@ -774,7 +787,7 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
       doctorPrescriptions,
       activeDoctors,
       doctorTriageLeads,
-      activeTab: req.query.tab || "queue",
+      activeTab: (req.query.tab && req.query.tab !== "triage") ? req.query.tab : "queue",
     });
   } catch (err) {
     console.error("Staff Dashboard Error:", err);
@@ -793,16 +806,59 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
 });
 
 // Update status of AI Triage Lead (Doctor only)
-app.post("/staff/triage/:id/status", isStaffLoggedIn, isDoctorOnly, async (req, res) => {
+app.post(["/staff/triage/:id/status", "/doctor/triage/:id/status"], isStaffLoggedIn, isDoctorOnly, async (req, res) => {
   try {
     const { status } = req.body;
     await SymptomTriage.findByIdAndUpdate(req.params.id, {
       status: status || "Reviewed",
+      reviewedBy: req.user.fullname,
+      reviewedAt: new Date(),
     });
-    res.redirect("/staff?tab=triage");
+    res.redirect(req.headers.referer || "/doctor/triage");
   } catch (err) {
     console.error("Error updating triage status:", err.message);
-    res.redirect("/staff?tab=triage");
+    res.redirect(req.headers.referer || "/doctor/triage");
+  }
+});
+
+// Doctor Dedicated AI Symptom Triage Page
+app.get(["/doctor/triage", "/staff/triage"], isStaffLoggedIn, isDoctorOnly, async (req, res) => {
+  try {
+    const specPattern = (req.user.specialization || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const doctorTriageLeads = await SymptomTriage.find({
+      $or: [
+        { suggestedDoctors: req.user._id },
+        { suggestedDoctorNames: req.user.fullname },
+        ...(specPattern ? [{ recommendedSpecialties: new RegExp(`\\b${specPattern}\\b`, "i") }] : []),
+      ],
+    }).sort({ createdAt: -1 });
+
+    const totalTriageChecks = doctorTriageLeads.length;
+    const highUrgencyCount = doctorTriageLeads.filter(t => t.urgency === "high").length;
+    const moderateUrgencyCount = doctorTriageLeads.filter(t => t.urgency === "moderate").length;
+    const lowUrgencyCount = doctorTriageLeads.filter(t => t.urgency === "low").length;
+    const reviewedCount = doctorTriageLeads.filter(t => t.status === "Reviewed").length;
+
+    res.render("listings/doctor-triage", {
+      doctorTriageLeads,
+      totalTriageChecks,
+      highUrgencyCount,
+      moderateUrgencyCount,
+      lowUrgencyCount,
+      reviewedCount,
+      activePage: "doctor-triage",
+    });
+  } catch (err) {
+    console.error("Doctor Triage Page Error:", err);
+    res.render("listings/doctor-triage", {
+      doctorTriageLeads: [],
+      totalTriageChecks: 0,
+      highUrgencyCount: 0,
+      moderateUrgencyCount: 0,
+      lowUrgencyCount: 0,
+      reviewedCount: 0,
+      activePage: "doctor-triage",
+    });
   }
 });
 
@@ -1076,6 +1132,9 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
       userId: req.user._id,
     }).sort({ createdAt: -1 }).limit(10);
 
+    const vitalsHistory = await Vital.find({ patientId: req.user._id }).sort({ date: -1 }).limit(30);
+    const latestVitals = vitalsHistory.length > 0 ? vitalsHistory[0] : null;
+
     res.render("listings/dashboard", {
       patientAppointments,
       patientReports,
@@ -1083,6 +1142,8 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
       prescriptions,
       availableDoctors,
       notifications,
+      vitalsHistory,
+      latestVitals,
       activeTab: req.query.tab || "appointments",
     });
   } catch (err) {
@@ -1094,8 +1155,82 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
       prescriptions: [],
       availableDoctors: [],
       notifications: [],
+      vitalsHistory: [],
+      latestVitals: null,
       activeTab: "appointments",
     });
+  }
+});
+
+// Log Clinical Vitals (Rule-based, Non-ML)
+app.post("/vitals/log", isLoggedIn, async (req, res) => {
+  try {
+    const {
+      systolic,
+      diastolic,
+      bloodSugar,
+      sugarType,
+      heartRate,
+      temperature,
+      weight,
+      height,
+      oxygenLevel,
+      notes,
+    } = req.body;
+
+    const bpEval = evaluateBloodPressure(systolic, diastolic);
+    const sugarEval = evaluateBloodSugar(bloodSugar, sugarType || "Fasting");
+    const pulseEval = evaluateHeartRate(heartRate);
+    const bmiEval = evaluateBmi(weight, height);
+    const oxEval = evaluateOxygen(oxygenLevel);
+    const tempEval = evaluateTemperature(temperature);
+
+    const hasAlert = bpEval.alert || sugarEval.alert || pulseEval.alert || oxEval.alert || tempEval.alert;
+
+    await Vital.create({
+      patientId: req.user._id,
+      recordedBy: req.user._id,
+      recordedByName: req.user.fullname,
+      systolic: systolic ? Number(systolic) : undefined,
+      diastolic: diastolic ? Number(diastolic) : undefined,
+      bloodSugar: bloodSugar ? Number(bloodSugar) : undefined,
+      sugarType: sugarType || "Fasting",
+      heartRate: heartRate ? Number(heartRate) : undefined,
+      temperature: temperature ? Number(temperature) : undefined,
+      weight: weight ? Number(weight) : undefined,
+      height: height ? Number(height) : undefined,
+      bmi: bmiEval.bmi,
+      oxygenLevel: oxygenLevel ? Number(oxygenLevel) : undefined,
+      bpCategory: bpEval.category,
+      bpBadge: bpEval.badgeClass,
+      sugarCategory: sugarEval.category,
+      sugarBadge: sugarEval.badgeClass,
+      pulseCategory: pulseEval.category,
+      pulseBadge: pulseEval.badgeClass,
+      bmiCategory: bmiEval.category,
+      bmiBadge: bmiEval.badgeClass,
+      oxygenCategory: oxEval.category,
+      oxygenBadge: oxEval.badgeClass,
+      tempCategory: tempEval.category,
+      hasAlert,
+      notes: notes || "",
+    });
+
+    res.redirect("/dashboard?tab=vitals");
+  } catch (err) {
+    console.error("Log Vitals Error:", err);
+    res.redirect("/dashboard?tab=vitals");
+  }
+});
+
+// Delete a Vitals Entry
+app.post("/vitals/:id/delete", isLoggedIn, async (req, res) => {
+  try {
+    await Vital.findOneAndDelete({ _id: req.params.id, patientId: req.user._id });
+    res.redirect("/dashboard?tab=vitals");
+  } catch (err) {
+    console.error("Delete Vital Error:", err);
+    res.redirect("/dashboard?tab=vitals");
   }
 });
 
@@ -1324,7 +1459,7 @@ app.get("/admin", isAdminLoggedIn, async (req, res) => {
       auditLogs,
       allTriageLogs,
       highUrgencyTriageCount,
-      activeTab: req.query.tab || "overview",
+      activeTab: (req.query.tab && req.query.tab !== "overview") ? req.query.tab : "verification",
     });
   } catch (err) {
     console.error("Admin Dashboard Error:", err);
@@ -1343,7 +1478,46 @@ app.get("/admin", isAdminLoggedIn, async (req, res) => {
       auditLogs: [],
       allTriageLogs: [],
       highUrgencyTriageCount: 0,
-      activeTab: "overview",
+      activeTab: "verification",
+    });
+  }
+});
+
+// Admin Dedicated AI Symptom Triage Page
+app.get("/admin/triage", isAdminLoggedIn, async (req, res) => {
+  try {
+    const allTriageLogs = await SymptomTriage.find().sort({ createdAt: -1 });
+    const totalTriageChecks = allTriageLogs.length;
+    const highUrgencyCount = allTriageLogs.filter(t => t.urgency === "high").length;
+    const moderateUrgencyCount = allTriageLogs.filter(t => t.urgency === "moderate").length;
+    const lowUrgencyCount = allTriageLogs.filter(t => t.urgency === "low").length;
+    const emergencyCount = allTriageLogs.filter(t => t.emergencyFlag).length;
+    const reviewedCount = allTriageLogs.filter(t => t.status === "Reviewed").length;
+    const pendingCount = allTriageLogs.filter(t => t.status !== "Reviewed").length;
+
+    res.render("listings/admin-triage", {
+      allTriageLogs,
+      totalTriageChecks,
+      highUrgencyCount,
+      moderateUrgencyCount,
+      lowUrgencyCount,
+      emergencyCount,
+      reviewedCount,
+      pendingCount,
+      activePage: "admin-triage"
+    });
+  } catch (err) {
+    console.error("Admin Triage Page Error:", err);
+    res.render("listings/admin-triage", {
+      allTriageLogs: [],
+      totalTriageChecks: 0,
+      highUrgencyCount: 0,
+      moderateUrgencyCount: 0,
+      lowUrgencyCount: 0,
+      emergencyCount: 0,
+      reviewedCount: 0,
+      pendingCount: 0,
+      activePage: "admin-triage"
     });
   }
 });
@@ -1355,9 +1529,9 @@ app.post("/admin/triage/:id/status", isAdminLoggedIn, async (req, res) => {
     await SymptomTriage.findByIdAndUpdate(req.params.id, {
       status: status || "Reviewed",
     });
-    res.redirect("/admin?tab=triage");
+    res.redirect(req.headers.referer || "/admin/triage");
   } catch (err) {
-    res.redirect("/admin?tab=triage");
+    res.redirect(req.headers.referer || "/admin/triage");
   }
 });
 

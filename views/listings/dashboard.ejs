@@ -13,7 +13,10 @@
                     <p><i class="fas fa-id-card text-cyan"></i> Patient Portal • <%= currentUser.email %></p>
                 </div>
             </div>
-            <div class="dash-quick-cta">
+            <div class="dash-quick-cta" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn-book-quick" onclick="openLogVitalsModal()" style="background: linear-gradient(135deg, #059669, #10b981); border-color: rgba(16, 185, 129, 0.4);">
+                    <i class="fas fa-heart-pulse"></i> Log Vitals
+                </button>
                 <button type="button" class="btn-book-quick" onclick="switchTab('appointments')">
                     <i class="fas fa-calendar-plus"></i> Book Consultation
                 </button>
@@ -78,6 +81,9 @@
             </button>
             <button type="button" class="dash-tab-btn <%= activeTab === 'prescriptions' ? 'active' : '' %>" onclick="switchTab('prescriptions')">
                 <i class="fas fa-prescription"></i> Prescriptions (<%= prescriptions.length %>)
+            </button>
+            <button type="button" class="dash-tab-btn <%= activeTab === 'vitals' ? 'active' : '' %>" onclick="switchTab('vitals')">
+                <i class="fas fa-heart-pulse text-emerald"></i> Health Vitals (<%= typeof vitalsHistory !== 'undefined' ? vitalsHistory.length : 0 %>)
             </button>
             <button type="button" class="dash-tab-btn <%= activeTab === 'history' ? 'active' : '' %>" onclick="switchTab('history')">
                 <i class="fas fa-history"></i> Consultation History
@@ -429,6 +435,250 @@
                 <% } %>
             </div>
         </div>
+
+        <!-- TAB: HEALTH VITALS & CHRONIC TRACKER (RULE-BASED, NON-ML) -->
+        <div id="tab-vitals" class="tab-pane-dark" style="<%= activeTab === 'vitals' ? 'display: block;' : 'display: none;' %>">
+            <div class="dash-card-dark">
+                <div class="card-head" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                    <div>
+                        <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;"><i class="fas fa-heart-pulse text-emerald"></i> Personal Health Vitals &amp; Tracker</h3>
+                        <small style="color: #64748b; font-size: 13px; margin-top: 4px; display: block;">Daily cardiovascular, metabolic, and biometrics tracking with AHA &amp; WHO clinical guideline evaluations</small>
+                    </div>
+                    <% if (typeof vitalsHistory !== 'undefined' && vitalsHistory.length > 0) { %>
+                    <div class="head-actions">
+                        <button type="button" class="btn-book-quick" onclick="openLogVitalsModal()" style="font-size: 13px; padding: 8px 18px; border-radius: 8px; width: auto; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-plus-circle"></i> Log New Reading
+                        </button>
+                    </div>
+                    <% } %>
+                </div>
+
+                <!-- Latest Vitals Key Metrics Ribbon -->
+                <% if (typeof latestVitals !== 'undefined' && latestVitals) { %>
+                    <div style="margin-top: 18px; margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                            <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">
+                                Most Recent Reading &bull; <%= new Date(latestVitals.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                            </span>
+                            <% if (latestVitals.hasAlert) { %>
+                                <span class="badge-tag" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                    <i class="fas fa-triangle-exclamation"></i> Clinical Alert Threshold Crossed
+                                </span>
+                            <% } else { %>
+                                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
+                                    <i class="fas fa-check-circle"></i> Vitals Within Expected Range
+                                </span>
+                            <% } %>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+                            <!-- Blood Pressure -->
+                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Blood Pressure</span>
+                                    <i class="fas fa-heart text-rose" style="font-size: 16px; color: #f43f5e;"></i>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <strong style="font-size: 24px; color: #f8fafc; font-weight: 800;">
+                                        <%= latestVitals.systolic && latestVitals.diastolic ? (latestVitals.systolic + ' / ' + latestVitals.diastolic) : '--' %>
+                                    </strong>
+                                    <small style="color: #64748b; font-size: 11px;"> mmHg</small>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <span class="status-pill <%= latestVitals.bpBadge === 'danger' ? 'cancelled' : (latestVitals.bpBadge === 'warning' ? 'confirmed' : 'completed') %>" style="font-size: 11px;">
+                                        <%= latestVitals.bpCategory %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Blood Sugar -->
+                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Blood Glucose</span>
+                                    <i class="fas fa-droplet text-amber" style="font-size: 16px; color: #f59e0b;"></i>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <strong style="font-size: 24px; color: #f8fafc; font-weight: 800;">
+                                        <%= latestVitals.bloodSugar || '--' %>
+                                    </strong>
+                                    <small style="color: #64748b; font-size: 11px;"> mg/dL (<%= latestVitals.sugarType %>)</small>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <span class="status-pill <%= latestVitals.sugarBadge === 'danger' ? 'cancelled' : (latestVitals.sugarBadge === 'warning' ? 'confirmed' : 'completed') %>" style="font-size: 11px;">
+                                        <%= latestVitals.sugarCategory %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Heart Rate -->
+                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Resting Pulse</span>
+                                    <i class="fas fa-wave-square text-cyan" style="font-size: 16px; color: #38bdf8;"></i>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <strong style="font-size: 24px; color: #f8fafc; font-weight: 800;">
+                                        <%= latestVitals.heartRate || '--' %>
+                                    </strong>
+                                    <small style="color: #64748b; font-size: 11px;"> bpm</small>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <span class="status-pill <%= latestVitals.pulseBadge === 'danger' ? 'cancelled' : (latestVitals.pulseBadge === 'warning' ? 'confirmed' : 'completed') %>" style="font-size: 11px;">
+                                        <%= latestVitals.pulseCategory %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- BMI & Weight -->
+                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Body Mass Index</span>
+                                    <i class="fas fa-weight-scale text-purple" style="font-size: 16px; color: #c084fc;"></i>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <strong style="font-size: 24px; color: #f8fafc; font-weight: 800;">
+                                        <%= latestVitals.bmi || '--' %>
+                                    </strong>
+                                    <small style="color: #64748b; font-size: 11px;"> BMI (<%= latestVitals.weight ? latestVitals.weight + ' kg' : '--' %>)</small>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <span class="status-pill <%= latestVitals.bmiBadge === 'danger' ? 'cancelled' : (latestVitals.bmiBadge === 'warning' ? 'confirmed' : 'completed') %>" style="font-size: 11px;">
+                                        <%= latestVitals.bmiCategory %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Oxygen Saturation SpO2 -->
+                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Blood Oxygen (SpO2)</span>
+                                    <i class="fas fa-lungs text-emerald" style="font-size: 16px; color: #34d399;"></i>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <strong style="font-size: 24px; color: #f8fafc; font-weight: 800;">
+                                        <%= latestVitals.oxygenLevel ? latestVitals.oxygenLevel + '%' : '--' %>
+                                    </strong>
+                                    <small style="color: #64748b; font-size: 11px;"><%= latestVitals.temperature ? ' • ' + latestVitals.temperature + '°F' : '' %></small>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <span class="status-pill <%= latestVitals.oxygenBadge === 'danger' ? 'cancelled' : (latestVitals.oxygenBadge === 'warning' ? 'confirmed' : 'completed') %>" style="font-size: 11px;">
+                                        <%= latestVitals.oxygenCategory %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+
+                <% if (typeof vitalsHistory !== 'undefined' && vitalsHistory.length > 0) { %>
+                    <!-- Historical Vitals Table -->
+                    <h4 style="font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 12px; margin-top: 16px;">
+                        <i class="fas fa-list-check text-cyan"></i> Vitals History Log
+                    </h4>
+
+                    <div class="table-scroll-wrap">
+                        <table class="dash-table-dark">
+                            <thead>
+                                <tr>
+                                    <th>Date &amp; Time</th>
+                                    <th>Blood Pressure</th>
+                                    <th>Blood Glucose</th>
+                                    <th>Pulse (BPM)</th>
+                                    <th>Weight &amp; BMI</th>
+                                    <th>Oxygen (SpO2)</th>
+                                    <th>Clinical Notes</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% vitalsHistory.forEach(v => { %>
+                                    <tr>
+                                        <td style="white-space: nowrap;">
+                                            <strong><%= new Date(v.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></strong>
+                                            <small style="display: block; color: #94a3b8;"><%= new Date(v.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></small>
+                                        </td>
+                                        <td>
+                                            <% if (v.systolic && v.diastolic) { %>
+                                                <strong><%= v.systolic %> / <%= v.diastolic %></strong> <small class="text-slate">mmHg</small>
+                                                <small style="display: block; margin-top: 2px;" class="status-pill <%= v.bpBadge === 'danger' ? 'cancelled' : (v.bpBadge === 'warning' ? 'confirmed' : 'completed') %>">
+                                                    <%= v.bpCategory %>
+                                                </small>
+                                            <% } else { %>
+                                                <span class="text-slate">--</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <% if (v.bloodSugar) { %>
+                                                <strong><%= v.bloodSugar %></strong> <small class="text-slate">mg/dL</small>
+                                                <small style="display: block; color: #94a3b8; font-size: 10.5px;"><%= v.sugarType %></small>
+                                                <small style="display: block; margin-top: 2px;" class="status-pill <%= v.sugarBadge === 'danger' ? 'cancelled' : (v.sugarBadge === 'warning' ? 'confirmed' : 'completed') %>">
+                                                    <%= v.sugarCategory %>
+                                                </small>
+                                            <% } else { %>
+                                                <span class="text-slate">--</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <% if (v.heartRate) { %>
+                                                <strong><%= v.heartRate %></strong> <small class="text-slate">bpm</small>
+                                                <small style="display: block; color: <%= v.pulseBadge === 'danger' ? '#ef4444' : '#34d399' %>; font-size: 11px;">
+                                                    <%= v.pulseCategory %>
+                                                </small>
+                                            <% } else { %>
+                                                <span class="text-slate">--</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <% if (v.weight) { %>
+                                                <strong><%= v.weight %> kg</strong>
+                                                <% if (v.bmi) { %>
+                                                    <small style="display: block; color: #c084fc; font-weight: 600;">BMI: <%= v.bmi %> (<%= v.bmiCategory %>)</small>
+                                                <% } %>
+                                            <% } else { %>
+                                                <span class="text-slate">--</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <% if (v.oxygenLevel) { %>
+                                                <strong><%= v.oxygenLevel %>%</strong>
+                                                <% if (v.temperature) { %>
+                                                    <small style="display: block; color: #94a3b8;"><%= v.temperature %>°F</small>
+                                                <% } %>
+                                            <% } else { %>
+                                                <span class="text-slate">--</span>
+                                            <% } %>
+                                        </td>
+                                        <td style="max-width: 220px;">
+                                            <small style="color: #cbd5e1;"><%= v.notes || 'Routine check' %></small>
+                                        </td>
+                                        <td>
+                                            <form method="POST" action="/vitals/<%= v._id %>/delete" onsubmit="return confirm('Delete this vitals entry?');" style="margin: 0;">
+                                                <button type="submit" class="btn-sm-action cancel" style="padding: 4px 8px; font-size: 11px;" title="Delete entry">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state-box" style="padding: 44px 20px; text-align: center;">
+                        <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.25); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                            <i class="fas fa-heart-pulse" style="font-size: 26px; color: #10b981;"></i>
+                        </div>
+                        <h4 style="font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 8px;">No Vitals Recorded Yet</h4>
+                        <p style="color: #94a3b8; max-width: 460px; margin: 0 auto 20px auto; font-size: 13.5px; line-height: 1.6;">
+                            Log your blood pressure, glucose, heart rate, and weight to track your health trends and automatically check against clinical standards.
+                        </p>
+                        <button type="button" class="btn-book-quick" onclick="openLogVitalsModal()" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; font-size: 13.5px; border-radius: 8px; margin: 0 auto;">
+                            <i class="fas fa-plus-circle"></i> Log Your First Reading
+                        </button>
+                    </div>
+                <% } %>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -447,4 +697,160 @@
         const newUrl = window.location.pathname + '?tab=' + tabName;
         window.history.replaceState(null, '', newUrl);
     }
+
+    // Vitals Modal Handlers
+    function openLogVitalsModal() {
+        const modal = document.getElementById('logVitalsModal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeLogVitalsModal() {
+        const modal = document.getElementById('logVitalsModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function updateLiveBmi() {
+        const w = parseFloat(document.getElementById('vWeightInput')?.value);
+        const h = parseFloat(document.getElementById('vHeightInput')?.value);
+        const preview = document.getElementById('liveBmiPreview');
+        if (!preview) return;
+
+        if (w > 0 && h > 0) {
+            const hM = h / 100;
+            const bmi = (w / (hM * hM)).toFixed(1);
+            let cat = 'Normal';
+            let color = '#34d399';
+            if (bmi < 18.5) { cat = 'Underweight'; color = '#fbbf24'; }
+            else if (bmi >= 25 && bmi < 30) { cat = 'Overweight'; color = '#fbbf24'; }
+            else if (bmi >= 30) { cat = 'Obese'; color = '#f87171'; }
+
+            preview.style.color = color;
+            preview.textContent = 'Calculated BMI: ' + bmi + ' (' + cat + ')';
+        } else {
+            preview.textContent = '';
+        }
+    }
+
+    // Modal background dismiss
+    const vitalsModalEl = document.getElementById('logVitalsModal');
+    if (vitalsModalEl) {
+        vitalsModalEl.addEventListener('click', function(e) {
+            if (e.target === this) closeLogVitalsModal();
+        });
+    }
+
+    // Auto-switch tab if url contains ?tab=
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab');
+        if (tab && document.getElementById('tab-' + tab)) {
+            switchTab(tab);
+        }
+    });
 </script>
+
+<!-- MODAL: LOG NEW HEALTH VITALS -->
+<div id="logVitalsModal" class="modal-backdrop-dark" style="display: none; align-items: center; justify-content: center; z-index: 9999;">
+    <div class="modal-box-dark" style="max-width: 620px; width: 95%; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <div>
+                <h3><i class="fas fa-heart-pulse text-emerald"></i> Record Daily Health Vitals</h3>
+                <small style="color: #94a3b8; font-size: 12px;">Enter your biometric readings for clinical guideline evaluation</small>
+            </div>
+            <button type="button" class="close-btn" onclick="closeLogVitalsModal()">&times;</button>
+        </div>
+
+        <form action="/vitals/log" method="POST" class="modal-form" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">
+            <!-- Row 1: Blood Pressure -->
+            <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
+                <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #f43f5e; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
+                    <i class="fas fa-heart"></i> Blood Pressure (mmHg)
+                </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="font-size: 11.5px; color: #94a3b8;">Systolic (Upper)</label>
+                        <input type="number" name="systolic" placeholder="e.g. 120" min="50" max="260" class="dark-dash-input" style="font-size: 13px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 11.5px; color: #94a3b8;">Diastolic (Lower)</label>
+                        <input type="number" name="diastolic" placeholder="e.g. 80" min="30" max="160" class="dark-dash-input" style="font-size: 13px;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Blood Glucose -->
+            <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
+                <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #f59e0b; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
+                    <i class="fas fa-droplet"></i> Blood Glucose (mg/dL)
+                </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="font-size: 11.5px; color: #94a3b8;">Sugar Reading</label>
+                        <input type="number" name="bloodSugar" placeholder="e.g. 95" min="20" max="600" class="dark-dash-input" style="font-size: 13px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 11.5px; color: #94a3b8;">Context</label>
+                        <select name="sugarType" class="dark-dash-select" style="font-size: 13px;">
+                            <option value="Fasting">Fasting (Before Breakfast)</option>
+                            <option value="Post-Meal">Post-Meal (2 hrs after meal)</option>
+                            <option value="Random">Random / Anytime</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Heart Rate & SpO2 -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                    <label style="font-size: 11.5px; color: #94a3b8; font-weight: 600;"><i class="fas fa-wave-square text-cyan"></i> Heart Rate (BPM)</label>
+                    <input type="number" name="heartRate" placeholder="e.g. 72" min="30" max="250" class="dark-dash-input" style="font-size: 13px;">
+                </div>
+                <div>
+                    <label style="font-size: 11.5px; color: #94a3b8; font-weight: 600;"><i class="fas fa-lungs text-emerald"></i> Oxygen Saturation (SpO2 %)</label>
+                    <input type="number" name="oxygenLevel" placeholder="e.g. 98" min="50" max="100" class="dark-dash-input" style="font-size: 13px;">
+                </div>
+            </div>
+
+            <!-- Row 4: Weight & Height with live BMI preview -->
+            <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #c084fc; letter-spacing: 0.5px; margin: 0;">
+                        <i class="fas fa-weight-scale"></i> Biometrics &amp; BMI
+                    </label>
+                    <span id="liveBmiPreview" style="font-size: 12px; font-weight: 700; color: #38bdf8;"></span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="font-size: 11.5px; color: #94a3b8;">Weight (kg)</label>
+                        <input type="number" step="0.1" id="vWeightInput" name="weight" placeholder="e.g. 70" min="5" max="300" class="dark-dash-input" style="font-size: 13px;" oninput="updateLiveBmi()">
+                    </div>
+                    <div>
+                        <label style="font-size: 11.5px; color: #94a3b8;">Height (cm)</label>
+                        <input type="number" step="0.5" id="vHeightInput" name="height" placeholder="e.g. 175" min="40" max="250" class="dark-dash-input" style="font-size: 13px;" oninput="updateLiveBmi()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5: Temperature & Notes -->
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px;">
+                <div>
+                    <label style="font-size: 11.5px; color: #94a3b8; font-weight: 600;"><i class="fas fa-temperature-half text-amber"></i> Temp (°F)</label>
+                    <input type="number" step="0.1" name="temperature" placeholder="e.g. 98.6" min="90" max="110" class="dark-dash-input" style="font-size: 13px;">
+                </div>
+                <div>
+                    <label style="font-size: 11.5px; color: #94a3b8; font-weight: 600;">Clinical Notes / Symptoms</label>
+                    <input type="text" name="notes" placeholder="e.g. Felt dizzy after morning jog" class="dark-dash-input" style="font-size: 13px;">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+                <button type="button" class="btn-dark-glass" onclick="closeLogVitalsModal()" style="padding: 10px 18px; font-size: 13px;">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-book-quick" style="padding: 10px 22px; font-size: 13px; border-radius: 8px; margin: 0; width: auto;">
+                    <i class="fas fa-check"></i> Evaluate &amp; Save Vitals
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

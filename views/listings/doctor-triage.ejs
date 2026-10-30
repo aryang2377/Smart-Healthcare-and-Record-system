@@ -1,0 +1,599 @@
+<% layout('/layouts/boilerplate.ejs') %>
+
+<div class="dashboard-wrapper-dark" style="min-height: calc(100vh - 120px); padding-bottom: 60px;">
+    <div class="dashboard-container dash-container">
+
+        <!-- Top Header Bar (No action buttons, robust flex structure) -->
+        <header class="dash-header-dark" style="margin-bottom: 24px;">
+            <div class="dash-user-info">
+                <div class="user-large-avatar doctor-avatar" style="color: #fff; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); flex-shrink: 0;">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
+                        <span class="auth-tag" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); font-size: 11px; padding: 2px 10px; border-radius: 20px; font-weight: 700; letter-spacing: 0.5px;">
+                            <i class="fas fa-stethoscope"></i> <%= (currentUser.specialization || 'Clinical Specialist').toUpperCase() %> INTAKE
+                        </span>
+                        <span style="color: #34d399; font-size: 12px; font-weight: 600;">
+                            <i class="fas fa-circle" style="font-size: 8px;"></i> Live Patient Intake Stream
+                        </span>
+                    </div>
+                    <h2 style="margin: 0; font-size: 26px; font-weight: 800;">AI Symptom Triage Inquiries</h2>
+                    <p style="margin-top: 4px; font-size: 13.5px; opacity: 0.9;">
+                        Incoming patient symptom assessments NLP-matched to your specialty (<%= currentUser.specialization %>) with urgency flags and automated referrals.
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI Metrics Strip -->
+        <div class="metrics-row-dark" style="margin-bottom: 24px;">
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-purple-glow">
+                    <i class="fas fa-notes-medical"></i>
+                </div>
+                <div>
+                    <h3 id="statTotalChecks"><%= totalTriageChecks %></h3>
+                    <span>Specialty Inquiries</span>
+                </div>
+            </div>
+
+            <div class="metric-card-dark">
+                <div class="metric-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h3 style="color: #ef4444;" id="statEmergency"><%= highUrgencyCount %></h3>
+                    <span>Critical / Emergency</span>
+                </div>
+            </div>
+
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-emerald-glow">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <div>
+                    <h3 id="statModerate"><%= moderateUrgencyCount + lowUrgencyCount %></h3>
+                    <span>Moderate &amp; Routine Care</span>
+                </div>
+            </div>
+
+            <div class="metric-card-dark">
+                <div class="metric-icon bg-cyan-glow">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <h3 id="statReviewed"><%= reviewedCount %></h3>
+                    <span>Reviewed by Doctor</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Triage Records Card -->
+        <div class="dash-card-dark">
+            <div class="card-head" style="flex-wrap: wrap; gap: 14px;">
+                <div>
+                    <h3><i class="fas fa-robot text-purple"></i> Specialist Clinical Referrals</h3>
+                    <small>Real-time stream of incoming patient assessments recommending <%= currentUser.specialization %></small>
+                </div>
+                <div class="head-actions" style="display: flex; gap: 8px; align-items: center;">
+                    <span class="badge-tag"><i class="fas fa-filter text-purple"></i> <span id="filteredCount"><%= doctorTriageLeads.length %></span> Inquiries Showing</span>
+                </div>
+            </div>
+
+            <!-- Live Filter & Search Toolbar -->
+            <% if (typeof doctorTriageLeads !== 'undefined' && doctorTriageLeads.length > 0) { %>
+            <div class="triage-toolbar-box" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; padding: 14px 16px; border-radius: 10px;">
+                <div style="flex: 1 1 240px; position: relative;">
+                    <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 13px;"></i>
+                    <input type="text" id="triageSearchInput" class="dark-dash-input" placeholder="Search by patient name, phone, email, symptom..." style="padding-left: 36px; font-size: 13px;">
+                </div>
+
+                <div style="flex: 0 1 180px;">
+                    <select id="urgencyFilterSelect" class="dark-dash-select" style="font-size: 13px;">
+                        <option value="all">All Urgency Levels</option>
+                        <option value="high">🚨 High / Emergency</option>
+                        <option value="moderate">⚠️ Moderate</option>
+                        <option value="low">✅ Low Risk</option>
+                    </select>
+                </div>
+
+                <div style="flex: 0 1 160px;">
+                    <select id="statusFilterSelect" class="dark-dash-select" style="font-size: 13px;">
+                        <option value="all">All Statuses</option>
+                        <option value="New">New Inquiries</option>
+                        <option value="Reviewed">Reviewed</option>
+                    </select>
+                </div>
+
+                <div style="flex: 0 1 170px;">
+                    <select id="visitorFilterSelect" class="dark-dash-select" style="font-size: 13px;">
+                        <option value="all">All Visitor Types</option>
+                        <option value="registered">Registered Patients</option>
+                        <option value="walkin">Walk-in Visitors</option>
+                    </select>
+                </div>
+
+                <button type="button" class="btn-dark-glass" onclick="resetTriageFilters()" style="padding: 8px 14px; font-size: 12px; white-space: nowrap;">
+                    <i class="fas fa-rotate-left"></i> Reset
+                </button>
+            </div>
+            <% } %>
+
+            <!-- Triage Data Table -->
+            <% if (typeof doctorTriageLeads === 'undefined' || doctorTriageLeads.length === 0) { %>
+                <div class="empty-tab-state" style="padding: 48px 20px; text-align: center;">
+                    <div class="empty-icon" style="font-size: 40px; color: #a855f7; margin-bottom: 12px;"><i class="fas fa-robot"></i></div>
+                    <h4>No AI Triage Referrals Yet</h4>
+                    <p style="color: #64748b; max-width: 460px; margin: 0 auto;">
+                        When patients check symptoms using the AI Symptom Checker and are recommended <%= currentUser.specialization %>, their triage summaries and contact details will appear here automatically.
+                    </p>
+                </div>
+            <% } else { %>
+                <div class="table-scroll-wrap">
+                    <table class="dash-table-dark" id="triageTable">
+                        <thead>
+                            <tr>
+                                <th>Date &amp; Time</th>
+                                <th>Patient Details</th>
+                                <th>Symptoms &amp; Notes</th>
+                                <th>Urgency &amp; Flags</th>
+                                <th>Suspected Conditions</th>
+                                <th>AI Clinical Assessment</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% doctorTriageLeads.forEach((triage) => { 
+                                const isHigh = triage.urgency === 'high';
+                                const isMod = triage.urgency === 'moderate';
+                                const urgencyVal = (triage.urgency || 'moderate').toLowerCase();
+                                const statusVal = triage.status === 'Reviewed' ? 'Reviewed' : 'New';
+                                const visitorVal = triage.patientId ? 'registered' : 'walkin';
+                                const searchText = [
+                                    triage.patientName || '',
+                                    triage.patientPhone || '',
+                                    triage.patientEmail || '',
+                                    (triage.symptoms || []).join(' '),
+                                    triage.description || '',
+                                    (triage.primaryConditions || []).join(' '),
+                                    (triage.recommendedSpecialties || []).join(' ')
+                                ].join(' ').toLowerCase();
+                            %>
+                                <tr class="triage-row"
+                                    data-urgency="<%= urgencyVal %>"
+                                    data-status="<%= statusVal %>"
+                                    data-visitor="<%= visitorVal %>"
+                                    data-search="<%= searchText %>">
+                                    <td style="white-space: nowrap;">
+                                        <strong><%= new Date(triage.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></strong>
+                                        <small style="display: block; color: #94a3b8;"><%= new Date(triage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></small>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="width: 36px; height: 36px; border-radius: 50%; background: <%= triage.patientId ? 'rgba(168, 85, 247, 0.15)' : 'rgba(148, 163, 184, 0.15)' %>; color: <%= triage.patientId ? '#c084fc' : '#94a3b8' %>; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
+                                                <%= (triage.patientName || 'V')[0].toUpperCase() %>
+                                            </div>
+                                            <div>
+                                                <strong><%= triage.patientName %></strong>
+                                                <% if (triage.patientPhone) { %>
+                                                    <small style="display: block; color: #34d399;"><i class="fas fa-phone-alt" style="font-size: 10px;"></i> <%= triage.patientPhone %></small>
+                                                <% } %>
+                                                <% if (triage.patientEmail) { %>
+                                                    <small style="display: block; color: #94a3b8;"><%= triage.patientEmail %></small>
+                                                <% } %>
+                                                <span class="badge-tag" style="margin-top: 3px; font-size: 10px; padding: 2px 6px;">
+                                                    <i class="fas <%= triage.patientId ? 'fa-id-badge text-purple' : 'fa-user-clock text-amber' %>"></i>
+                                                    <%= triage.patientId ? 'Registered Patient' : 'Walk-in Visitor' %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 5px; max-width: 220px;">
+                                            <% (triage.symptoms || []).forEach(sym => { %>
+                                                <span style="font-size: 11px; padding: 2px 7px; border-radius: 4px; background: rgba(56, 189, 248, 0.12); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.25);">
+                                                    <%= sym %>
+                                                </span>
+                                            <% }) %>
+                                        </div>
+                                        <% if (triage.description) { %>
+                                            <p style="font-size: 12px; color: #cbd5e1; font-style: italic; margin-top: 6px; line-height: 1.35; max-width: 240px; background: rgba(15, 23, 42, 0.5); padding: 6px 8px; border-radius: 6px; border-left: 2px solid #a855f7;">
+                                                "<%= triage.description %>"
+                                            </p>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <span class="status-pill <%= isHigh ? 'cancelled' : (isMod ? 'confirmed' : 'checked-in') %>" style="font-size: 11px;">
+                                            <i class="fas <%= isHigh ? 'fa-triangle-exclamation' : 'fa-stethoscope' %>"></i>
+                                            <%= (triage.urgency || 'MODERATE').toUpperCase() %>
+                                        </span>
+                                        <% if (triage.emergencyFlag) { %>
+                                            <span style="display: block; color: #ef4444; font-size: 11px; font-weight: 700; margin-top: 3px;">
+                                                <i class="fas fa-bolt"></i> EMERGENCY
+                                            </span>
+                                        <% } %>
+                                        <% if (triage.emergencyReason) { %>
+                                            <small style="display: block; color: #f87171; font-size: 11px; margin-top: 3px; max-width: 180px;">
+                                                <%= triage.emergencyReason %>
+                                            </small>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (triage.primaryConditions && triage.primaryConditions.length > 0) { %>
+                                            <div style="display: flex; flex-direction: column; gap: 4px; max-width: 200px;">
+                                                <% triage.primaryConditions.forEach(cond => { %>
+                                                    <span style="font-size: 11.5px; padding: 3px 8px; border-radius: 4px; background: rgba(168, 85, 247, 0.12); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.25); font-weight: 600;">
+                                                        <i class="fas fa-notes-medical" style="font-size: 10px;"></i> <%= cond %>
+                                                    </span>
+                                                <% }) %>
+                                            </div>
+                                        <% } else { %>
+                                            <small style="color: #64748b;">Clinical Assessment</small>
+                                        <% } %>
+                                    </td>
+                                    <td style="max-width: 280px;">
+                                        <p class="triage-summary-cell" style="font-size: 12px; margin: 0; line-height: 1.45;">
+                                            <%= triage.summary || 'Clinical triage assessment completed.' %>
+                                        </p>
+                                        <% if (triage.homeRemedyNote) { %>
+                                            <div style="margin-top: 6px; font-size: 11px; color: #34d399; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 4px;">
+                                                <i class="fas fa-heart"></i> <%= triage.homeRemedyNote %>
+                                            </div>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <span class="status-pill <%= triage.status === 'Reviewed' ? 'completed' : 'scheduled' %>" style="font-size: 11px;">
+                                            <%= triage.status || 'New' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                                            <button type="button" class="btn-action-view" onclick="openTriageDetailModal('<%= triage._id %>')" style="padding: 5px 10px; font-size: 11px; background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);">
+                                                <i class="fas fa-file-medical"></i> Full Details
+                                            </button>
+                                            <form method="POST" action="/staff/triage/<%= triage._id %>/status" style="margin: 0;">
+                                                <input type="hidden" name="status" value="<%= triage.status === 'Reviewed' ? 'New' : 'Reviewed' %>">
+                                                <button type="submit" class="btn-action-view" style="padding: 5px 10px; font-size: 11px; width: 100%;">
+                                                    <i class="fas <%= triage.status === 'Reviewed' ? 'fa-undo' : 'fa-check' %>"></i>
+                                                    <%= triage.status === 'Reviewed' ? 'Unmark' : 'Review' %>
+                                                </button>
+                                            </form>
+                                            <% if (triage.patientId) { %>
+                                                <a href="/staff?tab=prescription" class="btn-action-rx" title="Open Digital Rx Pad" style="padding: 5px 10px; font-size: 11px; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                                    <i class="fas fa-file-prescription"></i> Write Rx
+                                                </a>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="noMatchMessage" style="display: none; padding: 36px 20px; text-align: center; color: #94a3b8;">
+                    <i class="fas fa-search" style="font-size: 28px; margin-bottom: 8px; color: #64748b;"></i>
+                    <p style="margin: 0; font-size: 14px;">No triage records matched your search and filter criteria.</p>
+                </div>
+            <% } %>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL: FULL CLINICAL TRIAGE DOSSIER -->
+<div id="triageDetailModal" class="modal-backdrop-dark" style="display: none; align-items: center; justify-content: center; z-index: 9999;">
+    <div class="modal-box-dark" style="max-width: 720px; width: 95%; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <div>
+                <h3><i class="fas fa-file-medical text-purple"></i> Patient Clinical Triage Dossier</h3>
+                <small id="mDateTime" style="color: #94a3b8; font-size: 12px;"></small>
+            </div>
+            <button type="button" class="close-btn" onclick="closeTriageDetailModal()">&times;</button>
+        </div>
+
+        <div class="modal-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 18px;">
+            <!-- Patient Banner -->
+            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h4 id="mPatientName" style="margin: 0; font-size: 17px; font-weight: 700; color: #f8fafc;"></h4>
+                    <div style="margin-top: 4px; font-size: 12.5px; color: #94a3b8; display: flex; gap: 14px; flex-wrap: wrap;">
+                        <span id="mPatientPhone"><i class="fas fa-phone-alt text-emerald"></i> <span></span></span>
+                        <span id="mPatientEmail"><i class="fas fa-envelope text-cyan"></i> <span></span></span>
+                    </div>
+                </div>
+                <span id="mVisitorBadge" class="badge-tag"></span>
+            </div>
+
+            <!-- Urgency & Flags Banner -->
+            <div id="mUrgencyBanner" style="padding: 12px 16px; border-radius: 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <div id="mUrgencyIcon" style="font-size: 20px;"></div>
+                <div style="flex: 1;">
+                    <div id="mUrgencyTitle" style="font-weight: 800; font-size: 14px; text-transform: uppercase;"></div>
+                    <div id="mEmergencyReason" style="font-size: 12.5px; margin-top: 2px;"></div>
+                </div>
+                <div id="mStatusBadge"></div>
+            </div>
+
+            <!-- Reported Symptoms Section -->
+            <div>
+                <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                    Reported Symptoms &amp; Notes
+                </label>
+                <div id="mSymptomsList" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;"></div>
+                <div id="mDescriptionBox" style="background: rgba(15, 23, 42, 0.4); border-left: 3px solid #a855f7; padding: 8px 12px; border-radius: 4px; font-style: italic; font-size: 13px; color: #cbd5e1; display: none;"></div>
+            </div>
+
+            <!-- Suspected Conditions / Differential Diagnoses -->
+            <div>
+                <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                    NLP Suspected Conditions
+                </label>
+                <div id="mConditionsList" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+            </div>
+
+            <!-- Recommended Specialties & Doctors -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+                <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 8px; padding: 12px;">
+                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #c084fc; display: block; margin-bottom: 4px;">Recommended Faculty</span>
+                    <strong id="mSpecialties" style="color: #f8fafc; font-size: 13.5px;"></strong>
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 12px;">
+                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #34d399; display: block; margin-bottom: 4px;">Suggested Specialist</span>
+                    <strong id="mDoctors" style="color: #f8fafc; font-size: 13.5px;"></strong>
+                </div>
+            </div>
+
+            <!-- Full AI Clinical Assessment Summary -->
+            <div>
+                <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                    Clinical Assessment &amp; Guidance
+                </label>
+                <div id="mSummaryText" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.06); padding: 12px 14px; border-radius: 8px; font-size: 13px; color: #e2e8f0; line-height: 1.55;"></div>
+                <div id="mHomeRemedy" style="margin-top: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 8px 12px; border-radius: 6px; font-size: 12.5px; color: #34d399; display: none;">
+                    <i class="fas fa-heart"></i> <span id="mHomeRemedyText"></span>
+                </div>
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 16px; margin-top: 4px; flex-wrap: wrap; gap: 10px;">
+                <form id="mStatusForm" method="POST" style="margin: 0;">
+                    <input type="hidden" name="status" id="mStatusInput" value="">
+                    <button type="submit" id="mStatusBtn" class="btn-dash-primary" style="padding: 9px 18px; font-size: 13px;">
+                        <i class="fas fa-check"></i> <span></span>
+                    </button>
+                </form>
+                <div style="display: flex; gap: 8px;">
+                    <a id="mRxBtn" href="/staff?tab=prescription" class="btn-action-rx" style="display: none; padding: 8px 16px; font-size: 13px; text-decoration: none;">
+                        <i class="fas fa-file-prescription"></i> Write Digital Rx
+                    </a>
+                    <button type="button" class="btn-dark-glass" onclick="closeTriageDetailModal()" style="padding: 8px 18px; font-size: 13px;">
+                        Close Dossier
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // In-memory data store for detail modal
+    const triageDataStore = <%- JSON.stringify(doctorTriageLeads) %>;
+
+    function openTriageDetailModal(triageId) {
+        const item = triageDataStore.find(t => String(t._id) === String(triageId));
+        if (!item) return;
+
+        // Date
+        const dt = new Date(item.createdAt);
+        document.getElementById('mDateTime').textContent = dt.toLocaleDateString('en-US', { 
+            weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+        });
+
+        // Patient Info
+        document.getElementById('mPatientName').textContent = item.patientName || 'Anonymous Visitor';
+        
+        const phoneWrap = document.getElementById('mPatientPhone');
+        if (item.patientPhone) {
+            phoneWrap.style.display = 'inline';
+            phoneWrap.querySelector('span').textContent = item.patientPhone;
+        } else {
+            phoneWrap.style.display = 'none';
+        }
+
+        const emailWrap = document.getElementById('mPatientEmail');
+        if (item.patientEmail) {
+            emailWrap.style.display = 'inline';
+            emailWrap.querySelector('span').textContent = item.patientEmail;
+        } else {
+            emailWrap.style.display = 'none';
+        }
+
+        const badge = document.getElementById('mVisitorBadge');
+        if (item.patientId) {
+            badge.className = 'badge-tag';
+            badge.style.color = '#c084fc';
+            badge.innerHTML = '<i class="fas fa-id-badge"></i> Registered Patient';
+        } else {
+            badge.className = 'badge-tag';
+            badge.style.color = '#f59e0b';
+            badge.innerHTML = '<i class="fas fa-user-clock"></i> Walk-in Visitor';
+        }
+
+        // Urgency Banner
+        const banner = document.getElementById('mUrgencyBanner');
+        const icon = document.getElementById('mUrgencyIcon');
+        const title = document.getElementById('mUrgencyTitle');
+        const reason = document.getElementById('mEmergencyReason');
+
+        if (item.urgency === 'high') {
+            banner.style.background = 'rgba(239, 68, 68, 0.15)';
+            banner.style.border = '1px solid rgba(239, 68, 68, 0.35)';
+            icon.innerHTML = '<i class="fas fa-triangle-exclamation" style="color: #ef4444;"></i>';
+            title.style.color = '#ef4444';
+            title.textContent = 'High Urgency / Red Flag Alert';
+            reason.style.color = '#f87171';
+            reason.textContent = item.emergencyReason || 'Immediate medical attention or emergency room consultation recommended.';
+        } else if (item.urgency === 'moderate') {
+            banner.style.background = 'rgba(56, 189, 248, 0.12)';
+            banner.style.border = '1px solid rgba(56, 189, 248, 0.3)';
+            icon.innerHTML = '<i class="fas fa-stethoscope text-cyan"></i>';
+            title.style.color = '#38bdf8';
+            title.textContent = 'Moderate Clinical Urgency';
+            reason.style.color = '#94a3b8';
+            reason.textContent = 'Outpatient consultation recommended within 24-48 hours.';
+        } else {
+            banner.style.background = 'rgba(16, 185, 129, 0.12)';
+            banner.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+            icon.innerHTML = '<i class="fas fa-check-circle" style="color: #34d399;"></i>';
+            title.style.color = '#34d399';
+            title.textContent = 'Low Clinical Urgency';
+            reason.style.color = '#94a3b8';
+            reason.textContent = 'Routine care and self-monitoring appropriate.';
+        }
+
+        // Status Badge
+        const stBadge = document.getElementById('mStatusBadge');
+        if (item.status === 'Reviewed') {
+            stBadge.innerHTML = '<span class="status-pill completed"><i class="fas fa-check"></i> REVIEWED</span>';
+        } else {
+            stBadge.innerHTML = '<span class="status-pill scheduled"><i class="fas fa-clock"></i> NEW INQUIRY</span>';
+        }
+
+        // Symptoms List
+        const symBox = document.getElementById('mSymptomsList');
+        symBox.innerHTML = '';
+        (item.symptoms || []).forEach(s => {
+            const span = document.createElement('span');
+            span.style.cssText = 'font-size: 11.5px; padding: 3px 9px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3);';
+            span.textContent = s;
+            symBox.appendChild(span);
+        });
+
+        // Description
+        const descBox = document.getElementById('mDescriptionBox');
+        if (item.description) {
+            descBox.style.display = 'block';
+            descBox.textContent = '"' + item.description + '"';
+        } else {
+            descBox.style.display = 'none';
+        }
+
+        // Conditions
+        const condBox = document.getElementById('mConditionsList');
+        condBox.innerHTML = '';
+        (item.primaryConditions || []).forEach(c => {
+            const span = document.createElement('span');
+            span.style.cssText = 'font-size: 12px; padding: 4px 10px; border-radius: 5px; background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); font-weight: 600;';
+            span.innerHTML = '<i class="fas fa-notes-medical" style="font-size: 10px;"></i> ' + c;
+            condBox.appendChild(span);
+        });
+
+        // Faculty & Doctors
+        document.getElementById('mSpecialties').textContent = (item.recommendedSpecialties || []).join(', ') || 'General Medicine';
+        document.getElementById('mDoctors').textContent = (item.suggestedDoctorNames || []).join(', ') || 'Available Specialist';
+
+        // Summary & Home Remedy
+        document.getElementById('mSummaryText').textContent = item.summary || 'Clinical evaluation performed by automated triage model.';
+        const remBox = document.getElementById('mHomeRemedy');
+        if (item.homeRemedyNote) {
+            remBox.style.display = 'block';
+            document.getElementById('mHomeRemedyText').textContent = item.homeRemedyNote;
+        } else {
+            remBox.style.display = 'none';
+        }
+
+        // Status Action Form
+        const form = document.getElementById('mStatusForm');
+        form.action = '/staff/triage/' + item._id + '/status';
+        const input = document.getElementById('mStatusInput');
+        const btn = document.getElementById('mStatusBtn');
+
+        if (item.status === 'Reviewed') {
+            input.value = 'New';
+            btn.querySelector('span').textContent = 'Unmark as Reviewed';
+            btn.querySelector('i').className = 'fas fa-undo';
+            btn.className = 'btn-dark-glass';
+        } else {
+            input.value = 'Reviewed';
+            btn.querySelector('span').textContent = 'Mark as Reviewed';
+            btn.querySelector('i').className = 'fas fa-check-circle';
+            btn.className = 'btn-dash-primary';
+        }
+
+        // Rx Button
+        const rxBtn = document.getElementById('mRxBtn');
+        if (item.patientId) {
+            rxBtn.style.display = 'inline-flex';
+        } else {
+            rxBtn.style.display = 'none';
+        }
+
+        // Show Modal
+        document.getElementById('triageDetailModal').style.display = 'flex';
+    }
+
+    function closeTriageDetailModal() {
+        document.getElementById('triageDetailModal').style.display = 'none';
+    }
+
+    // Modal background click close
+    document.getElementById('triageDetailModal').addEventListener('click', function(e) {
+        if (e.target === this) closeTriageDetailModal();
+    });
+
+    // Real-Time Search & Filtering Logic
+    const searchInput = document.getElementById('triageSearchInput');
+    const urgencySelect = document.getElementById('urgencyFilterSelect');
+    const statusSelect = document.getElementById('statusFilterSelect');
+    const visitorSelect = document.getElementById('visitorFilterSelect');
+    const countDisplay = document.getElementById('filteredCount');
+    const noMatch = document.getElementById('noMatchMessage');
+    const rows = document.querySelectorAll('.triage-row');
+
+    function filterTriageRows() {
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const urgency = urgencySelect ? urgencySelect.value : 'all';
+        const status = statusSelect ? statusSelect.value : 'all';
+        const visitor = visitorSelect ? visitorSelect.value : 'all';
+
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const rSearch = row.getAttribute('data-search') || '';
+            const rUrgency = row.getAttribute('data-urgency') || '';
+            const rStatus = row.getAttribute('data-status') || '';
+            const rVisitor = row.getAttribute('data-visitor') || '';
+
+            const matchesQuery = !query || rSearch.includes(query);
+            const matchesUrgency = urgency === 'all' || rUrgency === urgency;
+            const matchesStatus = status === 'all' || rStatus === status;
+            const matchesVisitor = visitor === 'all' || rVisitor === visitor;
+
+            if (matchesQuery && matchesUrgency && matchesStatus && matchesVisitor) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (countDisplay) countDisplay.textContent = visibleCount;
+        if (noMatch) noMatch.style.display = (visibleCount === 0 && rows.length > 0) ? 'block' : 'none';
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterTriageRows);
+    if (urgencySelect) urgencySelect.addEventListener('change', filterTriageRows);
+    if (statusSelect) statusSelect.addEventListener('change', filterTriageRows);
+    if (visitorSelect) visitorSelect.addEventListener('change', filterTriageRows);
+
+    function resetTriageFilters() {
+        if (searchInput) searchInput.value = '';
+        if (urgencySelect) urgencySelect.value = 'all';
+        if (statusSelect) statusSelect.value = 'all';
+        if (visitorSelect) visitorSelect.value = 'all';
+        filterTriageRows();
+    }
+</script>

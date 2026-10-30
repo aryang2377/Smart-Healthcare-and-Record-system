@@ -55,6 +55,16 @@ const userSchema = new mongoose.Schema({
     default: "",
   },
 
+  // Patient Clinical Information
+  bloodGroup: {
+    type: String,
+    default: "",
+  },
+  allergies: {
+    type: String,
+    default: "",
+  },
+
   // Step 2: Professional Information
   specialization: {
     type: String,

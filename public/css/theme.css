@@ -1680,6 +1680,16 @@
   color: #475569 !important;
 }
 
+.triage-toolbar-box {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .triage-toolbar-box {
+  background: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
 [data-theme="light"] select option {
   background-color: #ffffff;
   color: #0f172a;

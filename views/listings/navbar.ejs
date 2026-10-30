@@ -26,13 +26,13 @@
           </li>
         <% } else if (currentUser.role === 'doctor') { %>
           <li>
-            <a href="/staff?tab=triage" class="nav-link <%= (typeof activeTab !== 'undefined' && activeTab === 'triage') ? 'active' : '' %>" data-path="/staff?tab=triage" onclick="if (typeof switchTab === 'function') { switchTab('triage'); return false; }">
+            <a href="/doctor/triage" class="nav-link <%= (typeof activePage !== 'undefined' && activePage === 'doctor-triage') ? 'active' : '' %>" data-path="/doctor/triage">
               <i class="fas fa-robot text-purple"></i> AI Symptom Triage
             </a>
           </li>
         <% } else if (currentUser.role === 'admin') { %>
           <li>
-            <a href="/admin?tab=triage" class="nav-link <%= (typeof activeTab !== 'undefined' && activeTab === 'triage') ? 'active' : '' %>" data-path="/admin?tab=triage" onclick="if (typeof switchTab === 'function') { switchTab('triage'); return false; }">
+            <a href="/admin/triage" class="nav-link <%= (typeof activePage !== 'undefined' && activePage === 'admin-triage') ? 'active' : '' %>" data-path="/admin/triage">
               <i class="fas fa-robot text-cyan"></i> AI Symptom Triage
             </a>
           </li>
@@ -42,13 +42,13 @@
         <% if (currentUser) { %>
           <% if (currentUser.role === 'admin') { %>
             <li>
-              <a href="/admin" class="nav-link <%= (typeof activeTab !== 'undefined' && activeTab === 'triage') ? '' : 'active-console' %>" data-path="/admin">
+              <a href="/admin" class="nav-link <%= (typeof activePage !== 'undefined' && activePage === 'admin-triage') ? '' : 'active-console' %>" data-path="/admin">
                 <i class="fas fa-shield-alt text-purple"></i> Admin Console
               </a>
             </li>
           <% } else if (currentUser.role === 'doctor' || currentUser.role === 'receptionist') { %>
             <li>
-              <a href="/staff" class="nav-link <%= (typeof activeTab !== 'undefined' && activeTab === 'triage') ? '' : 'active-console' %>" data-path="/staff">
+              <a href="/staff" class="nav-link <%= (typeof activePage !== 'undefined' && activePage === 'doctor-triage') ? '' : 'active-console' %>" data-path="/staff">
                 <i class="fas <%= currentUser.role === 'doctor' ? 'fa-stethoscope text-cyan' : 'fa-id-badge text-blue' %>"></i>
                 <%= currentUser.role === 'doctor' ? 'Doctor Console' : 'Staff Console' %>
               </a>
@@ -88,10 +88,14 @@
           </button>
         </div>
 
-        <% if (currentUser) { %>
+        <% if (currentUser) { 
+          const rawMobileName = (currentUser.fullname || 'User').trim();
+          const mobileNameWithoutTitle = rawMobileName.replace(/^dr\.?\s+/i, '').trim();
+          const mobileInitial = (mobileNameWithoutTitle[0] || rawMobileName[0] || 'U').toUpperCase();
+        %>
           <div class="mobile-user-info">
-            <div class="user-avatar-badge">
-              <%= (currentUser.fullname || 'U')[0].toUpperCase() %>
+            <div class="user-avatar-badge <%= currentUser.role %>">
+              <%= mobileInitial %>
             </div>
             <div>
               <strong><%= currentUser.fullname || 'User' %></strong>
@@ -128,14 +132,25 @@
         </span>
       </button>
 
-      <% if (currentUser) { %>
-        <div class="user-profile-badge">
-          <div class="user-avatar-circle">
-            <%= (currentUser.fullname || 'U')[0].toUpperCase() %>
+      <% if (currentUser) { 
+        const rawName = (currentUser.fullname || 'User').trim();
+        const nameWithoutTitle = rawName.replace(/^dr\.?\s+/i, '').trim();
+        const userInitial = (nameWithoutTitle[0] || rawName[0] || 'U').toUpperCase();
+        
+        let displayName = rawName;
+        if (currentUser.role === 'admin' && rawName.toLowerCase() === 'hospital administrator') {
+          displayName = 'Hospital Admin';
+        } else if (currentUser.role === 'receptionist') {
+          displayName = rawName.replace(/\s*\(front\s*desk\)/i, '').trim();
+        }
+      %>
+        <div class="user-profile-badge" title="<%= currentUser.fullname %>">
+          <div class="user-avatar-circle <%= currentUser.role %>">
+            <%= userInitial %>
           </div>
           <div class="user-meta-header">
             <span class="user-greeting">
-              <strong><%= currentUser.fullname.split(' ')[0] %></strong>
+              <strong><%= displayName %></strong>
             </span>
             <span class="role-pill-badge <%= currentUser.role %>">
               <%= currentUser.role.toUpperCase() %>

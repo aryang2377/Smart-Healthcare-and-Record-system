@@ -41,28 +41,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Highlight active link based on current path and active query/tab
+  // Highlight active link based on current path
   const updateActiveNavLinks = () => {
     const currentPath = window.location.pathname;
-    const currentSearch = window.location.search;
-    const isTriage = currentSearch.includes("tab=triage");
 
     navLinks.forEach((link) => {
       const linkPath = link.getAttribute("data-path") || link.getAttribute("href") || "";
       link.classList.remove("active");
 
-      if (isTriage) {
-        if (linkPath.includes("tab=triage")) {
-          link.classList.add("active");
-        }
-      } else {
-        if (
-          !linkPath.includes("tab=triage") &&
-          (linkPath === currentPath ||
-            (linkPath !== "/" && currentPath.startsWith(linkPath)))
-        ) {
-          link.classList.add("active");
-        }
+      if (linkPath === currentPath) {
+        link.classList.add("active");
+      } else if (
+        linkPath !== "/" &&
+        linkPath !== "/admin" &&
+        linkPath !== "/staff" &&
+        linkPath !== "/doctor/triage" &&
+        linkPath !== "/admin/triage" &&
+        currentPath.startsWith(linkPath)
+      ) {
+        link.classList.add("active");
       }
     });
   };
