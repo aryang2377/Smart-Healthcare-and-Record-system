@@ -116,13 +116,13 @@
 
         <!-- Optional Patient Details for Visitor / Guest -->
         <% if (!currentUser) { %>
-          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
-            <div style="font-size: 12px; color: #38bdf8; font-weight: 600; margin-bottom: 8px;">
+          <div class="guest-details-box">
+            <div class="guest-details-title">
               <i class="fas fa-id-card"></i> Patient Details (Optional for Hospital Records)
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <input type="text" id="patientNameInput" class="dark-input" style="padding: 8px 12px; font-size: 13px; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff;" placeholder="Your Name">
-              <input type="text" id="patientContactInput" class="dark-input" style="padding: 8px 12px; font-size: 13px; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff;" placeholder="Phone or Email">
+            <div class="guest-inputs-grid">
+              <input type="text" id="patientNameInput" class="dark-input guest-input" placeholder="Your Name">
+              <input type="text" id="patientContactInput" class="dark-input guest-input" placeholder="Phone or Email">
             </div>
           </div>
         <% } %>

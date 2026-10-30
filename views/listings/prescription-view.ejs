@@ -480,6 +480,159 @@
     margin-top: 12px;
 }
 
+/* Light Theme Overrides for Prescription Slip */
+[data-theme="light"] .rx-slip-wrapper {
+    background: #f1f5f9;
+}
+[data-theme="light"] .btn-rx-back {
+    color: #475569;
+}
+[data-theme="light"] .btn-rx-back:hover {
+    color: #0284c7;
+}
+[data-theme="light"] .rx-paper-card {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+    color: #0f172a;
+}
+[data-theme="light"] .rx-brand-info h2 {
+    color: #0f172a;
+}
+[data-theme="light"] .rx-brand-info p {
+    color: #0284c7;
+}
+[data-theme="light"] .rx-brand-info small {
+    color: #64748b;
+}
+[data-theme="light"] .rx-id-text {
+    color: #0f172a;
+}
+[data-theme="light"] .rx-badge-box small {
+    color: #64748b;
+}
+[data-theme="light"] .rx-doc-block h3,
+[data-theme="light"] .rx-pat-block h3 {
+    color: #0f172a;
+}
+[data-theme="light"] .rx-pat-meta {
+    color: #334155;
+}
+[data-theme="light"] .rx-meta-sub {
+    color: #64748b;
+}
+[data-theme="light"] .rx-divider-dotted {
+    border-bottom-color: rgba(15, 23, 42, 0.12);
+}
+[data-theme="light"] .rx-label-tag {
+    color: #475569;
+}
+[data-theme="light"] .rx-content-box {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.1);
+    color: #1e293b;
+}
+[data-theme="light"] .rx-medications-section {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.1);
+}
+[data-theme="light"] .rx-symbol-heading {
+    border-bottom-color: rgba(15, 23, 42, 0.08);
+}
+[data-theme="light"] .rx-symbol-heading h4 {
+    color: #0f172a;
+}
+[data-theme="light"] .rx-meds-box {
+    background: #ffffff;
+    border-color: rgba(15, 23, 42, 0.12);
+}
+[data-theme="light"] .rx-meds-pre {
+    color: #0f172a;
+}
+[data-theme="light"] .rx-advice-item {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.1);
+}
+[data-theme="light"] .rx-advice-title {
+    color: #1e293b;
+}
+[data-theme="light"] .rx-advice-item p {
+    color: #475569;
+}
+[data-theme="light"] .rx-followup-bar {
+    background: rgba(2, 132, 199, 0.06);
+    border-color: rgba(2, 132, 199, 0.2);
+    color: #0f172a;
+}
+[data-theme="light"] .rx-slip-footer {
+    border-top-color: rgba(15, 23, 42, 0.1);
+}
+[data-theme="light"] .rx-qr-placeholder strong {
+    color: #0f172a;
+}
+[data-theme="light"] .rx-sign-line {
+    background: #cbd5e1;
+}
+[data-theme="light"] .rx-sign-block strong {
+    color: #0f172a;
+}
+[data-theme="light"] .rx-sign-block small {
+    color: #64748b;
+}
+[data-theme="light"] .rx-legal-disclaimer {
+    color: #64748b;
+}
+
+/* Responsive Breakpoints for Prescription Slip */
+@media (max-width: 768px) {
+    .rx-slip-wrapper {
+        padding: 20px 14px 40px;
+    }
+    .rx-paper-card {
+        padding: 24px 20px;
+    }
+    .rx-parties-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .rx-advice-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 580px) {
+    .rx-clinic-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+    .rx-badge-box {
+        text-align: left;
+    }
+    .rx-action-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .btn-rx-print, .btn-rx-back {
+        justify-content: center;
+        width: 100%;
+    }
+    .rx-slip-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    .rx-sign-block {
+        text-align: left;
+        width: 100%;
+    }
+    .rx-sign-line {
+        margin-left: 0;
+    }
+}
+
 @media print {
     body {
         background: #fff !important;

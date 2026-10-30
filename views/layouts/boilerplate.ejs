@@ -14,8 +14,17 @@
     <link rel="stylesheet" href="/css/find doctors.css">
     <link rel="stylesheet" href="/css/symptom.css">
     <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="icon" href="/images/logo.png" type="image/png">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('caresync_theme') || localStorage.getItem('theme');
+            var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            var theme = (saved === 'light' || saved === 'dark') ? saved : (prefersLight ? 'light' : 'dark');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
 </head>
 
 <body>
@@ -26,6 +35,7 @@
         </main>
         <%- include("../listings/footer.ejs") %>
     </div>
+    <script src="/js/theme.js"></script>
     <script src="/js/navbar.js"></script>
 </body>
 

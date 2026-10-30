@@ -26,8 +26,8 @@
                         <i class="fas fa-file-prescription"></i> Write & Send Rx
                     </button>
                 <% } else { %>
-                    <button type="button" class="btn-book-quick" onclick="switchTab('schedule')">
-                        <i class="fas fa-calendar-plus"></i> Book Walk-In Patient
+                    <button type="button" class="btn-book-quick" onclick="switchTab('queue')">
+                        <i class="fas fa-user-clock"></i> Today's Queue
                     </button>
                 <% } %>
             </div>
@@ -85,12 +85,11 @@
             <button type="button" class="dash-tab-btn <%= activeTab === 'queue' ? 'active' : '' %>" onclick="switchTab('queue')">
                 <i class="fas fa-user-clock"></i> Today's Queue (<%= todayQueue.length %>)
             </button>
-            <button type="button" class="dash-tab-btn <%= activeTab === 'schedule' ? 'active' : '' %>" onclick="switchTab('schedule')">
-                <i class="fas fa-calendar-alt"></i> Master Schedule (<%= allAppointments.length %>)
-            </button>
-            <button type="button" class="dash-tab-btn <%= activeTab === 'prescription' ? 'active' : '' %>" onclick="switchTab('prescription')">
-                <i class="fas fa-file-prescription text-cyan"></i> Digital Rx Pad (<%= typeof doctorPrescriptions !== 'undefined' ? doctorPrescriptions.length : 0 %>)
-            </button>
+            <% if (currentUser.role === 'doctor') { %>
+                <button type="button" class="dash-tab-btn <%= activeTab === 'prescription' ? 'active' : '' %>" onclick="switchTab('prescription')">
+                    <i class="fas fa-file-prescription text-cyan"></i> Digital Rx Pad (<%= typeof doctorPrescriptions !== 'undefined' ? doctorPrescriptions.length : 0 %>)
+                </button>
+            <% } %>
             <button type="button" class="dash-tab-btn <%= activeTab === 'upload' ? 'active' : '' %>" onclick="switchTab('upload')">
                 <i class="fas fa-file-medical-alt"></i> Diagnostic Reports (<%= typeof doctorReports !== 'undefined' ? doctorReports.length : 0 %>)
             </button>
@@ -100,6 +99,9 @@
             <% if (currentUser.role === 'doctor') { %>
                 <button type="button" class="dash-tab-btn <%= activeTab === 'availability' ? 'active' : '' %>" onclick="switchTab('availability')">
                     <i class="fas fa-clock text-emerald"></i> My Availability
+                </button>
+                <button type="button" class="dash-tab-btn <%= activeTab === 'triage' ? 'active' : '' %>" onclick="switchTab('triage')">
+                    <i class="fas fa-robot text-purple"></i> AI Symptom Triage (<%= typeof doctorTriageLeads !== 'undefined' ? doctorTriageLeads.length : 0 %>)
                 </button>
             <% } %>
         </div>
@@ -218,152 +220,8 @@
             </div>
         </div>
 
-        <!-- TAB 2: MASTER SCHEDULE & WALK-IN BOOKING -->
-        <div id="tab-schedule" class="tab-pane-dark" style="<%= activeTab === 'schedule' ? 'display: block;' : 'display: none;' %>">
-            <div class="dash-grid-split">
-                <!-- Walk-In Booking Form -->
-                <div class="dash-card-dark">
-                    <div class="card-head">
-                        <h3><i class="fas fa-calendar-plus text-cyan"></i> Schedule Walk-In Consultation</h3>
-                        <small>Directly book an appointment for an arriving patient</small>
-                    </div>
-
-                    <form action="/appointments" method="POST" class="dash-form">
-                        <div class="form-group">
-                            <label>Patient Full Name *</label>
-                            <input type="text" name="patientName" placeholder="Enter patient name" required class="dark-dash-input">
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Age</label>
-                                <input type="number" name="age" min="1" max="120" placeholder="e.g. 35" class="dark-dash-input">
-                            </div>
-                            <div class="form-group">
-                                <label>Gender</label>
-                                <select name="gender" class="dark-dash-select">
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Select Attending Doctor *</label>
-                            <select name="doctorName" required class="dark-dash-select">
-                                <% if (currentUser.role === 'doctor') { %>
-                                    <option value="<%= currentUser.fullname %>"><%= currentUser.fullname %> (You)</option>
-                                <% } %>
-                                <% if (typeof activeDoctors !== 'undefined' && activeDoctors.length > 0) { %>
-                                    <% activeDoctors.forEach(doc => { %>
-                                        <% if (doc.fullname !== currentUser.fullname) { %>
-                                            <option value="<%= doc.fullname %>"><%= doc.fullname %> (<%= doc.specialization %>)</option>
-                                        <% } %>
-                                    <% }) %>
-                                <% } else { %>
-                                    <option value="Dr. Rajesh Sharma">Dr. Rajesh Sharma (Cardiology)</option>
-                                    <option value="Dr. Priya Mehta">Dr. Priya Mehta (Dermatology)</option>
-                                    <option value="Dr. Amit Verma">Dr. Amit Verma (General Medicine)</option>
-                                <% } %>
-                            </select>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Consultation Date *</label>
-                                <input type="date" name="date" required class="dark-dash-input" value="<%= new Date().toISOString().split('T')[0] %>">
-                            </div>
-                            <div class="form-group">
-                                <label>Time Slot *</label>
-                                <select name="time" class="dark-dash-select">
-                                    <option value="09:00 AM">09:00 AM</option>
-                                    <option value="09:30 AM">09:30 AM</option>
-                                    <option value="10:00 AM">10:00 AM</option>
-                                    <option value="10:30 AM">10:30 AM</option>
-                                    <option value="11:00 AM">11:00 AM</option>
-                                    <option value="11:30 AM">11:30 AM</option>
-                                    <option value="12:00 PM">12:00 PM</option>
-                                    <option value="02:00 PM">02:00 PM</option>
-                                    <option value="02:30 PM">02:30 PM</option>
-                                    <option value="03:00 PM">03:00 PM</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Chief Complaints / Symptoms</label>
-                            <input type="text" name="notes" placeholder="e.g. Chest pain, fever, follow-up visit" class="dark-dash-input">
-                        </div>
-
-                        <button type="submit" class="btn-dash-primary">
-                            <i class="fas fa-check-circle"></i> Confirm Walk-In Visit
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Schedule Table -->
-                <div class="dash-card-dark">
-                    <div class="card-head">
-                        <h3><i class="fas fa-calendar-alt text-blue"></i> Consultation Schedule Ledger</h3>
-                        <small>Complete record of active, completed, and past visits</small>
-                    </div>
-
-                    <% if (allAppointments.length > 0) { %>
-                        <div class="table-scroll-wrap">
-                            <table class="dash-table-dark">
-                                <thead>
-                                    <tr>
-                                        <th>Patient</th>
-                                        <th>Attending Doctor</th>
-                                        <th>Date & Time</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% allAppointments.forEach(appt => { %>
-                                        <tr>
-                                            <td>
-                                                <strong><%= appt.patientName %></strong><br>
-                                                <small class="text-dim"><%= appt.notes || 'Routine consultation' %></small>
-                                            </td>
-                                            <td><small style="color: #38bdf8;"><%= appt.doctorName %></small></td>
-                                            <td>
-                                                <%= new Date(appt.date).toLocaleDateString() %><br>
-                                                <small class="text-cyan"><%= appt.slot || appt.time %></small>
-                                            </td>
-                                            <td>
-                                                <span class="status-pill <%= appt.status.toLowerCase().replace(/[^a-z]/g, '') %>">
-                                                    <%= appt.status %>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <% if (appt.status === 'Scheduled' || appt.status === 'Confirmed') { %>
-                                                    <form action="/staff/appointments/<%= appt._id %>/status" method="POST" style="display:inline;">
-                                                        <input type="hidden" name="status" value="Checked-In">
-                                                        <button type="submit" class="btn-sm-action checkin">Check In</button>
-                                                    </form>
-                                                <% } else { %>
-                                                    <span class="text-dim">—</span>
-                                                <% } %>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
-                                </tbody>
-                            </table>
-                        </div>
-                    <% } else { %>
-                        <div class="empty-state-box">
-                            <i class="fas fa-calendar-times"></i>
-                            <p>No appointments scheduled.</p>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: DIGITAL PRESCRIPTION PAD -->
+        <!-- TAB 3: DIGITAL PRESCRIPTION PAD (DOCTOR ONLY) -->
+        <% if (currentUser.role === 'doctor') { %>
         <div id="tab-prescription" class="tab-pane-dark" style="<%= activeTab === 'prescription' ? 'display: block;' : 'display: none;' %>">
             <div class="dash-grid-split">
                 <!-- Rx Form -->
@@ -373,87 +231,75 @@
                         <small>Prescribe medications, clinical diagnosis, and diet/lifestyle advice</small>
                     </div>
 
-                    <% if (currentUser.role === 'doctor') { %>
-                        <form action="/staff/prescriptions/create" method="POST" class="dash-form" id="rxPadForm">
+                    <form action="/staff/prescriptions/create" method="POST" class="dash-form" id="rxPadForm">
+                        <div class="form-group">
+                            <label><i class="fas fa-user-injured text-cyan"></i> Select Patient from Registry</label>
+                            <select name="patientId" id="rxSelectPatient" class="dark-dash-select" onchange="autoFillRxPatient(this)">
+                                <option value="">-- Choose Patient or Type Below --</option>
+                                <% patientRoster.forEach(p => { %>
+                                    <option value="<%= p._id %>" data-name="<%= p.fullname %>" data-email="<%= p.email %>">
+                                        <%= p.fullname %> (<%= p.email %>)
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Patient Name *</label>
+                            <input type="text" name="patientName" id="rxPatientName" placeholder="Enter or confirm patient name" required class="dark-dash-input">
+                        </div>
+
+                        <div class="form-row">
                             <div class="form-group">
-                                <label><i class="fas fa-user-injured text-cyan"></i> Select Patient from Registry</label>
-                                <select name="patientId" id="rxSelectPatient" class="dark-dash-select" onchange="autoFillRxPatient(this)">
-                                    <option value="">-- Choose Patient or Type Below --</option>
-                                    <% patientRoster.forEach(p => { %>
-                                        <option value="<%= p._id %>" data-name="<%= p.fullname %>" data-email="<%= p.email %>">
-                                            <%= p.fullname %> (<%= p.email %>)
-                                        </option>
-                                    <% }) %>
+                                <label>Age</label>
+                                <input type="number" name="patientAge" id="rxPatientAge" placeholder="e.g. 35" min="1" max="120" class="dark-dash-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select name="patientGender" id="rxPatientGender" class="dark-dash-select">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
+                        </div>
 
+                        <div class="form-group">
+                            <label><i class="fas fa-comment-medical text-amber" style="color: #fbbf24;"></i> Patient's Reported Problem / Symptoms *</label>
+                            <textarea name="problem" id="rxProblem" placeholder="Enter patient complaints: e.g. High fever for 2 days, persistent cough, chest congestion, throat pain, headache..." rows="3" class="dark-dash-textarea" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-stethoscope text-cyan"></i> Doctor's Clinical Diagnosis *</label>
+                            <input type="text" name="diagnosis" id="rxDiagnosis" placeholder="e.g. Acute Upper Respiratory Tract Infection (URTI) / Bronchitis" required class="dark-dash-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-capsules text-emerald"></i> Prescribed Medications (℞) *</label>
+                            <textarea name="medicines" id="rxMedicines" placeholder="Enter medication regimen:&#10;1. Tab. Paracetamol 650mg — 1 tab thrice daily after meals (3 days)&#10;2. Tab. Azithromycin 500mg — 1 tab once daily before lunch (5 days)&#10;3. Syp. TusQ-DX (100ml) — 10ml twice daily (5 days)" rows="4" class="dark-dash-textarea" required></textarea>
+                        </div>
+
+                        <div class="form-row">
                             <div class="form-group">
-                                <label>Patient Name *</label>
-                                <input type="text" name="patientName" id="rxPatientName" placeholder="Enter or confirm patient name" required class="dark-dash-input">
+                                <label><i class="fas fa-heartbeat text-blue"></i> Diet & Instructions</label>
+                                <textarea name="advice" rows="2" placeholder="e.g. Warm water gargles twice daily, bed rest, hydrate adequately." class="dark-dash-textarea"></textarea>
                             </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Age</label>
-                                    <input type="number" name="patientAge" id="rxPatientAge" placeholder="e.g. 35" min="1" max="120" class="dark-dash-input">
-                                </div>
-                                <div class="form-group">
-                                    <label>Gender</label>
-                                    <select name="patientGender" id="rxPatientGender" class="dark-dash-select">
-                                        <option value="">Select Gender</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-                            </div>
-
                             <div class="form-group">
-                                <label><i class="fas fa-comment-medical text-amber" style="color: #fbbf24;"></i> Patient's Reported Problem / Symptoms *</label>
-                                <textarea name="problem" id="rxProblem" placeholder="Enter patient complaints: e.g. High fever for 2 days, persistent cough, chest congestion, throat pain, headache..." rows="3" class="dark-dash-textarea" required></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label><i class="fas fa-stethoscope text-cyan"></i> Doctor's Clinical Diagnosis *</label>
-                                <input type="text" name="diagnosis" id="rxDiagnosis" placeholder="e.g. Acute Upper Respiratory Tract Infection (URTI) / Bronchitis" required class="dark-dash-input">
-                            </div>
-
-                            <div class="form-group">
-                                <label><i class="fas fa-capsules text-emerald"></i> Prescribed Medications (℞) *</label>
-                                <textarea name="medicines" id="rxMedicines" placeholder="Enter medication regimen:&#10;1. Tab. Paracetamol 650mg — 1 tab thrice daily after meals (3 days)&#10;2. Tab. Azithromycin 500mg — 1 tab once daily before lunch (5 days)&#10;3. Syp. TusQ-DX (100ml) — 10ml twice daily (5 days)" rows="4" class="dark-dash-textarea" required></textarea>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label><i class="fas fa-heartbeat text-blue"></i> Diet & Instructions</label>
-                                    <textarea name="advice" rows="2" placeholder="e.g. Warm water gargles twice daily, bed rest, hydrate adequately." class="dark-dash-textarea"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label><i class="fas fa-vial text-purple"></i> Recommended Lab Tests</label>
-                                    <textarea name="testsRecommended" rows="2" placeholder="e.g. CBC, Chest X-Ray if cough persists." class="dark-dash-textarea"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label><i class="fas fa-calendar-alt text-cyan"></i> Next Review / Follow-Up</label>
-                                <input type="text" name="followUp" value="Review after 5 days if symptoms persist" class="dark-dash-input">
-                            </div>
-
-                            <button type="submit" class="btn-dash-primary" style="background: linear-gradient(135deg, #0284c7, #10b981); width: 100%; justify-content: center;">
-                                <i class="fas fa-paper-plane"></i> Dispatch Digital Prescription to Patient
-                            </button>
-                        </form>
-                    <% } else { %>
-                        <div class="auth-alert-info" style="margin-top: 15px;">
-                            <i class="fas fa-info-circle"></i>
-                            <div>
-                                <strong>Front-Desk Operational Notice:</strong>
-                                <p style="margin: 4px 0 0; font-size: 13px;">
-                                    Clinical prescription generation is restricted to licensed physicians. Receptionists can inspect dispatched prescriptions and print copies for arriving patients using the ledger on the right.
-                                </p>
+                                <label><i class="fas fa-vial text-purple"></i> Recommended Lab Tests</label>
+                                <textarea name="testsRecommended" rows="2" placeholder="e.g. CBC, Chest X-Ray if cough persists." class="dark-dash-textarea"></textarea>
                             </div>
                         </div>
-                    <% } %>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt text-cyan"></i> Next Review / Follow-Up</label>
+                            <input type="text" name="followUp" value="Review after 5 days if symptoms persist" class="dark-dash-input">
+                        </div>
+
+                        <button type="submit" class="btn-dash-primary" style="background: linear-gradient(135deg, #0284c7, #10b981); width: 100%; justify-content: center;">
+                            <i class="fas fa-paper-plane"></i> Dispatch Digital Prescription to Patient
+                        </button>
+                    </form>
                 </div>
 
                 <!-- Sent Prescriptions Ledger -->
@@ -506,6 +352,7 @@
                 </div>
             </div>
         </div>
+        <% } %>
 
         <!-- TAB 4: DIAGNOSTIC LAB REPORTS -->
         <div id="tab-upload" class="tab-pane-dark" style="<%= activeTab === 'upload' ? 'display: block;' : 'display: none;' %>">
@@ -645,8 +492,8 @@
                                                     <i class="fas fa-file-prescription"></i> Write Rx
                                                 </button>
                                             <% } else { %>
-                                                <button type="button" class="btn-sm-action checkin" onclick="switchTab('schedule')">
-                                                    <i class="fas fa-calendar-plus"></i> Book
+                                                <button type="button" class="btn-sm-action checkin" onclick="switchTab('queue')">
+                                                    <i class="fas fa-user-clock"></i> Queue
                                                 </button>
                                             <% } %>
                                         </td>
@@ -851,13 +698,13 @@
                                                     </span>
                                                 <% } %>
                                                 <% if (triage.primaryConditions && triage.primaryConditions.length > 0) { %>
-                                                    <small style="display: block; color: #cbd5e1; margin-top: 3px;">
+                                                    <small class="triage-cond-text" style="display: block; margin-top: 3px;">
                                                         <%= triage.primaryConditions.join(', ') %>
                                                     </small>
                                                 <% } %>
                                             </td>
                                             <td style="max-width: 280px;">
-                                                <p style="font-size: 12.5px; color: #cbd5e1; margin: 0; line-height: 1.4;">
+                                                <p class="triage-summary-cell" style="font-size: 12.5px; margin: 0; line-height: 1.4;">
                                                     <%= triage.summary || 'Clinical triage completed.' %>
                                                 </p>
                                             </td>
