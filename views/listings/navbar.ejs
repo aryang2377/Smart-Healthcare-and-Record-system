@@ -42,20 +42,20 @@
         <% if (currentUser) { %>
           <% if (currentUser.role === 'admin') { %>
             <li>
-              <a href="/admin" class="nav-link <%= (typeof activePage !== 'undefined' && activePage === 'admin-triage') ? '' : 'active-console' %>" data-path="/admin">
+              <a href="/admin" class="nav-link" data-path="/admin">
                 <i class="fas fa-shield-alt text-purple"></i> Admin Console
               </a>
             </li>
           <% } else if (currentUser.role === 'doctor' || currentUser.role === 'receptionist') { %>
             <li>
-              <a href="/staff" class="nav-link <%= (typeof activePage !== 'undefined' && activePage === 'doctor-triage') ? '' : 'active-console' %>" data-path="/staff">
+              <a href="/staff" class="nav-link" data-path="/staff">
                 <i class="fas <%= currentUser.role === 'doctor' ? 'fa-stethoscope text-cyan' : 'fa-id-badge text-blue' %>"></i>
                 <%= currentUser.role === 'doctor' ? 'Doctor Console' : 'Staff Console' %>
               </a>
             </li>
           <% } else { %>
             <li>
-              <a href="/dashboard" class="nav-link active-console" data-path="/dashboard">
+              <a href="/dashboard" class="nav-link" data-path="/dashboard">
                 <i class="fas fa-th-large text-emerald"></i> My Dashboard
               </a>
             </li>
@@ -90,15 +90,36 @@
 
         <% if (currentUser) { 
           const rawMobileName = (currentUser.fullname || 'User').trim();
-          const mobileNameWithoutTitle = rawMobileName.replace(/^dr\.?\s+/i, '').trim();
-          const mobileInitial = (mobileNameWithoutTitle[0] || rawMobileName[0] || 'U').toUpperCase();
+          const cleanMobileName = rawMobileName.replace(/^dr\.?\s*/i, '').trim();
+          
+          let displayMobileName = rawMobileName;
+          let mobileInitial = 'U';
+
+          if (currentUser.role === 'doctor') {
+            if (!cleanMobileName || cleanMobileName.toLowerCase() === 'doctor') {
+              displayMobileName = 'Doctor';
+              mobileInitial = 'D';
+            } else {
+              displayMobileName = rawMobileName.startsWith('Dr.') ? rawMobileName : ('Dr. ' + cleanMobileName);
+              mobileInitial = (cleanMobileName[0] || 'D').toUpperCase();
+            }
+          } else if (currentUser.role === 'admin') {
+            displayMobileName = (rawMobileName.toLowerCase() === 'hospital administrator' || rawMobileName.toLowerCase() === 'system admin') ? 'Hospital Admin' : rawMobileName;
+            mobileInitial = (displayMobileName[0] || 'A').toUpperCase();
+          } else if (currentUser.role === 'receptionist') {
+            displayMobileName = rawMobileName.replace(/\s*\(front\s*desk\)/i, '').trim();
+            mobileInitial = (displayMobileName[0] || 'R').toUpperCase();
+          } else {
+            displayMobileName = rawMobileName;
+            mobileInitial = (cleanMobileName[0] || rawMobileName[0] || 'P').toUpperCase();
+          }
         %>
           <div class="mobile-user-info">
             <div class="user-avatar-badge <%= currentUser.role %>">
               <%= mobileInitial %>
             </div>
             <div>
-              <strong><%= currentUser.fullname || 'User' %></strong>
+              <strong><%= displayMobileName %></strong>
               <small class="role-subtext"><%= (currentUser.role || 'patient').toUpperCase() %></small>
             </div>
           </div>
@@ -134,14 +155,28 @@
 
       <% if (currentUser) { 
         const rawName = (currentUser.fullname || 'User').trim();
-        const nameWithoutTitle = rawName.replace(/^dr\.?\s+/i, '').trim();
-        const userInitial = (nameWithoutTitle[0] || rawName[0] || 'U').toUpperCase();
+        const cleanName = rawName.replace(/^dr\.?\s*/i, '').trim();
         
         let displayName = rawName;
-        if (currentUser.role === 'admin' && rawName.toLowerCase() === 'hospital administrator') {
-          displayName = 'Hospital Admin';
+        let userInitial = 'U';
+
+        if (currentUser.role === 'doctor') {
+          if (!cleanName || cleanName.toLowerCase() === 'doctor') {
+            displayName = 'Doctor';
+            userInitial = 'D';
+          } else {
+            displayName = rawName.startsWith('Dr.') ? rawName : ('Dr. ' + cleanName);
+            userInitial = (cleanName[0] || 'D').toUpperCase();
+          }
+        } else if (currentUser.role === 'admin') {
+          displayName = (rawName.toLowerCase() === 'hospital administrator' || rawName.toLowerCase() === 'system admin') ? 'Hospital Admin' : rawName;
+          userInitial = (displayName[0] || 'A').toUpperCase();
         } else if (currentUser.role === 'receptionist') {
           displayName = rawName.replace(/\s*\(front\s*desk\)/i, '').trim();
+          userInitial = (displayName[0] || 'R').toUpperCase();
+        } else {
+          displayName = rawName;
+          userInitial = (cleanName[0] || rawName[0] || 'P').toUpperCase();
         }
       %>
         <div class="user-profile-badge" title="<%= currentUser.fullname %>">

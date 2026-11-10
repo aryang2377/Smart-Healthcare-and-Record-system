@@ -103,4 +103,37 @@ function togglePwd(inputId, btn) {
         icon.classList.add('fa-eye');
     }
 }
+
+const staffLoginForm = document.querySelector('.auth-form');
+if (staffLoginForm) {
+    staffLoginForm.addEventListener('submit', function (e) {
+        const email = document.getElementById('staffEmail');
+        const pass = document.getElementById('staffPassword');
+
+        if (!email.value.trim() || !email.value.includes('@')) {
+            e.preventDefault();
+            showModernAlert('Please enter your staff clinical email address.', 'warning', { title: 'Staff Email Required', targetInput: email });
+            return false;
+        }
+        if (!pass.value.trim()) {
+            e.preventDefault();
+            showModernAlert('Please enter your staff password.', 'warning', { title: 'Password Required', targetInput: pass });
+            return false;
+        }
+
+        try {
+            sessionStorage.setItem('caresync_toast', JSON.stringify({
+                title: 'Success',
+                message: 'Staff Login Successful',
+                type: 'success'
+            }));
+        } catch (err) {}
+    });
+}
+
+<% if (typeof error !== 'undefined' && error) { %>
+document.addEventListener('DOMContentLoaded', function () {
+    showModernAlert(<%- JSON.stringify(error) %>, 'error', { title: 'Staff Authentication Notice' });
+});
+<% } %>
 </script>

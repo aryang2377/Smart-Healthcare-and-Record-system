@@ -13,7 +13,7 @@
             <p class="auth-subtitle">Enter your registered email address to receive reset instructions</p>
         </div>
 
-        <form onsubmit="event.preventDefault(); alert('A password reset link has been dispatched to your email address.'); window.location.href='/login';" class="auth-form">
+        <form id="forgotForm" class="auth-form">
             <div class="form-group">
                 <label for="forgotEmail">Registered Email Address</label>
                 <input
@@ -30,6 +30,27 @@
                 <i class="fas fa-paper-plane"></i> Send Reset Link
             </button>
         </form>
+
+        <script>
+            document.getElementById('forgotForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const email = document.getElementById('forgotEmail');
+                if (!email.value.trim() || !email.value.includes('@')) {
+                    showModernAlert('Please enter a valid registered email address.', 'warning', {
+                        title: 'Email Address Required',
+                        targetInput: email
+                    });
+                    return;
+                }
+                showModernAlert('A password reset link has been dispatched to your registered email address.', 'success', {
+                    title: 'Reset Link Dispatched',
+                    duration: 3500
+                });
+                setTimeout(function () {
+                    window.location.href = '/login';
+                }, 1600);
+            });
+        </script>
 
         <div class="auth-links">
             <p>

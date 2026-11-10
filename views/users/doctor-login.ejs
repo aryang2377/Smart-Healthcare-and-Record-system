@@ -96,4 +96,37 @@ function togglePwd(inputId, btn) {
         icon.classList.add('fa-eye');
     }
 }
+
+const docLoginForm = document.querySelector('.auth-form');
+if (docLoginForm) {
+    docLoginForm.addEventListener('submit', function (e) {
+        const email = document.getElementById('doctorEmail');
+        const pass = document.getElementById('doctorPassword');
+
+        if (!email.value.trim() || !email.value.includes('@')) {
+            e.preventDefault();
+            showModernAlert('Please enter your official staff email address.', 'warning', { title: 'Staff Email Required', targetInput: email });
+            return false;
+        }
+        if (!pass.value.trim()) {
+            e.preventDefault();
+            showModernAlert('Please enter your security password.', 'warning', { title: 'Password Required', targetInput: pass });
+            return false;
+        }
+
+        try {
+            sessionStorage.setItem('caresync_toast', JSON.stringify({
+                title: 'Success',
+                message: 'Staff Login Successful',
+                type: 'success'
+            }));
+        } catch (err) {}
+    });
+}
+
+<% if (typeof error !== 'undefined' && error) { %>
+document.addEventListener('DOMContentLoaded', function () {
+    showModernAlert(<%- JSON.stringify(error) %>, 'error', { title: 'Staff Authentication Notice' });
+});
+<% } %>
 </script>

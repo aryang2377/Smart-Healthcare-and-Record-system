@@ -445,8 +445,8 @@
                         <small style="color: #64748b; font-size: 13px; margin-top: 4px; display: block;">Daily cardiovascular, metabolic, and biometrics tracking with AHA &amp; WHO clinical guideline evaluations</small>
                     </div>
                     <% if (typeof vitalsHistory !== 'undefined' && vitalsHistory.length > 0) { %>
-                    <div class="head-actions">
-                        <button type="button" class="btn-book-quick" onclick="openLogVitalsModal()" style="font-size: 13px; padding: 8px 18px; border-radius: 8px; width: auto; display: inline-flex; align-items: center; gap: 8px;">
+                    <div class="head-actions" style="margin-left: auto;">
+                        <button type="button" class="btn-book-quick" onclick="openLogVitalsModal()" style="font-size: 13px; padding: 8px 18px; border-radius: 8px; width: auto !important; max-width: 200px; display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;">
                             <i class="fas fa-plus-circle"></i> Log New Reading
                         </button>
                     </div>
@@ -473,16 +473,16 @@
 
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
                             <!-- Blood Pressure -->
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                            <div class="vitals-metric-card">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Blood Pressure</span>
-                                    <i class="fas fa-heart text-rose" style="font-size: 16px; color: #f43f5e;"></i>
+                                    <span class="vitals-metric-label">Blood Pressure</span>
+                                    <i class="fas fa-heart text-rose" style="font-size: 16px;"></i>
                                 </div>
                                 <div style="margin-top: 8px;">
-                                    <strong style="font-size: 24px; color: #f8fafc; font-weight: 800;">
+                                    <strong class="vitals-metric-val">
                                         <%= latestVitals.systolic && latestVitals.diastolic ? (latestVitals.systolic + ' / ' + latestVitals.diastolic) : '--' %>
                                     </strong>
-                                    <small style="color: #64748b; font-size: 11px;"> mmHg</small>
+                                    <small class="vitals-metric-unit"> mmHg</small>
                                 </div>
                                 <div style="margin-top: 8px;">
                                     <span class="status-pill <%= latestVitals.bpBadge === 'danger' ? 'cancelled' : (latestVitals.bpBadge === 'warning' ? 'confirmed' : 'completed') %>" style="font-size: 11px;">
@@ -492,16 +492,16 @@
                             </div>
 
                             <!-- Blood Sugar -->
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                            <div class="vitals-metric-card">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Blood Glucose</span>
-                                    <i class="fas fa-droplet text-amber" style="font-size: 16px; color: #f59e0b;"></i>
+                                    <span class="vitals-metric-label">Blood Glucose</span>
+                                    <i class="fas fa-droplet text-amber" style="font-size: 16px;"></i>
                                 </div>
                                 <div style="margin-top: 8px;">
-                                    <strong style="font-size: 24px; color: #f8fafc; font-weight: 800;">
+                                    <strong class="vitals-metric-val">
                                         <%= latestVitals.bloodSugar || '--' %>
                                     </strong>
-                                    <small style="color: #64748b; font-size: 11px;"> mg/dL (<%= latestVitals.sugarType %>)</small>
+                                    <small class="vitals-metric-unit"> mg/dL (<%= latestVitals.sugarType %>)</small>
                                 </div>
                                 <div style="margin-top: 8px;">
                                     <span class="status-pill <%= latestVitals.sugarBadge === 'danger' ? 'cancelled' : (latestVitals.sugarBadge === 'warning' ? 'confirmed' : 'completed') %>" style="font-size: 11px;">
@@ -511,16 +511,16 @@
                             </div>
 
                             <!-- Heart Rate -->
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                            <div class="vitals-metric-card">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Resting Pulse</span>
-                                    <i class="fas fa-wave-square text-cyan" style="font-size: 16px; color: #38bdf8;"></i>
+                                    <span class="vitals-metric-label">Resting Pulse</span>
+                                    <i class="fas fa-wave-square text-cyan" style="font-size: 16px;"></i>
                                 </div>
                                 <div style="margin-top: 8px;">
-                                    <strong style="font-size: 24px; color: #f8fafc; font-weight: 800;">
+                                    <strong class="vitals-metric-val">
                                         <%= latestVitals.heartRate || '--' %>
                                     </strong>
-                                    <small style="color: #64748b; font-size: 11px;"> bpm</small>
+                                    <small class="vitals-metric-unit"> bpm</small>
                                 </div>
                                 <div style="margin-top: 8px;">
                                     <span class="status-pill <%= latestVitals.pulseBadge === 'danger' ? 'cancelled' : (latestVitals.pulseBadge === 'warning' ? 'confirmed' : 'completed') %>" style="font-size: 11px;">
@@ -530,16 +530,16 @@
                             </div>
 
                             <!-- BMI & Weight -->
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                            <div class="vitals-metric-card">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Body Mass Index</span>
-                                    <i class="fas fa-weight-scale text-purple" style="font-size: 16px; color: #c084fc;"></i>
+                                    <span class="vitals-metric-label">Body Mass Index</span>
+                                    <i class="fas fa-weight-scale text-purple" style="font-size: 16px;"></i>
                                 </div>
                                 <div style="margin-top: 8px;">
-                                    <strong style="font-size: 24px; color: #f8fafc; font-weight: 800;">
+                                    <strong class="vitals-metric-val">
                                         <%= latestVitals.bmi || '--' %>
                                     </strong>
-                                    <small style="color: #64748b; font-size: 11px;"> BMI (<%= latestVitals.weight ? latestVitals.weight + ' kg' : '--' %>)</small>
+                                    <small class="vitals-metric-unit"> BMI (<%= latestVitals.weight ? latestVitals.weight + ' kg' : '--' %>)</small>
                                 </div>
                                 <div style="margin-top: 8px;">
                                     <span class="status-pill <%= latestVitals.bmiBadge === 'danger' ? 'cancelled' : (latestVitals.bmiBadge === 'warning' ? 'confirmed' : 'completed') %>" style="font-size: 11px;">
@@ -549,16 +549,16 @@
                             </div>
 
                             <!-- Oxygen Saturation SpO2 -->
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+                            <div class="vitals-metric-card">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Blood Oxygen (SpO2)</span>
-                                    <i class="fas fa-lungs text-emerald" style="font-size: 16px; color: #34d399;"></i>
+                                    <span class="vitals-metric-label">Blood Oxygen (SpO2)</span>
+                                    <i class="fas fa-lungs text-emerald" style="font-size: 16px;"></i>
                                 </div>
                                 <div style="margin-top: 8px;">
-                                    <strong style="font-size: 24px; color: #f8fafc; font-weight: 800;">
+                                    <strong class="vitals-metric-val">
                                         <%= latestVitals.oxygenLevel ? latestVitals.oxygenLevel + '%' : '--' %>
                                     </strong>
-                                    <small style="color: #64748b; font-size: 11px;"><%= latestVitals.temperature ? ' • ' + latestVitals.temperature + '°F' : '' %></small>
+                                    <small class="vitals-metric-unit"><%= latestVitals.temperature ? ' • ' + latestVitals.temperature + '°F' : '' %></small>
                                 </div>
                                 <div style="margin-top: 8px;">
                                     <span class="status-pill <%= latestVitals.oxygenBadge === 'danger' ? 'cancelled' : (latestVitals.oxygenBadge === 'warning' ? 'confirmed' : 'completed') %>" style="font-size: 11px;">
@@ -672,7 +672,7 @@
                         <p style="color: #94a3b8; max-width: 460px; margin: 0 auto 20px auto; font-size: 13.5px; line-height: 1.6;">
                             Log your blood pressure, glucose, heart rate, and weight to track your health trends and automatically check against clinical standards.
                         </p>
-                        <button type="button" class="btn-book-quick" onclick="openLogVitalsModal()" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; font-size: 13.5px; border-radius: 8px; margin: 0 auto;">
+                        <button type="button" class="btn-book-quick" onclick="openLogVitalsModal()" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 26px; font-size: 14px; border-radius: 10px; margin: 0 auto; width: auto !important; max-width: 250px;">
                             <i class="fas fa-plus-circle"></i> Log Your First Reading
                         </button>
                     </div>

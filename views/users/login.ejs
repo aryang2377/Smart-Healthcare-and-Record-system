@@ -3,11 +3,11 @@
 <div class="auth-container">
     <div class="auth-box">
         <div class="auth-header">
-            <a href="/">
+            <a href="/" class="auth-logo-link">
                 <img src="/images/logo.png" alt="CareSync" class="auth-logo">
             </a>
             <span class="auth-tag patient">
-                <i class="fas fa-user"></i> Patient & User Portal
+                <i class="fas fa-user-circle"></i> Patient &amp; User Portal
             </span>
             <h2 class="auth-title">Account Login</h2>
             <p class="auth-subtitle">Sign in to manage appointments and medical records</p>
@@ -59,32 +59,33 @@
                     <input type="checkbox" name="remember" checked>
                     <span>Remember me</span>
                 </label>
-                <a href="/forgot">Forgot password?</a>
+                <a href="/forgot" class="forgot-link">Forgot password?</a>
             </div>
 
             <button type="submit" class="auth-btn">
-                <i class="fas fa-sign-in-alt"></i> Login
+                <i class="fas fa-arrow-right-to-bracket"></i> Login
             </button>
         </form>
 
         <div class="auth-switch-section">
-            <div class="auth-switch-item">
-                <p>Don't have an account?</p>
-                <a href="/register" class="btn-auth-outline patient">
-                    <i class="fas fa-user-plus"></i> Register as Patient
+            <div class="auth-switch-row">
+                <span>Don't have an account?</span>
+                <a href="/register" class="auth-link-bold">
+                    Register as Patient <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
 
-            <div class="auth-switch-item">
-                <p>Are you a healthcare professional?</p>
-                <a href="/doctor/apply" class="btn-auth-outline doctor">
-                    <i class="fas fa-user-md"></i> Apply as Doctor
-                </a>
+            <div class="auth-switch-footer">
+                <span class="auth-footer-tag">Healthcare Professional?</span>
+                <div class="auth-pill-group">
+                    <a href="/doctor/apply" class="auth-pill-btn doctor">
+                        <i class="fas fa-user-md"></i> Apply as Doctor
+                    </a>
+                    <a href="/doctor/login" class="auth-pill-btn subtle">
+                        <i class="fas fa-stethoscope"></i> Staff Sign In
+                    </a>
+                </div>
             </div>
-        </div>
-
-        <div class="auth-subnote">
-            Doctor already verified? <a href="/doctor/login">Doctor Sign In</a>
         </div>
     </div>
 </div>
@@ -104,4 +105,37 @@ function togglePwd(inputId, btn) {
         icon.classList.add('fa-eye');
     }
 }
+
+const loginForm = document.querySelector('.auth-form');
+if (loginForm) {
+    loginForm.addEventListener('submit', function (e) {
+        const email = document.getElementById('loginEmail');
+        const pass = document.getElementById('loginPassword');
+
+        if (!email.value.trim() || !email.value.includes('@')) {
+            e.preventDefault();
+            showModernAlert('Please enter a valid email address.', 'warning', { title: 'Email Required', targetInput: email });
+            return false;
+        }
+        if (!pass.value.trim()) {
+            e.preventDefault();
+            showModernAlert('Please enter your account password.', 'warning', { title: 'Password Required', targetInput: pass });
+            return false;
+        }
+
+        try {
+            sessionStorage.setItem('caresync_toast', JSON.stringify({
+                title: 'Success',
+                message: 'Login Successful',
+                type: 'success'
+            }));
+        } catch (err) {}
+    });
+}
+
+<% if (typeof error !== 'undefined' && error) { %>
+document.addEventListener('DOMContentLoaded', function () {
+    showModernAlert(<%- JSON.stringify(error) %>, 'error', { title: 'Authentication Notice' });
+});
+<% } %>
 </script>

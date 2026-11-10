@@ -194,13 +194,13 @@
                                     <td>
                                         <div style="display: flex; flex-wrap: wrap; gap: 5px; max-width: 220px;">
                                             <% (triage.symptoms || []).forEach(sym => { %>
-                                                <span style="font-size: 11px; padding: 2px 7px; border-radius: 4px; background: rgba(56, 189, 248, 0.12); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.25);">
+                                                <span class="triage-sym-tag">
                                                     <%= sym %>
                                                 </span>
                                             <% }) %>
                                         </div>
                                         <% if (triage.description) { %>
-                                            <p style="font-size: 12px; color: #cbd5e1; font-style: italic; margin-top: 6px; line-height: 1.35; max-width: 240px; background: rgba(15, 23, 42, 0.5); padding: 6px 8px; border-radius: 6px; border-left: 2px solid #38bdf8;">
+                                            <p class="triage-desc-quote">
                                                 "<%= triage.description %>"
                                             </p>
                                         <% } %>

@@ -171,7 +171,7 @@ const isAdminLoggedIn = async (req, res, next) => {
 // PUBLIC ROUTES
 // ==========================================
 
-app.get("/", (req, res) => {
+app.get(["/", "/listings", "/home"], (req, res) => {
   res.render("listings/home");
 });
 
@@ -348,8 +348,19 @@ app.get("/reports", (req, res) => {
   return res.redirect("/dashboard?tab=reports");
 });
 
-app.get("/appointment", (req, res) => {
-  res.redirect("/dashboard");
+app.get(["/appointment", "/appointments"], (req, res) => {
+  if (res.locals.currentUser) {
+    return res.redirect("/dashboard?tab=appointments");
+  }
+  res.redirect("/doctors");
+});
+
+app.get("/vitals", (req, res) => {
+  res.redirect("/dashboard?tab=vitals");
+});
+
+app.get("/admin/dashboard", (req, res) => {
+  res.redirect("/admin");
 });
 
 app.get("/forgot", (req, res) => {
@@ -402,18 +413,18 @@ app.post("/login", async (req, res, next) => {
     await logAudit("User Sign In", "AUTH", user, user.email, "Logged in successfully", req);
 
     if (user.role === "admin") {
-      return res.redirect("/admin");
+      return res.redirect("/admin?login=success");
     } else if (user.role === "doctor" || user.role === "receptionist") {
-      return res.redirect("/staff");
+      return res.redirect("/staff?login=success");
     } else {
-      return res.redirect("/dashboard");
+      return res.redirect("/dashboard?login=success");
     }
   } catch (err) {
     next(err);
   }
 });
 
-app.get("/register", (req, res) => {
+app.get(["/register", "/signup"], (req, res) => {
   if (res.locals.currentUser) {
     return res.redirect("/dashboard");
   }
@@ -459,7 +470,7 @@ app.post("/register", async (req, res, next) => {
 
     await logAudit("Patient Registered", "AUTH", newUser, newUser.email, "New patient account created", req);
 
-    res.redirect("/dashboard");
+    res.redirect("/dashboard?register=success");
   } catch (err) {
     next(err);
   }
@@ -560,9 +571,9 @@ app.post(["/staff/login", "/doctor/login"], async (req, res, next) => {
     await logAudit("Staff Sign In", "AUTH", user, user.email, `Logged into ${user.role.toUpperCase()} Console`, req);
 
     if (user.role === "admin") {
-      return res.redirect("/admin");
+      return res.redirect("/admin?login=success");
     }
-    res.redirect("/staff");
+    res.redirect("/staff?login=success");
   } catch (err) {
     next(err);
   }
@@ -685,7 +696,7 @@ app.post(
 );
 
 // Unified Staff Dashboard (/staff with backward-compatible /doctor)
-app.get("/doctor", (req, res) => {
+app.get(["/doctor", "/doctor/dashboard"], (req, res) => {
   const query = req.url.includes("?") ? req.url.substring(req.url.indexOf("?")) : "";
   res.redirect(`/staff${query}`);
 });
@@ -958,10 +969,10 @@ app.post(["/staff/reports/upload", "/doctor/reports/upload"], isStaffLoggedIn, u
       req
     );
 
-    res.redirect("/staff?tab=upload");
+    res.redirect("/staff?tab=upload&report=success");
   } catch (err) {
     console.error("Report upload error:", err);
-    res.redirect("/staff?tab=upload");
+    res.redirect("/staff?tab=upload&report=success");
   }
 });
 
@@ -1046,10 +1057,10 @@ app.post(["/staff/prescriptions/create", "/doctor/prescriptions/create"], isDoct
       req
     );
 
-    res.redirect("/staff?tab=prescription");
+    res.redirect("/staff?tab=prescription&rx=success");
   } catch (err) {
     console.error("Prescription creation error:", err);
-    res.redirect("/staff?tab=prescription");
+    res.redirect("/staff?tab=prescription&rx=success");
   }
 });
 
@@ -1216,10 +1227,10 @@ app.post("/vitals/log", isLoggedIn, async (req, res) => {
       notes: notes || "",
     });
 
-    res.redirect("/dashboard?tab=vitals");
+    res.redirect("/dashboard?tab=vitals&vitals=logged");
   } catch (err) {
     console.error("Log Vitals Error:", err);
-    res.redirect("/dashboard?tab=vitals");
+    res.redirect("/dashboard?tab=vitals&vitals=logged");
   }
 });
 
@@ -1227,10 +1238,10 @@ app.post("/vitals/log", isLoggedIn, async (req, res) => {
 app.post("/vitals/:id/delete", isLoggedIn, async (req, res) => {
   try {
     await Vital.findOneAndDelete({ _id: req.params.id, patientId: req.user._id });
-    res.redirect("/dashboard?tab=vitals");
+    res.redirect("/dashboard?tab=vitals&vitals=logged");
   } catch (err) {
     console.error("Delete Vital Error:", err);
-    res.redirect("/dashboard?tab=vitals");
+    res.redirect("/dashboard?tab=vitals&vitals=logged");
   }
 });
 
@@ -1293,11 +1304,11 @@ app.post("/appointments", async (req, res) => {
     );
 
     if (currentUser && (currentUser.role === "doctor" || currentUser.role === "receptionist")) {
-      return res.redirect("/staff?tab=schedule");
+      return res.redirect("/staff?tab=schedule&appointment=success");
     } else if (currentUser && currentUser.role === "admin") {
-      return res.redirect("/admin?tab=appointments");
+      return res.redirect("/admin?tab=appointments&appointment=success");
     } else {
-      return res.redirect("/dashboard?tab=appointments");
+      return res.redirect("/dashboard?tab=appointments&appointment=success");
     }
   } catch (err) {
     console.error("Appointment booking error:", err);
@@ -1403,7 +1414,7 @@ app.post("/admin/login", async (req, res, next) => {
 
     await logAudit("Admin Sign In", "AUTH", adminUser, adminUser.email, "Logged into Admin Console", req);
 
-    res.redirect("/admin");
+    res.redirect("/admin?login=success");
   } catch (err) {
     next(err);
   }

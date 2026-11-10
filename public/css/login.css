@@ -1,80 +1,103 @@
 /* ==========================================================================
-   CARESYNC - CLEAN DARK AUTHENTICATION STYLING (STUDENT LEVEL)
+   CARESYNC - MODERN AUTHENTICATION STYLING
    ========================================================================== */
 
 .auth-container,
 .login-container,
 .register-container {
-    min-height: calc(100vh - 160px);
+    min-height: calc(100vh - 140px);
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 50px 16px;
-    background: #090d16;
+    background: radial-gradient(circle at 50% 20%, rgba(2, 132, 199, 0.14) 0%, #090d16 75%);
     box-sizing: border-box;
+    position: relative;
 }
 
 .auth-box,
 .login-box,
 .register-box {
-    width: 400px;
+    width: 430px;
     max-width: 100%;
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 14px;
-    padding: 32px 28px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(180deg, rgba(17, 24, 39, 0.96) 0%, rgba(11, 17, 32, 0.98) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 18px;
+    padding: 38px 32px 32px;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.05);
     text-align: left;
     box-sizing: border-box;
+    backdrop-filter: blur(20px);
+    position: relative;
 }
 
 .auth-header {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 26px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth-logo-link {
+    display: inline-flex;
+    justify-content: center;
+    margin-bottom: 12px;
+    transition: transform 0.2s ease;
+}
+
+.auth-logo-link:hover {
+    transform: scale(1.04);
 }
 
 .auth-logo {
-    height: 36px;
-    margin-bottom: 10px;
+    height: 40px;
+    margin-bottom: 0;
     display: inline-block;
+    object-fit: contain;
 }
 
 .auth-tag {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 3px 10px;
+    letter-spacing: 0.06em;
+    padding: 5px 14px;
     border-radius: 20px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .auth-tag.patient {
-    background: rgba(56, 189, 248, 0.12);
+    background: rgba(56, 189, 248, 0.09);
     color: #38bdf8;
     border: 1px solid rgba(56, 189, 248, 0.25);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.12);
 }
 
 .auth-tag.doctor {
-    background: rgba(16, 185, 129, 0.12);
+    background: rgba(16, 185, 129, 0.09);
     color: #34d399;
     border: 1px solid rgba(16, 185, 129, 0.25);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.12);
 }
 
 .auth-tag.admin {
-    background: rgba(168, 85, 247, 0.12);
+    background: rgba(168, 85, 247, 0.09);
     color: #c084fc;
     border: 1px solid rgba(168, 85, 247, 0.25);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.12);
 }
 
 .auth-title {
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 25px;
+    font-weight: 800;
     color: #f8fafc;
-    margin: 4px 0 6px;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
 }
 
 .auth-subtitle {
@@ -114,7 +137,7 @@
 .form-group,
 .input-group,
 .auth-form-group {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .form-group label,
@@ -123,35 +146,63 @@
     display: block;
     font-size: 13px;
     font-weight: 600;
-    color: #cbd5e1;
-    margin-bottom: 6px;
+    color: #e2e8f0;
+    margin-bottom: 7px;
+    letter-spacing: 0.01em;
 }
 
 .form-group input,
 .form-group select,
+.form-group textarea,
 .input-group input,
 .auth-form-group input,
-.auth-form-group select {
+.auth-form-group select,
+.auth-form textarea {
     width: 100%;
-    padding: 10px 14px;
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 8px;
+    padding: 11px 14px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 9px;
     color: #f8fafc;
     font-size: 14px;
     box-sizing: border-box;
     font-family: inherit;
-    transition: border-color 0.2s, background 0.2s;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder,
+.auth-form-group input::placeholder,
+.auth-form textarea::placeholder {
+    color: #64748b;
+}
+
+.form-group textarea,
+.auth-form textarea {
+    min-height: 105px;
+    line-height: 1.55;
+    resize: vertical;
+}
+
+.form-hint {
+    display: block;
+    color: #64748b;
+    font-size: 11.5px;
+    margin-top: 5px;
+    line-height: 1.4;
 }
 
 .form-group input:focus,
 .form-group select:focus,
+.form-group textarea:focus,
 .input-group input:focus,
 .auth-form-group input:focus,
-.auth-form-group select:focus {
+.auth-form-group select:focus,
+.auth-form textarea:focus {
     outline: none;
     border-color: #38bdf8;
-    background: #0f172a;
+    background: rgba(15, 23, 42, 0.95);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2), 0 0 20px rgba(56, 189, 248, 0.12);
 }
 
 .password-wrap {
@@ -166,12 +217,12 @@
 
 .eye-btn {
     position: absolute;
-    right: 8px;
+    right: 12px;
     background: transparent;
     border: none;
     color: #94a3b8;
     cursor: pointer;
-    padding: 6px 8px;
+    padding: 6px;
     font-size: 14px;
     transition: color 0.2s;
 }
@@ -184,42 +235,55 @@
 .login-btn,
 .register-btn {
     width: 100%;
-    padding: 11px;
-    background: #2563eb;
+    padding: 12px 18px;
+    background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
     color: #ffffff;
     border: none;
-    border-radius: 8px;
-    font-size: 14.5px;
-    font-weight: 600;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    transition: all 0.22s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-top: 6px;
+    margin-top: 4px;
+    box-shadow: 0 4px 18px rgba(2, 132, 199, 0.35);
 }
 
 .auth-btn:hover,
 .login-btn:hover,
 .register-btn:hover {
-    background: #1d4ed8;
+    background: linear-gradient(135deg, #0369a1 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 24px rgba(2, 132, 199, 0.55);
+    transform: translateY(-1.5px);
+}
+
+.auth-btn:active {
+    transform: translateY(0);
 }
 
 .auth-btn.doctor-btn {
-    background: #059669;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 4px 18px rgba(5, 150, 105, 0.35);
 }
 
 .auth-btn.doctor-btn:hover {
-    background: #047857;
+    background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+    box-shadow: 0 6px 24px rgba(5, 150, 105, 0.5);
+    transform: translateY(-1.5px);
 }
 
 .auth-btn.admin-btn {
-    background: #7c3aed;
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35);
 }
 
 .auth-btn.admin-btn:hover {
-    background: #6d28d9;
+    background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.5);
+    transform: translateY(-1.5px);
 }
 
 .auth-links,
@@ -249,53 +313,161 @@
     justify-content: space-between;
     align-items: center;
     font-size: 13px;
-    margin-bottom: 16px;
+    margin: 16px 0 20px;
     color: #94a3b8;
 }
 
 .auth-checkbox {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     cursor: pointer;
     user-select: none;
+    color: #cbd5e1;
+    font-weight: 500;
 }
 
 .auth-checkbox input {
-    accent-color: #38bdf8;
-    width: 15px;
-    height: 15px;
+    accent-color: #0284c7;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.forgot-link,
+.auth-extra-row a {
+    color: #38bdf8 !important;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    transition: color 0.18s ease;
+}
+
+.forgot-link:hover,
+.auth-extra-row a:hover {
+    color: #7dd3fc !important;
+    text-decoration: underline;
 }
 
 .auth-subnote {
     margin-top: 18px;
     padding-top: 14px;
-    border-top: 1px solid #1e293b;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     text-align: center;
     font-size: 12px;
     color: #64748b;
 }
 
 .auth-subnote a {
-    color: #94a3b8;
+    color: #38bdf8;
     text-decoration: none;
     font-weight: 600;
 }
 
 .auth-subnote a:hover {
-    color: #38bdf8;
+    color: #7dd3fc;
+    text-decoration: underline;
 }
 
 /* ==========================================================================
    PUBLIC LOGIN & REGISTER ACTION BOXES
    ========================================================================== */
 .auth-switch-section {
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid #1e293b;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
+}
+
+.auth-switch-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    color: #94a3b8;
+}
+
+.auth-link-bold {
+    color: #38bdf8;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.auth-link-bold:hover {
+    color: #7dd3fc;
+    text-decoration: underline;
+    transform: translateX(2px);
+}
+
+.auth-switch-footer {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 12px 14px;
+    text-align: center;
+}
+
+.auth-footer-tag {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+}
+
+.auth-pill-group {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.auth-pill-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.auth-pill-btn.doctor {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #34d399;
+}
+
+.auth-pill-btn.doctor:hover {
+    background: rgba(16, 185, 129, 0.16);
+    color: #6ee7b7;
+    border-color: rgba(16, 185, 129, 0.45);
+    transform: translateY(-1px);
+}
+
+.auth-pill-btn.subtle {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: #cbd5e1;
+}
+
+.auth-pill-btn.subtle:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
 }
 
 .auth-switch-item {
@@ -314,7 +486,7 @@
     justify-content: center;
     gap: 6px;
     width: 100%;
-    padding: 8px 14px;
+    padding: 9px 14px;
     border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
@@ -325,19 +497,26 @@
 
 .btn-auth-outline.patient {
     background: rgba(56, 189, 248, 0.08);
-    border: 1px solid rgba(56, 189, 248, 0.3);
+    border: 1px solid rgba(56, 189, 248, 0.25);
     color: #38bdf8;
 }
 
 .btn-auth-outline.patient:hover {
     background: rgba(56, 189, 248, 0.18);
     color: #7dd3fc;
+    border-color: rgba(56, 189, 248, 0.45);
 }
 
 .btn-auth-outline.doctor {
     background: rgba(16, 185, 129, 0.08);
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    border: 1px solid rgba(16, 185, 129, 0.25);
     color: #34d399;
+}
+
+.btn-auth-outline.doctor:hover {
+    background: rgba(16, 185, 129, 0.18);
+    color: #6ee7b7;
+    border-color: rgba(16, 185, 129, 0.45);
 }
 
 .btn-auth-outline.doctor:hover {
@@ -349,13 +528,13 @@
    DOCTOR MULTI-STEP APPLICATION STYLES
    ========================================================================== */
 .doctor-apply-box {
-    width: 640px;
+    width: 680px;
     max-width: 100%;
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 16px;
-    padding: 34px 32px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(15, 23, 42, 0.96));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 38px 36px;
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.08);
 }
 
 .steps-progress-bar {
@@ -363,25 +542,37 @@
     justify-content: space-between;
     align-items: center;
     position: relative;
-    margin-bottom: 28px;
-    padding: 0 10px;
+    margin: 24px 0 34px;
+    padding: 0 20px;
+}
+
+.steps-progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: 45px;
+    right: 45px;
+    height: 3px;
+    background: #1e293b;
+    z-index: 1;
+    border-radius: 3px;
 }
 
 .step-indicator {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     position: relative;
     z-index: 2;
     cursor: default;
 }
 
 .step-circle {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: #1e293b;
+    background: #0f172a;
     border: 2px solid #334155;
     color: #94a3b8;
     display: flex;
@@ -390,25 +581,30 @@
     font-size: 13px;
     font-weight: 700;
     transition: all 0.25s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .step-indicator.active .step-circle {
-    background: #0284c7;
+    background: linear-gradient(135deg, #0284c7, #38bdf8);
     border-color: #38bdf8;
     color: white;
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.55);
+    transform: scale(1.08);
 }
 
 .step-indicator.completed .step-circle {
-    background: #059669;
+    background: linear-gradient(135deg, #059669, #10b981);
     border-color: #10b981;
     color: white;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
 }
 
 .step-label {
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
     color: #64748b;
+    letter-spacing: 0.02em;
+    transition: color 0.2s ease;
 }
 
 .step-indicator.active .step-label {
@@ -418,6 +614,7 @@
 
 .step-indicator.completed .step-label {
     color: #34d399;
+    font-weight: 600;
 }
 
 .step-pane {
@@ -426,49 +623,86 @@
 
 .step-pane.active {
     display: block;
-    animation: fadeInStep 0.3s ease;
+    animation: fadeInStep 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fadeInStep {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 .step-heading {
-    font-size: 16px;
+    font-size: 16.5px;
     font-weight: 700;
     color: #f1f5f9;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #1e293b;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .doc-upload-item {
-    background: #0a0f1d;
-    border: 1px dashed #334155;
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
+    background: rgba(10, 15, 29, 0.65);
+    border: 1px dashed rgba(56, 189, 248, 0.28);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.doc-upload-item:hover {
+    border-color: rgba(56, 189, 248, 0.55);
+    background: rgba(10, 15, 29, 0.9);
 }
 
 .doc-upload-item label {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
     color: #e2e8f0;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .doc-upload-item small {
     display: block;
-    font-size: 11.5px;
+    font-size: 12px;
     color: #94a3b8;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.doc-upload-item input[type="file"] {
+    width: 100%;
+    padding: 8px 12px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 12.5px;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.doc-upload-item input[type="file"]::file-selector-button {
+    padding: 6px 14px;
+    margin-right: 12px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    color: white;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.doc-upload-item input[type="file"]::file-selector-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 .step-buttons-row {
@@ -476,13 +710,13 @@
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    margin-top: 24px;
-    padding-top: 18px;
-    border-top: 1px solid #1e293b;
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .btn-step-prev {
-    padding: 10px 18px;
+    padding: 10px 20px;
     background: #1e293b;
     border: 1px solid #334155;
     color: #cbd5e1;
@@ -492,18 +726,19 @@
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    transition: background 0.2s;
+    gap: 8px;
+    transition: all 0.2s ease;
 }
 
 .btn-step-prev:hover {
     background: #334155;
     color: white;
+    transform: translateX(-2px);
 }
 
 .btn-step-next {
-    padding: 10px 22px;
-    background: #2563eb;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #0284c7, #2563eb);
     border: none;
     color: white;
     border-radius: 8px;
@@ -512,12 +747,15 @@
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    transition: background 0.2s;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    transition: all 0.2s ease;
 }
 
 .btn-step-next:hover {
-    background: #1d4ed8;
+    background: linear-gradient(135deg, #0369a1, #1d4ed8);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5);
+    transform: translateY(-1px);
 }
 
 @media (max-width: 580px) {
@@ -525,7 +763,22 @@
         padding: 24px 18px;
     }
 
+    .steps-progress-bar {
+        padding: 0 8px;
+    }
+
+    .steps-progress-bar::before {
+        left: 28px;
+        right: 28px;
+    }
+
+    .step-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
     .step-label {
-        display: none;
+        font-size: 10.5px;
     }
 }

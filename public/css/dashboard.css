@@ -168,6 +168,13 @@
     padding-bottom: 12px;
     margin-bottom: 24px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.dash-tabs-bar::-webkit-scrollbar {
+    display: none;
 }
 
 .dash-tab-btn {
@@ -495,6 +502,54 @@
 .btn-sm-action:hover {
     transform: translateY(-1px);
     opacity: 0.9;
+}
+
+.vitals-metric-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.vitals-metric-label {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.vitals-metric-val {
+    font-size: 24px;
+    color: #f8fafc;
+    font-weight: 800;
+}
+
+.vitals-metric-unit {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.triage-sym-tag {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(56, 189, 248, 0.12);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    display: inline-block;
+}
+
+.triage-desc-quote {
+    font-size: 12px;
+    color: #cbd5e1;
+    font-style: italic;
+    margin-top: 6px;
+    line-height: 1.35;
+    max-width: 240px;
+    background: rgba(15, 23, 42, 0.5);
+    padding: 6px 8px;
+    border-radius: 6px;
+    border-left: 2px solid #a855f7;
 }
 
 /* Prescriptions Grid */

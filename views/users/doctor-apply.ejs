@@ -3,7 +3,7 @@
 <div class="auth-container">
     <div class="doctor-apply-box">
         <div class="auth-header">
-            <a href="/">
+            <a href="/" class="auth-logo-link">
                 <img src="/images/logo.png" alt="CareSync" class="auth-logo">
             </a>
             <span class="auth-tag doctor">
@@ -154,8 +154,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="docBio">Professional Bio & Focus Areas</label>
-                    <textarea id="docBio" name="bio" rows="2" placeholder="Brief summary of clinical expertise, patient care philosophy, and sub-specialties..."></textarea>
+                    <label for="docBio"><i class="fas fa-user-md text-cyan"></i> Professional Bio & Focus Areas</label>
+                    <textarea id="docBio" name="bio" rows="3" placeholder="Provide a summary of your clinical expertise, sub-specialty interests, clinical achievements, and patient care philosophy..."></textarea>
+                    <small class="form-hint">Highlight key focus areas, surgical or medical specialties, and academic credentials.</small>
                 </div>
 
                 <div class="step-buttons-row">
@@ -175,8 +176,8 @@
                 </div>
 
                 <div class="auth-alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <span>College project simulation: please upload dummy PDF or image documents. Real medical documents are not required.</span>
+                    <i class="fas fa-shield-alt text-cyan"></i>
+                    <span>Please upload clear digital copies of your credentials for institutional verification and medical council credentialing. Accepted formats: PDF, PNG, JPG (up to 10MB each).</span>
                 </div>
 
                 <div class="doc-upload-item">
@@ -285,10 +286,6 @@
         </form>
 
         <div class="auth-links">
-            <p>
-                Already an approved doctor?
-                <a href="/doctor/login">Doctor Sign In</a>
-            </p>
             <div class="auth-subnote">
                 Patient looking for portal? <a href="/login">Go to Patient Login</a>
             </div>
@@ -312,10 +309,13 @@ function goToStep(step) {
         if (pane) pane.classList.remove('active');
         if (indicator) {
             indicator.classList.remove('active');
+            const circle = indicator.querySelector('.step-circle');
             if (i < step) {
                 indicator.classList.add('completed');
+                if (circle) circle.innerHTML = '<i class="fas fa-check" style="font-size: 11px;"></i>';
             } else {
                 indicator.classList.remove('completed');
+                if (circle) circle.textContent = i;
             }
         }
     }
@@ -338,11 +338,26 @@ function validateStep(step) {
         const email = document.getElementById('docEmail');
         const phone = document.getElementById('docPhone');
 
-        if (!name.value.trim()) { alert('Please enter your full legal name.'); name.focus(); return false; }
-        if (!dob.value) { alert('Please select your date of birth.'); dob.focus(); return false; }
-        if (!gender.value) { alert('Please select your gender.'); gender.focus(); return false; }
-        if (!email.value.trim() || !email.value.includes('@')) { alert('Please enter a valid official email address.'); email.focus(); return false; }
-        if (!phone.value.trim()) { alert('Please enter your contact phone number.'); phone.focus(); return false; }
+        if (!name.value.trim()) {
+            showModernAlert('Please enter your full legal name.', 'warning', { title: 'Legal Name Required', targetInput: name });
+            return false;
+        }
+        if (!dob.value) {
+            showModernAlert('Please select your date of birth.', 'warning', { title: 'Date of Birth Required', targetInput: dob });
+            return false;
+        }
+        if (!gender.value) {
+            showModernAlert('Please select your gender.', 'warning', { title: 'Gender Selection Required', targetInput: gender });
+            return false;
+        }
+        if (!email.value.trim() || !email.value.includes('@')) {
+            showModernAlert('Please enter a valid official email address.', 'warning', { title: 'Valid Email Required', targetInput: email });
+            return false;
+        }
+        if (!phone.value.trim()) {
+            showModernAlert('Please enter your contact phone number.', 'warning', { title: 'Phone Number Required', targetInput: phone });
+            return false;
+        }
     } else if (step === 2) {
         const spec = document.getElementById('docSpecialty');
         const qual = document.getElementById('docQualifications');
@@ -350,14 +365,67 @@ function validateStep(step) {
         const lic = document.getElementById('docLicense');
         const auth = document.getElementById('docAuthority');
 
-        if (!spec.value) { alert('Please select your medical specialty.'); spec.focus(); return false; }
-        if (!qual.value.trim()) { alert('Please enter your medical qualifications.'); qual.focus(); return false; }
-        if (exp.value === '') { alert('Please specify your years of experience.'); exp.focus(); return false; }
-        if (!lic.value.trim()) { alert('Please enter your medical license/registration number.'); lic.focus(); return false; }
-        if (!auth.value.trim()) { alert('Please enter your registration authority (e.g. Medical Council).'); auth.focus(); return false; }
+        if (!spec.value) {
+            showModernAlert('Please select your medical specialty.', 'warning', { title: 'Medical Specialty Required', targetInput: spec });
+            return false;
+        }
+        if (!qual.value.trim()) {
+            showModernAlert('Please enter your medical qualifications.', 'warning', { title: 'Qualifications Required', targetInput: qual });
+            return false;
+        }
+        if (exp.value === '') {
+            showModernAlert('Please specify your years of clinical experience.', 'warning', { title: 'Experience Required', targetInput: exp });
+            return false;
+        }
+        if (!lic.value.trim()) {
+            showModernAlert('Please enter your medical license or registration number.', 'warning', { title: 'License Number Required', targetInput: lic });
+            return false;
+        }
+        if (!auth.value.trim()) {
+            showModernAlert('Please enter your registration authority (e.g. Medical Council).', 'warning', { title: 'Registration Authority Required', targetInput: auth });
+            return false;
+        }
+    } else if (step === 4) {
+        const pass = document.getElementById('docPass');
+        const confirmPass = document.getElementById('docConfirmPass');
+        if (!pass.value || pass.value.length < 6) {
+            showModernAlert('Account password must be at least 6 characters long.', 'warning', { title: 'Password Too Short', targetInput: pass });
+            return false;
+        }
+        if (pass.value !== confirmPass.value) {
+            showModernAlert('Passwords do not match. Please verify your password confirmation.', 'error', { title: 'Password Mismatch', targetInput: confirmPass });
+            return false;
+        }
     }
     return true;
 }
+
+// Ensure full validation on final form submission
+const doctorApplyForm = document.getElementById('doctorApplyForm');
+if (doctorApplyForm) {
+    doctorApplyForm.addEventListener('submit', function (e) {
+        for (let s = 1; s <= 4; s++) {
+            if (!validateStep(s)) {
+                e.preventDefault();
+                goToStep(s);
+                return false;
+            }
+        }
+        try {
+            sessionStorage.setItem('caresync_toast', JSON.stringify({
+                title: 'Success',
+                message: 'Doctor Application Submitted Successfully',
+                type: 'success'
+            }));
+        } catch (err) {}
+    });
+}
+
+<% if (typeof error !== 'undefined' && error) { %>
+document.addEventListener('DOMContentLoaded', function () {
+    showModernAlert(<%- JSON.stringify(error) %>, 'error', { title: 'Application Notice' });
+});
+<% } %>
 
 function togglePwd(inputId, btn) {
     const input = document.getElementById(inputId);

@@ -7,7 +7,7 @@
     <div class="symptom-header-dark">
       <span class="badge-tag">
         <span class="live-dot-green"></span>
-        <i class="fas fa-robot text-cyan"></i> AI Clinical Assistant &bull; Live
+        <i class="fas fa-robot"></i> AI Clinical Assistant &bull; Live
       </span>
       <h2>Clinical AI Symptom Checker &amp; Triage</h2>
       <p>Select your symptoms or describe them in your own words. Our AI analyzes your condition, estimates urgency, and routes you to the right specialist from our verified doctor network.</p>
@@ -32,7 +32,7 @@
 
       <!-- LEFT: Symptom Input -->
       <div class="symptom-card-dark">
-        <h3><i class="fas fa-notes-medical" style="color:#38bdf8"></i> Select Your Symptoms</h3>
+        <h3><i class="fas fa-notes-medical text-cyan"></i> Select Your Symptoms</h3>
         <p class="section-desc">Click all that apply, then add a description for better accuracy.</p>
 
         <!-- Head & Neuro -->
@@ -130,7 +130,7 @@
         <!-- Free text -->
         <div class="custom-notes-block">
           <label>
-            <i class="fas fa-comment-medical" style="color:#38bdf8"></i>
+            <i class="fas fa-comment-medical text-cyan"></i>
             Describe your condition in more detail (optional but recommended)
           </label>
           <textarea id="descText" class="dark-textarea" rows="3"
@@ -155,11 +155,11 @@
 
       <!-- RIGHT: Results Panel -->
       <div class="symptom-card-dark results-card">
-        <h3><i class="fas fa-brain" style="color:#38bdf8"></i> AI Clinical Analysis</h3>
+        <h3><i class="fas fa-brain text-cyan"></i> AI Clinical Analysis</h3>
         <p class="section-desc">Your triage assessment will appear here after analysis.</p>
 
         <!-- Idle State -->
-        <div id="resultsIdle" class="results-idle" style="display:flex">
+        <div id="resultsIdle" class="results-idle" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
           <div class="idle-icon-wrap"><i class="fas fa-robot"></i></div>
           <h4>Awaiting Symptom Input</h4>
           <p>Select symptoms from the panel and click "Analyze Symptoms" to receive your AI-powered clinical triage assessment.</p>
@@ -177,7 +177,7 @@
         <!-- Error State -->
         <div id="resultsError" class="results-error-state" style="display:none">
           <div class="idle-icon-wrap" style="background:rgba(239,68,68,0.08)">
-            <i class="fas fa-triangle-exclamation" style="color:#f87171"></i>
+            <i class="fas fa-triangle-exclamation text-rose"></i>
           </div>
           <p class="error-msg" style="color:#f87171;font-size:14px;text-align:center;margin-top:12px"></p>
           <p style="color:#64748b;font-size:13px;text-align:center;margin-top:6px">Please retry or contact hospital reception.</p>
@@ -287,6 +287,10 @@
       const err = document.getElementById('formError');
       err.textContent = 'Please select at least one symptom or describe your condition.';
       err.style.display = 'block';
+      showModernAlert('Please select at least one symptom or describe your condition in the text box.', 'warning', {
+        title: 'Symptoms Required',
+        targetInput: '#descText'
+      });
       return;
     }
     document.getElementById('formError').style.display = 'none';
