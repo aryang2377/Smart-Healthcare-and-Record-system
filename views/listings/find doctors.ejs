@@ -30,8 +30,8 @@
         <div class="table-controls-bar">
             <div class="search-wrap">
                 <i class="fas fa-search search-icon"></i>
-                <input 
-                    type="text" 
+                <input
+                    type="text"
                     id="doctorSearchInput"
                     placeholder="Search doctor name or specialization..."
                     class="dark-input"
@@ -74,7 +74,7 @@
                 </thead>
                 <tbody>
                     <% if (typeof dbDoctors !== 'undefined' && dbDoctors && dbDoctors.length > 0) { %>
-                        <% dbDoctors.forEach((doc, idx) => { 
+                        <% dbDoctors.forEach((doc, idx) => {
                             const colors = ['blue', 'emerald', 'cyan', 'purple', 'amber'];
                             const color = colors[idx % colors.length];
                         %>
@@ -238,7 +238,6 @@
     </div>
 </section>
 
-<!-- Simple Booking Modal -->
 <div id="quickBookModal" class="modal-backdrop-dark" style="display: none;">
     <div class="modal-box-dark">
         <div class="modal-header">

@@ -412,6 +412,6 @@ Stop-Process -Id (Get-NetTCPConnection -LocalPort 4000).OwningProcess -Force
 ## 👨‍💻 License & Authors
 
 * **Project**: CareSync — Smart Healthcare & Record System
-* **Authors / Developers**: **Aryan Gupta** & **Kasharika Uppal**
+* **Author / Developer**: **Aryan Gupta** (Registration Number: `2430030261`)
 * **Repository**: [GitHub Repository](https://github.com/aryang2377/Smart-Healthcare-and-Record-system)
 * **License**: [ISC License](https://opensource.org/licenses/ISC)

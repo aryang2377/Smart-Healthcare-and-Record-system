@@ -2,7 +2,7 @@
 
 <section class="rx-slip-wrapper">
     <div class="rx-slip-container">
-        <!-- Action Bar (hidden on print) -->
+
         <div class="rx-action-bar no-print">
             <a href="javascript:history.back()" class="btn-rx-back">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
@@ -14,9 +14,8 @@
             </div>
         </div>
 
-        <!-- Official Prescription Slip Card -->
         <div class="rx-paper-card" id="printableRx">
-            <!-- Header -->
+
             <div class="rx-clinic-header">
                 <div class="rx-brand-info">
                     <div class="rx-clinic-logo">
@@ -37,9 +36,8 @@
 
             <div class="rx-divider-solid"></div>
 
-            <!-- Doctor & Patient Details Grid -->
             <div class="rx-parties-grid">
-                <!-- Doctor block -->
+
                 <div class="rx-doc-block">
                     <span class="rx-section-label">ATTENDING PHYSICIAN</span>
                     <h3><%= rx.doctorName %></h3>
@@ -47,7 +45,6 @@
                     <small class="rx-meta-sub">Institutional Medical Faculty • CareSync Hospital</small>
                 </div>
 
-                <!-- Patient block -->
                 <div class="rx-pat-block">
                     <span class="rx-section-label">PATIENT DETAILS</span>
                     <h3><%= rx.patientName %></h3>
@@ -68,7 +65,6 @@
 
             <div class="rx-divider-dotted"></div>
 
-            <!-- Problem / Chief Complaints -->
             <div class="rx-clinical-section">
                 <div class="rx-field-row">
                     <span class="rx-label-tag"><i class="fas fa-comment-medical"></i> Patient's Reported Problem / Symptoms:</span>
@@ -85,7 +81,6 @@
                 </div>
             </div>
 
-            <!-- Rx Symbol & Medications -->
             <div class="rx-medications-section">
                 <div class="rx-symbol-heading">
                     <span class="rx-big-symbol">℞</span>
@@ -97,7 +92,6 @@
                 </div>
             </div>
 
-            <!-- Advice & Tests -->
             <% if (rx.advice || rx.testsRecommended) { %>
                 <div class="rx-advice-grid">
                     <% if (rx.advice) { %>
@@ -116,7 +110,6 @@
                 </div>
             <% } %>
 
-            <!-- Follow-up -->
             <div class="rx-followup-bar">
                 <div>
                     <i class="fas fa-calendar-alt text-cyan"></i>
@@ -127,7 +120,6 @@
                 </div>
             </div>
 
-            <!-- Footer Signatures -->
             <div class="rx-slip-footer">
                 <div class="rx-qr-placeholder">
                     <i class="fas fa-shield-alt text-cyan" style="font-size: 28px;"></i>

@@ -40,18 +40,15 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// View Engine Setup
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Body parsers & static assets
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Ensure private upload directories exist outside public web root (HIPAA / PHI Compliance)
 const uploadDir = path.join(__dirname, "storage", "private_uploads", "reports");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -62,7 +59,6 @@ if (!fs.existsSync(doctorUploadDir)) {
   fs.mkdirSync(doctorUploadDir, { recursive: true });
 }
 
-// Multer Allowed File Whitelist (Prevent malicious executables / RCE)
 const medicalFileFilter = (req, file, cb) => {
   const allowedMimeTypes = [
     "application/pdf",
@@ -77,7 +73,6 @@ const medicalFileFilter = (req, file, cb) => {
   }
 };
 
-// Multer Storages for Confidential Health Records & Doctor Credentials
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
@@ -106,7 +101,6 @@ const doctorUpload = multer({
   fileFilter: medicalFileFilter,
 });
 
-// Audit Logging Utility
 const logAudit = async (action, category, actor, target, details, req) => {
   try {
     const ip = req ? (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "127.0.0.1") : "127.0.0.1";
@@ -125,7 +119,6 @@ const logAudit = async (action, category, actor, target, details, req) => {
   }
 };
 
-// Global Current User Middleware for Views & Requests
 app.use(async (req, res, next) => {
   try {
     const token = req.cookies?.token;
@@ -145,7 +138,6 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Authentication & Role-Based Middlewares
 const isLoggedIn = async (req, res, next) => {
   if (!req.user) {
     return res.redirect("/login");
@@ -158,7 +150,6 @@ const isStaffLoggedIn = async (req, res, next) => {
     return res.redirect("/staff/login");
   }
 
-  // Doctors must be approved by hospital administration
   if (req.user.role === "doctor" && req.user.approvalStatus !== "approved") {
     res.clearCookie("token");
     return res.redirect("/staff/login");
@@ -190,15 +181,10 @@ const isAdminLoggedIn = async (req, res, next) => {
   next();
 };
 
-// ==========================================
-// PUBLIC ROUTES
-// ==========================================
-
 app.get(["/", "/listings", "/home"], (req, res) => {
   res.render("listings/home");
 });
 
-// Only verified and active doctors appear on public directory
 app.get("/doctors", async (req, res) => {
   try {
     const dbDoctors = await User.find({
@@ -219,7 +205,6 @@ app.get("/symptom", (req, res) => {
   res.render("listings/symptom");
 });
 
-// AI Symptom Analyzer — ML-powered triage endpoint
 app.post("/symptom/analyze", async (req, res) => {
   try {
     if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY.trim() === "your_groq_api_key_here") {
@@ -235,7 +220,6 @@ app.post("/symptom/analyze", async (req, res) => {
 
     const analysis = await analyzeSymptoms(symptomList, description);
 
-    // Match doctors by recommended specialties with smart alias expansions
     const specialtyAliases = {
       "General Medicine": ["General Medicine", "General Physician", "Internal Medicine", "Physician"],
       "ENT": ["ENT", "Otolaryngology", "Ear Nose Throat", "Otorhinolaryngology"],
@@ -277,7 +261,6 @@ app.post("/symptom/analyze", async (req, res) => {
         .limit(4);
     }
 
-    // Fallback: show general medicine doctors if no specialty match
     if (doctors.length === 0) {
       doctors = await User.find({
         role: "doctor",
@@ -292,7 +275,6 @@ app.post("/symptom/analyze", async (req, res) => {
     const finalPatientEmail = req.user?.email || (patientEmail && patientEmail.trim()) || "";
     const finalPatientPhone = req.user?.phone || (patientPhone && patientPhone.trim()) || "";
 
-    // Persist triage inquiry linked to recommended doctors
     try {
       await SymptomTriage.create({
         patientId: req.user?._id || null,
@@ -312,7 +294,6 @@ app.post("/symptom/analyze", async (req, res) => {
         suggestedDoctorNames: doctors.map((d) => d.fullname),
       });
 
-      // Dispatch clinical notification to all suggested doctors
       for (const doc of doctors) {
         await Notification.create({
           userId: doc._id,
@@ -357,7 +338,6 @@ app.post("/symptom/analyze", async (req, res) => {
   }
 });
 
-// Medical records privacy protection
 app.get("/reports", (req, res) => {
   if (!res.locals.currentUser) {
     return res.redirect("/login");
@@ -389,10 +369,6 @@ app.get("/admin/dashboard", (req, res) => {
 app.get("/forgot", (req, res) => {
   res.render("users/forgot");
 });
-
-// ==========================================
-// 1. PATIENT AUTHENTICATION ROUTES
-// ==========================================
 
 app.get("/login", (req, res) => {
   if (res.locals.currentUser) {
@@ -507,11 +483,6 @@ app.get("/logout", async (req, res) => {
   res.redirect("/");
 });
 
-// ==========================================
-// 2. UNIFIED HEALTHCARE STAFF PORTAL ROUTES (/staff & /staff/login)
-// ==========================================
-
-// Staff Login View (Both Doctors and Receptionists)
 app.get("/staff/login", (req, res) => {
   if (res.locals.currentUser && (res.locals.currentUser.role === "doctor" || res.locals.currentUser.role === "receptionist")) {
     if (res.locals.currentUser.role === "doctor" && res.locals.currentUser.approvalStatus !== "approved") {
@@ -525,7 +496,6 @@ app.get("/staff/login", (req, res) => {
   res.render("users/staff-login", { error: null });
 });
 
-// Backward-compatibility redirect from /doctor/login to /staff/login
 app.get("/doctor/login", (req, res) => {
   res.redirect("/staff/login");
 });
@@ -555,7 +525,6 @@ app.post(["/staff/login", "/doctor/login"], async (req, res, next) => {
       });
     }
 
-    // Check doctor verification lifecycle
     if (user.role === "doctor") {
       if (user.approvalStatus === "pending") {
         return res.status(403).render("users/staff-login", {
@@ -607,7 +576,6 @@ app.get(["/staff/logout", "/doctor/logout"], (req, res) => {
   res.redirect("/staff/login");
 });
 
-// Doctor Multi-Step Onboarding Application (/doctor/apply & /staff/apply)
 app.get(["/doctor/apply", "/staff/apply"], (req, res) => {
   res.render("users/doctor-apply", { error: null });
 });
@@ -718,7 +686,6 @@ app.post(
   }
 );
 
-// Unified Staff Dashboard (/staff with backward-compatible /doctor)
 app.get(["/doctor", "/doctor/dashboard"], (req, res) => {
   const query = req.url.includes("?") ? req.url.substring(req.url.indexOf("?")) : "";
   res.redirect(`/staff${query}`);
@@ -751,7 +718,6 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
       (a) => a.status === "Completed"
     );
 
-    // Patients appear in doctor's panel IF AND ONLY IF they have booked an appointment with this doctor (Strict ObjectId Relational Scoping)
     let patientRoster = [];
     if (req.user.role === "doctor") {
       const docAppts = await Appointment.find({ doctorId: req.user._id }).select("patientId");
@@ -766,7 +732,7 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
         patientRoster = [];
       }
     } else {
-      // Receptionists have facility-wide outpatient visibility
+
       patientRoster = await User.find({ role: "patient" }).select(
         "fullname email phone createdAt"
       );
@@ -824,7 +790,6 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
   }
 });
 
-// Update status of AI Triage Lead (Doctor only)
 app.post(["/staff/triage/:id/status", "/doctor/triage/:id/status"], isStaffLoggedIn, isDoctorOnly, async (req, res) => {
   try {
     const { status } = req.body;
@@ -840,7 +805,6 @@ app.post(["/staff/triage/:id/status", "/doctor/triage/:id/status"], isStaffLogge
   }
 });
 
-// Doctor Dedicated AI Symptom Triage Page
 app.get(["/doctor/triage", "/staff/triage"], isStaffLoggedIn, isDoctorOnly, async (req, res) => {
   try {
     const specPattern = (req.user.specialization || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -881,14 +845,13 @@ app.get(["/doctor/triage", "/staff/triage"], isStaffLoggedIn, isDoctorOnly, asyn
   }
 });
 
-// Update appointment status: Check-In, In-Consultation, Complete, Cancel, No-Show
 app.post(["/staff/appointments/:id/status", "/doctor/appointments/:id/status"], isStaffLoggedIn, async (req, res) => {
   try {
     const { status, notes } = req.body;
     const appt = await Appointment.findById(req.params.id);
 
     if (appt) {
-      // Permission check: only doctors can conduct and conclude consultations
+
       if ((status === "In-Consultation" || status === "Completed") && req.user.role !== "doctor" && req.user.role !== "admin") {
         return res.status(403).render("error", {
           message: "Only attending doctors have authority to start and conclude clinical consultations.",
@@ -907,7 +870,6 @@ app.post(["/staff/appointments/:id/status", "/doctor/appointments/:id/status"], 
       if (notes) appt.notes = notes.trim();
       await appt.save();
 
-      // Dispatch patient notification
       if (appt.patientId) {
         let msg = `Your appointment status was updated to: ${status}.`;
         if (status === "Checked-In") msg = `You have been checked in by reception. Please wait in the outpatient lounge.`;
@@ -936,7 +898,6 @@ app.post(["/staff/appointments/:id/status", "/doctor/appointments/:id/status"], 
   }
 });
 
-// Issue Doctor-Authorized Lab Report
 app.post(["/staff/reports/upload", "/doctor/reports/upload"], isStaffLoggedIn, upload.single("reportFile"), async (req, res) => {
   try {
     const { patientId, title, category, notes } = req.body;
@@ -988,7 +949,6 @@ app.post(["/staff/reports/upload", "/doctor/reports/upload"], isStaffLoggedIn, u
   }
 });
 
-// Doctor Create & Send Digital Prescription directly to Patient (DOCTOR ONLY)
 app.post(["/staff/prescriptions/create", "/doctor/prescriptions/create"], isDoctorOnly, async (req, res) => {
   try {
     const {
@@ -1037,7 +997,6 @@ app.post(["/staff/prescriptions/create", "/doctor/prescriptions/create"], isDoct
       status: "Sent to Patient",
     });
 
-    // Create linked Report for EHR vault
     await Report.create({
       patientId: patientObj ? patientObj._id : req.user._id,
       patientName: (patientName && patientName.trim()) || (patientObj ? patientObj.fullname : "Patient"),
@@ -1051,7 +1010,6 @@ app.post(["/staff/prescriptions/create", "/doctor/prescriptions/create"], isDoct
       uploadedByRole: "doctor",
     });
 
-    // Dispatch real-time in-app notification
     if (patientObj) {
       await Notification.create({
         userId: patientObj._id,
@@ -1076,7 +1034,6 @@ app.post(["/staff/prescriptions/create", "/doctor/prescriptions/create"], isDoct
   }
 });
 
-// Doctor Availability Update
 app.post("/staff/availability/update", isDoctorOnly, async (req, res) => {
   try {
     const { workingDays, workingHours, appointmentDuration, consultationFee, breaks } = req.body;
@@ -1099,11 +1056,6 @@ app.post("/staff/availability/update", isDoctorOnly, async (req, res) => {
   }
 });
 
-// ==========================================
-// SECURE PHI / DOCUMENT ACCESS ENDPOINTS (HIPAA & IDOR Protected)
-// ==========================================
-
-// View & Print Official Digital Prescription (Strict RBAC & IDOR Protected)
 app.get("/prescriptions/:id", isLoggedIn, async (req, res) => {
   try {
     const rx = await Prescription.findById(req.params.id);
@@ -1113,7 +1065,6 @@ app.get("/prescriptions/:id", isLoggedIn, async (req, res) => {
       });
     }
 
-    // Strict Authorization & IDOR Check: Only Patient, Prescribing Doctor, or Hospital Staff
     const isOwnerPatient = rx.patientId && rx.patientId.toString() === req.user._id.toString();
     const isDoctor = rx.doctorId && rx.doctorId.toString() === req.user._id.toString();
     const isHospitalStaff = req.user.role === "admin" || req.user.role === "receptionist";
@@ -1149,7 +1100,6 @@ app.get("/prescriptions/:id", isLoggedIn, async (req, res) => {
   }
 });
 
-// Secure Diagnostic Report Stream Endpoint (Strict PHI Access Control)
 app.get("/reports/:id/file", isLoggedIn, async (req, res) => {
   try {
     const report = await Report.findById(req.params.id);
@@ -1157,7 +1107,6 @@ app.get("/reports/:id/file", isLoggedIn, async (req, res) => {
       return res.status(404).render("error", { message: "Report record not found." });
     }
 
-    // Authorization: Owner Patient, Doctor, or Hospital Admin/Receptionist
     const isOwnerPatient = report.patientId && report.patientId.toString() === req.user._id.toString();
     const isDoctor = report.doctorId && report.doctorId.toString() === req.user._id.toString();
     const isHospitalStaff = req.user.role === "admin" || req.user.role === "doctor" || req.user.role === "receptionist";
@@ -1176,7 +1125,6 @@ app.get("/reports/:id/file", isLoggedIn, async (req, res) => {
       });
     }
 
-    // Determine disk file path
     let diskPath = report.filePath;
     if (!diskPath || !fs.existsSync(diskPath)) {
       const fileName = path.basename(report.fileUrl || report.fileName || "");
@@ -1199,7 +1147,6 @@ app.get("/reports/:id/file", isLoggedIn, async (req, res) => {
   }
 });
 
-// Secure Doctor Verification Document Endpoint (Admin & Self-Doctor Only)
 app.get("/staff/doctor-docs/:doctorId/:docType", isLoggedIn, async (req, res) => {
   try {
     const { doctorId, docType } = req.params;
@@ -1254,7 +1201,6 @@ app.get("/staff/doctor-docs/:doctorId/:docType", isLoggedIn, async (req, res) =>
   }
 });
 
-// Intercept legacy static upload routes to prevent unauthorized bypass
 app.get("/uploads/reports/:filename", isLoggedIn, async (req, res) => {
   const rep = await Report.findOne({ $or: [{ fileUrl: { $regex: req.params.filename } }, { fileName: req.params.filename }] });
   if (rep) {
@@ -1275,10 +1221,6 @@ app.get("/uploads/doctor_docs/:filename", isLoggedIn, async (req, res) => {
   return res.status(404).render("error", { message: "Document file not found." });
 });
 
-// ==========================================
-// 3. PATIENT DASHBOARD & APPOINTMENTS (/dashboard)
-// ==========================================
-
 app.get("/dashboard", isLoggedIn, async (req, res) => {
   try {
     if (req.user.role === "admin") {
@@ -1288,7 +1230,6 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
       return res.redirect("/staff");
     }
 
-    // Strict Patient-Ownership Scoping via ObjectId
     const patientAppointments = await Appointment.find({ patientId: req.user._id }).sort({ date: -1 });
     const patientReports = await Report.find({ patientId: req.user._id }).sort({ createdAt: -1 });
     const patientPrescriptions = await Prescription.find({ patientId: req.user._id }).sort({ createdAt: -1 });
@@ -1337,7 +1278,6 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
   }
 });
 
-// Log Clinical Vitals (Rule-based, Non-ML)
 app.post("/vitals/log", isLoggedIn, async (req, res) => {
   try {
     const {
@@ -1398,7 +1338,6 @@ app.post("/vitals/log", isLoggedIn, async (req, res) => {
   }
 });
 
-// Delete a Vitals Entry
 app.post("/vitals/:id/delete", isLoggedIn, async (req, res) => {
   try {
     await Vital.findOneAndDelete({ _id: req.params.id, patientId: req.user._id });
@@ -1409,7 +1348,6 @@ app.post("/vitals/:id/delete", isLoggedIn, async (req, res) => {
   }
 });
 
-// Book Appointment with protected time slot & atomic concurrency lock
 app.post("/appointments", async (req, res) => {
   try {
     const { patientName, age, gender, date, time, doctorName, notes } = req.body;
@@ -1436,12 +1374,10 @@ app.post("/appointments", async (req, res) => {
       });
     }
 
-    // Normalize date to UTC midnight to ensure consistent indexing and comparison
     const rawDate = date && !isNaN(new Date(date).getTime()) ? new Date(date) : new Date();
     const normalizedDate = new Date(Date.UTC(rawDate.getUTCFullYear(), rawDate.getUTCMonth(), rawDate.getUTCDate()));
     const cleanTime = (time || "10:00 AM").trim();
 
-    // 1. Conflict Check: Is the doctor already booked for this slot?
     const existingConflict = await Appointment.findOne({
       doctorId: doctorObj._id,
       date: normalizedDate,
@@ -1455,7 +1391,6 @@ app.post("/appointments", async (req, res) => {
       });
     }
 
-    // 2. Prevent patient double-booking at the exact same time
     if (patientId) {
       const patientConflict = await Appointment.findOne({
         patientId,
@@ -1470,7 +1405,6 @@ app.post("/appointments", async (req, res) => {
       }
     }
 
-    // 3. Create appointment with unique compound index error handling (handles parallel race conditions)
     let appt;
     try {
       appt = await Appointment.create({
@@ -1495,7 +1429,6 @@ app.post("/appointments", async (req, res) => {
       throw createErr;
     }
 
-    // Notify patient
     if (patientId) {
       await Notification.create({
         userId: patientId,
@@ -1504,7 +1437,6 @@ app.post("/appointments", async (req, res) => {
       });
     }
 
-    // Notify doctor
     if (doctorObj) {
       await Notification.create({
         userId: doctorObj._id,
@@ -1535,7 +1467,6 @@ app.post("/appointments", async (req, res) => {
   }
 });
 
-// Patient / Staff Cancel Appointment (Strict Ownership Verification)
 app.post("/appointments/:id/cancel", isLoggedIn, async (req, res) => {
   try {
     const appt = await Appointment.findById(req.params.id);
@@ -1598,10 +1529,6 @@ app.post("/appointments/:id/cancel", isLoggedIn, async (req, res) => {
   }
 });
 
-// ==========================================
-// 4. ADMIN PORTAL ROUTES (/admin)
-// ==========================================
-
 app.get("/admin/login", (req, res) => {
   if (res.locals.currentUser && res.locals.currentUser.role === "admin") {
     return res.redirect("/admin");
@@ -1652,7 +1579,6 @@ app.get("/admin/logout", (req, res) => {
   res.redirect("/admin/login");
 });
 
-// Admin Console Dashboard
 app.get("/admin", isAdminLoggedIn, async (req, res) => {
   try {
     const totalPatients = await User.countDocuments({ role: "patient" });
@@ -1721,7 +1647,6 @@ app.get("/admin", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// Admin Dedicated AI Symptom Triage Page
 app.get("/admin/triage", isAdminLoggedIn, async (req, res) => {
   try {
     const allTriageLogs = await SymptomTriage.find().sort({ createdAt: -1 });
@@ -1760,7 +1685,6 @@ app.get("/admin/triage", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// Admin update status of AI Triage Inquiry
 app.post("/admin/triage/:id/status", isAdminLoggedIn, async (req, res) => {
   try {
     const { status } = req.body;
@@ -1773,7 +1697,6 @@ app.post("/admin/triage/:id/status", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// Admin Approve Doctor Application
 app.post("/admin/doctors/:id/approve", isAdminLoggedIn, async (req, res) => {
   try {
     const doc = await User.findById(req.params.id);
@@ -1798,7 +1721,6 @@ app.post("/admin/doctors/:id/approve", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// Admin Request More Information from Doctor
 app.post("/admin/doctors/:id/request-info", isAdminLoggedIn, async (req, res) => {
   try {
     const { adminNotes } = req.body;
@@ -1823,7 +1745,6 @@ app.post("/admin/doctors/:id/request-info", isAdminLoggedIn, async (req, res) =>
   }
 });
 
-// Admin Reject Doctor Application
 app.post("/admin/doctors/:id/reject", isAdminLoggedIn, async (req, res) => {
   try {
     const { adminNotes } = req.body;
@@ -1848,7 +1769,6 @@ app.post("/admin/doctors/:id/reject", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// Admin Add / Provision Doctor or Receptionist
 app.post("/admin/staff/add", isAdminLoggedIn, async (req, res) => {
   try {
     const { fullname, email, password, specialization, phone, role } = req.body;
@@ -1893,7 +1813,6 @@ app.post("/admin/staff/add", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// Admin Toggle Staff Active State
 app.post("/admin/staff/:id/toggle-active", isAdminLoggedIn, async (req, res) => {
   try {
     const staff = await User.findById(req.params.id);
@@ -1909,7 +1828,6 @@ app.post("/admin/staff/:id/toggle-active", isAdminLoggedIn, async (req, res) => 
   }
 });
 
-// Admin Delete Staff
 app.post("/admin/staff/:id/delete", isAdminLoggedIn, async (req, res) => {
   try {
     const staff = await User.findById(req.params.id);
@@ -1925,7 +1843,6 @@ app.post("/admin/staff/:id/delete", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// Admin Add Department
 app.post("/admin/departments/add", isAdminLoggedIn, async (req, res) => {
   try {
     const { name, code, floor, headDoctor, description } = req.body;
@@ -1946,7 +1863,6 @@ app.post("/admin/departments/add", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// Admin Delete Department
 app.post("/admin/departments/:id/delete", isAdminLoggedIn, async (req, res) => {
   try {
     const dept = await Department.findById(req.params.id);
@@ -1962,7 +1878,6 @@ app.post("/admin/departments/:id/delete", isAdminLoggedIn, async (req, res) => {
   }
 });
 
-// Admin Update Appointment Status
 app.post("/admin/appointments/:id/status", isAdminLoggedIn, async (req, res) => {
   try {
     const { status } = req.body;
@@ -1979,18 +1894,12 @@ app.post("/admin/appointments/:id/status", isAdminLoggedIn, async (req, res) => 
   }
 });
 
-// ==========================================
-// 404 & GLOBAL ERROR HANDLING MIDDLEWARE
-// ==========================================
-
-// Catch-all 404 handler
 app.use((req, res) => {
   res.status(404).render("error", {
     message: "The requested clinical page or medical resource could not be found.",
   });
 });
 
-// Centralized Express Error Handler
 app.use((err, req, res, next) => {
   console.error("Global Server Error:", err);
   if (res.headersSent) {
@@ -2001,13 +1910,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ==========================================
-// SERVER INITIALIZATION & AUTO-SEED
-// ==========================================
-
 connectDB()
   .then(async () => {
-    // Seed default admin, doctor, receptionist credentials & departments
+
     await seedDefaultUsers();
 
     const PORT = process.env.PORT || 4000;

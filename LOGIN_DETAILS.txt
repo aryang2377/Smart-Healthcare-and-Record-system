@@ -1,0 +1,147 @@
+================================================================================
+   CARESYNC - SMART HEALTHCARE & OUTPATIENT CLINICAL MANAGEMENT SYSTEM
+   MASTER SYSTEM CREDENTIALS & EVALUATION LOGIN DETAILS
+   Developer: Aryan Gupta (Registration Number: 2430030261)
+   Manipal University Jaipur - Department of Information Technology - PBL-3 (INT3170)
+================================================================================
+
+[1] SYSTEM ADMINISTRATOR CONSOLE
+    URL: http://localhost:4000/admin/login
+    Role: admin
+    Account: Hospital Administrator
+    Email: admin@caresync.health
+    Password: AdminCareSync@2026
+    Privileges: Doctor verification, staff provisioning, master appointments, 
+                departments, audit logs, AI triage audit ledger.
+
+--------------------------------------------------------------------------------
+[2] FRONT-DESK RECEPTIONISTS (UNIFIED STAFF PORTAL)
+    URL: http://localhost:4000/staff/login
+    Role: receptionist
+    
+    1. Sarah Jenkins (Day Shift: 08:00 AM - 03:00 PM)
+       Email: receptionist@caresync.health
+       Password: Staff#Sarah26
+       Phone: +91 98765 11223
+       Duties: Arriving check-ins, walk-in consultations, outpatient lounge queue.
+       
+    2. David Miller (Evening Shift: 02:00 PM - 09:00 PM)
+       Email: reception@caresync.health
+       Password: Staff#David26
+       Phone: +91 98666 77788
+       Duties: Outpatient queue triage, mark no-shows/cancellations, prescription check.
+
+--------------------------------------------------------------------------------
+[3] VERIFIED ATTENDING PHYSICIANS (14 CLINICAL DEPARTMENTS)
+    URL: http://localhost:4000/staff/login
+    Role: doctor
+
+    1. Cardiology
+       Doctor: Dr. Rajesh Sharma
+       Email: doctor@caresync.health
+       Password: Cardio#Sharma26
+       Fee: INR 800 | Timings: Mon - Fri (09:00 AM - 02:00 PM)
+       License: MCI-CARD-2024-8849
+
+    2. Dermatology
+       Doctor: Dr. Priya Mehta
+       Email: dr.priya@caresync.health
+       Password: Derma#Mehta26
+       Fee: INR 600 | Timings: Mon - Sat (10:00 AM - 04:00 PM)
+       License: MCI-DERM-2023-4102
+
+    3. General Medicine
+       Doctor: Dr. Amit Verma
+       Email: dr.verma@caresync.health
+       Password: GenMed#Verma26
+       Fee: INR 500 | Timings: Mon - Sat (08:30 AM - 03:00 PM)
+       License: MCI-GENMED-2022-1984
+
+    4. Pediatrics
+       Doctor: Dr. Neha Kapoor
+       Email: dr.kapoor@caresync.health
+       Password: Pedia#Kapoor26
+       Fee: INR 650 | Timings: Mon - Fri (09:30 AM - 02:30 PM)
+       License: MCI-PED-2024-6721
+
+    5. Neurology
+       Doctor: Dr. Rahul Singh
+       Email: dr.singh@caresync.health
+       Password: Neuro#Singh26
+       Fee: INR 900 | Timings: Mon - Thu (10:00 AM - 03:30 PM)
+       License: MCI-NEUR-2021-3310
+
+    6. Orthopedics
+       Doctor: Dr. Karan Malhotra
+       Email: dr.malhotra@caresync.health
+       Password: Ortho#Malhotra26
+       Fee: INR 750 | Timings: Mon - Sat (09:00 AM - 02:00 PM)
+       License: MCI-ORTH-2020-5542
+
+    7. Gynecology & Obstetrics
+       Doctor: Dr. Ananya Gupta
+       Email: dr.ananya@caresync.health
+       Password: Gynec#Gupta26
+       Fee: INR 700 | Timings: Mon - Fri (10:00 AM - 04:00 PM)
+       License: MCI-GYN-2023-7891
+
+    8. ENT (Otolaryngology)
+       Doctor: Dr. Vikram Nair
+       Email: dr.nair@caresync.health
+       Password: Ent#Nair26
+       Fee: INR 600 | Timings: Mon - Sat (11:00 AM - 05:00 PM)
+       License: MCI-ENT-2022-9012
+
+    9. Gastroenterology
+       Doctor: Dr. Alok Bansal
+       Email: dr.bansal@caresync.health
+       Password: Gastro#Bansal26
+       Fee: INR 850 | Timings: Mon - Fri (09:00 AM - 03:00 PM)
+       License: MCI-GASTRO-2021-4478
+
+    10. Pulmonology
+       Doctor: Dr. Ritu Saxena
+       Email: dr.saxena@caresync.health
+       Password: Pulmo#Saxena26
+       Fee: INR 750 | Timings: Mon - Fri (10:00 AM - 04:00 PM)
+       License: MCI-PULM-2023-2289
+
+    11. Psychiatry
+       Doctor: Dr. Sameer Joshi
+       Email: dr.joshi@caresync.health
+       Password: Psych#Joshi26
+       Fee: INR 800 | Timings: Mon - Sat (12:00 PM - 06:00 PM)
+       License: MCI-PSYCH-2024-1134
+
+    12. Ophthalmology
+       Doctor: Dr. Meenakshi Sundaram
+       Email: dr.sundaram@caresync.health
+       Password: Eye#Sundaram26
+       Fee: INR 650 | Timings: Mon - Sat (09:00 AM - 02:00 PM)
+       License: MCI-OPHTH-2020-6677
+
+    13. Endocrinology
+       Doctor: Dr. Sanjay Deshmukh
+       Email: dr.deshmukh@caresync.health
+       Password: Endo#Deshmukh26
+       Fee: INR 850 | Timings: Tue - Sat (10:00 AM - 03:30 PM)
+       License: MCI-ENDO-2022-8820
+
+    14. Urology
+       Doctor: Dr. Deepak Aggarwal
+       Email: dr.aggarwal@caresync.health
+       Password: Uro#Aggarwal26
+       Fee: INR 900 | Timings: Mon - Fri (09:30 AM - 03:30 PM)
+       License: MCI-UROL-2021-3901
+
+--------------------------------------------------------------------------------
+[4] REGISTERED OUTPATIENT ACCOUNT
+    URL: http://localhost:4000/login
+    Role: patient
+    Full Name: John Doe
+    Email: john@gmail.com
+    Password: john12
+    Phone: +91 98765 00001
+    Privileges: Protected slot booking across 14 specialties, live visit stage 
+                tracking, private EHR lab report vault, digital prescriptions.
+================================================================================

@@ -33,7 +33,6 @@ const userSchema = new mongoose.Schema({
     default: true,
   },
 
-  // Step 1: Personal Information
   dob: {
     type: String,
     default: "",
@@ -55,7 +54,6 @@ const userSchema = new mongoose.Schema({
     default: "",
   },
 
-  // Patient Clinical Information
   bloodGroup: {
     type: String,
     default: "",
@@ -65,7 +63,6 @@ const userSchema = new mongoose.Schema({
     default: "",
   },
 
-  // Step 2: Professional Information
   specialization: {
     type: String,
     default: "",
@@ -99,7 +96,6 @@ const userSchema = new mongoose.Schema({
     default: "",
   },
 
-  // Step 3: Verification Documents
   licenseDoc: {
     type: String,
     default: "",
@@ -113,7 +109,6 @@ const userSchema = new mongoose.Schema({
     default: "",
   },
 
-  // Step 4: Availability
   workingDays: {
     type: String,
     default: "Mon - Fri",

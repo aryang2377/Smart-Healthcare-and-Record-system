@@ -3,7 +3,6 @@
 <section class="symptom-page-dark">
   <div class="symptom-container-dark">
 
-    <!-- Header -->
     <div class="symptom-header-dark">
       <span class="badge-tag">
         <span class="live-dot-green"></span>
@@ -13,7 +12,6 @@
       <p>Select your symptoms or describe them in your own words. Our AI analyzes your condition, estimates urgency, and routes you to the right specialist from our verified doctor network.</p>
     </div>
 
-    <!-- Emergency Alert (shown only when high urgency detected) -->
     <div id="emergencyAlert" class="emergency-alert-banner" style="display:none">
       <div class="emergency-icon-wrap">
         <i class="fas fa-triangle-exclamation"></i>
@@ -27,15 +25,12 @@
       </a>
     </div>
 
-    <!-- Main 2-column Grid -->
     <div class="symptom-main-grid">
 
-      <!-- LEFT: Symptom Input -->
       <div class="symptom-card-dark">
         <h3><i class="fas fa-notes-medical text-cyan"></i> Select Your Symptoms</h3>
         <p class="section-desc">Click all that apply, then add a description for better accuracy.</p>
 
-        <!-- Head & Neuro -->
         <div class="symptom-cat-label">Head &amp; Neurological</div>
         <div class="symptom-chips-container">
           <span class="symptom-chip" data-symptom="Headache"><i class="fas fa-head-side-virus"></i> Headache</span>
@@ -47,7 +42,6 @@
           <span class="symptom-chip" data-symptom="Memory Issues"><i class="fas fa-circle-question"></i> Memory Issues</span>
         </div>
 
-        <!-- Chest & Cardiac -->
         <div class="symptom-cat-label">Chest &amp; Cardiovascular</div>
         <div class="symptom-chips-container">
           <span class="symptom-chip" data-symptom="Chest Pain"><i class="fas fa-heart-pulse"></i> Chest Pain</span>
@@ -57,7 +51,6 @@
           <span class="symptom-chip" data-symptom="Leg Swelling"><i class="fas fa-person-walking"></i> Leg Swelling</span>
         </div>
 
-        <!-- Digestive -->
         <div class="symptom-cat-label">Digestive System</div>
         <div class="symptom-chips-container">
           <span class="symptom-chip" data-symptom="Nausea"><i class="fas fa-face-dizzy"></i> Nausea</span>
@@ -69,7 +62,6 @@
           <span class="symptom-chip" data-symptom="Loss of Appetite"><i class="fas fa-utensils"></i> No Appetite</span>
         </div>
 
-        <!-- Respiratory -->
         <div class="symptom-cat-label">Respiratory</div>
         <div class="symptom-chips-container">
           <span class="symptom-chip" data-symptom="Cough"><i class="fas fa-wind"></i> Cough</span>
@@ -80,7 +72,6 @@
           <span class="symptom-chip" data-symptom="Sneezing"><i class="fas fa-cloud"></i> Sneezing</span>
         </div>
 
-        <!-- Musculoskeletal -->
         <div class="symptom-cat-label">Muscles &amp; Joints</div>
         <div class="symptom-chips-container">
           <span class="symptom-chip" data-symptom="Joint Pain"><i class="fas fa-bone"></i> Joint Pain</span>
@@ -91,7 +82,6 @@
           <span class="symptom-chip" data-symptom="Stiffness"><i class="fas fa-lock"></i> Stiffness</span>
         </div>
 
-        <!-- Skin -->
         <div class="symptom-cat-label">Skin</div>
         <div class="symptom-chips-container">
           <span class="symptom-chip" data-symptom="Skin Rash"><i class="fas fa-hand-dots"></i> Rash</span>
@@ -101,7 +91,6 @@
           <span class="symptom-chip" data-symptom="Dry Skin"><i class="fas fa-droplet-slash"></i> Dry Skin</span>
         </div>
 
-        <!-- General -->
         <div class="symptom-cat-label">General Symptoms</div>
         <div class="symptom-chips-container">
           <span class="symptom-chip" data-symptom="Fever"><i class="fas fa-thermometer"></i> Fever</span>
@@ -114,7 +103,6 @@
           <span class="symptom-chip" data-symptom="Excessive Thirst"><i class="fas fa-glass-water"></i> Excessive Thirst</span>
         </div>
 
-        <!-- Optional Patient Details for Visitor / Guest -->
         <% if (!currentUser) { %>
           <div class="guest-details-box">
             <div class="guest-details-title">
@@ -127,7 +115,6 @@
           </div>
         <% } %>
 
-        <!-- Free text -->
         <div class="custom-notes-block">
           <label>
             <i class="fas fa-comment-medical text-cyan"></i>
@@ -153,19 +140,16 @@
         </div>
       </div>
 
-      <!-- RIGHT: Results Panel -->
       <div class="symptom-card-dark results-card">
         <h3><i class="fas fa-brain text-cyan"></i> AI Clinical Analysis</h3>
         <p class="section-desc">Your triage assessment will appear here after analysis.</p>
 
-        <!-- Idle State -->
         <div id="resultsIdle" class="results-idle" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
           <div class="idle-icon-wrap"><i class="fas fa-robot"></i></div>
           <h4>Awaiting Symptom Input</h4>
           <p>Select symptoms from the panel and click "Analyze Symptoms" to receive your AI-powered clinical triage assessment.</p>
         </div>
 
-        <!-- Loading State -->
         <div id="resultsLoading" class="results-loading-state" style="display:none">
           <div class="ai-loading-wrap">
             <div class="ai-spinner"></div>
@@ -174,7 +158,6 @@
           </div>
         </div>
 
-        <!-- Error State -->
         <div id="resultsError" class="results-error-state" style="display:none">
           <div class="idle-icon-wrap" style="background:rgba(239,68,68,0.08)">
             <i class="fas fa-triangle-exclamation text-rose"></i>
@@ -183,7 +166,6 @@
           <p style="color:#64748b;font-size:13px;text-align:center;margin-top:6px">Please retry or contact hospital reception.</p>
         </div>
 
-        <!-- Active Results -->
         <div id="resultsActive" class="results-active" style="display:none">
           <div class="triage-status-bar">
             <span id="urgencyPill" class="urgency-pill moderate">&#9888; MODERATE</span>
@@ -228,7 +210,6 @@
       </div>
     </div>
 
-    <!-- Matched Doctors Section -->
     <div id="matchedDoctors" class="matched-doctors-section" style="display:none">
       <div class="matched-doctors-header">
         <h3><i class="fas fa-user-doctor"></i> Recommended Specialists Available Now</h3>

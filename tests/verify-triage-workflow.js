@@ -8,7 +8,6 @@ async function runTest() {
   await mongoose.connect(process.env.MONGODB_URI);
   console.log("Connected to MongoDB.");
 
-  // Test 1: Verify strictly 1 doctor per specialization
   const doctors = await User.find({ role: "doctor", approvalStatus: "approved", isActive: true });
   console.log(`\n--- Test 1: Checking Doctor Specializations (Total: ${doctors.length}) ---`);
   const specCounts = {};
@@ -28,7 +27,6 @@ async function runTest() {
     throw new Error("Found duplicate doctors for a specialization!");
   }
 
-  // Test 2: Create a sample triage inquiry matching Cardiology (Dr. Rajesh Sharma)
   console.log("\n--- Test 2: Simulating AI Symptom Triage for Cardiology ---");
   const cardioDoc = await User.findOne({ specialization: "Cardiology", role: "doctor" });
   if (!cardioDoc) throw new Error("Cardiology doctor not found!");
@@ -50,7 +48,6 @@ async function runTest() {
   });
   console.log("[PASS] SymptomTriage created with ID:", newTriage._id);
 
-  // Test 3: Doctor dashboard inquiry matching
   console.log("\n--- Test 3: Checking Doctor Dashboard Query Matching ---");
   const specPattern = (cardioDoc.specialization || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const doctorLeads = await SymptomTriage.find({
@@ -67,7 +64,6 @@ async function runTest() {
   }
   console.log(`[PASS] Doctor (${cardioDoc.fullname}) received triage lead successfully! Lead urgency: ${foundLead.urgency}`);
 
-  // Test 4: Admin dashboard query matching
   console.log("\n--- Test 4: Checking Admin Dashboard Query Matching ---");
   const allTriage = await SymptomTriage.find().sort({ createdAt: -1 });
   const adminFound = allTriage.find(l => l._id.toString() === newTriage._id.toString());
@@ -76,7 +72,6 @@ async function runTest() {
   }
   console.log(`[PASS] Admin dashboard query retrieved triage log successfully! Total logs: ${allTriage.length}`);
 
-  // Clean up the test triage
   await SymptomTriage.findByIdAndDelete(newTriage._id);
   console.log("[PASS] Test triage lead cleaned up successfully.");
 

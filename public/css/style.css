@@ -1,6 +1,3 @@
-/* ==========================================================================
-   CareSync Dark & Attractive Healthcare Theme (Student Engineering Project)
-   ========================================================================== */
 
 :root {
   --bg-deep: #090d16;
@@ -9,21 +6,21 @@
   --bg-surface-hover: #1e293b;
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-glow: rgba(56, 189, 248, 0.3);
-  
+
   --neon-cyan: #38bdf8;
   --neon-blue: #3b82f6;
   --neon-emerald: #10b981;
   --neon-purple: #a855f7;
   --neon-amber: #f59e0b;
-  
+
   --text-white: #f8fafc;
   --text-muted: #94a3b8;
   --text-dim: #64748b;
-  
+
   --glow-cyan: 0 0 25px rgba(56, 189, 248, 0.25);
   --glow-blue: 0 0 25px rgba(59, 130, 246, 0.25);
   --shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.4);
-  
+
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
@@ -53,10 +50,6 @@ body {
 .main-content {
   flex: 1;
 }
-
-/* ==========================================================================
-   DARK NAVBAR
-   ========================================================================== */
 
 .navbar-wrapper {
   position: sticky;
@@ -316,10 +309,6 @@ body {
   display: none;
 }
 
-/* ==========================================================================
-   HERO SECTION (DARK & ATTRACTIVE)
-   ========================================================================== */
-
 .hero-section {
   background: radial-gradient(circle at 75% 25%, rgba(14, 165, 233, 0.18) 0%, rgba(9, 13, 22, 1) 62%),
               radial-gradient(circle at 15% 75%, rgba(59, 130, 246, 0.12) 0%, rgba(9, 13, 22, 1) 52%);
@@ -471,7 +460,6 @@ body {
   background: rgba(56, 189, 248, 0.05);
 }
 
-/* Quick Stats Bar */
 .quick-stats-bar {
   display: inline-flex;
   align-items: center;
@@ -540,7 +528,6 @@ body {
 .text-emerald { color: var(--neon-emerald); }
 .text-amber { color: var(--neon-amber); }
 
-/* Right Visual */
 .hero-visual {
   flex: 0.95;
   position: relative;
@@ -577,7 +564,6 @@ body {
   filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.65));
 }
 
-/* Dark Floating Badges */
 .dark-float-badge {
   position: absolute;
   z-index: 3;
@@ -671,10 +657,6 @@ body {
   display: inline-block;
 }
 
-/* ==========================================================================
-   TECH STACK STRIP
-   ========================================================================== */
-
 .tech-stack-section {
   background: #0d1322;
   border-top: 1px solid var(--border-subtle);
@@ -727,10 +709,6 @@ body {
   border-color: rgba(56, 189, 248, 0.3);
   transform: translateY(-2px);
 }
-
-/* ==========================================================================
-   PROJECT MODULES SECTION
-   ========================================================================== */
 
 .modules-section {
   padding: 85px 24px;
@@ -875,10 +853,6 @@ body {
   border: 1px solid var(--border-subtle);
 }
 
-/* ==========================================================================
-   SYSTEM WORKFLOW
-   ========================================================================== */
-
 .workflow-section {
   padding: 85px 24px;
   background: #0d1322;
@@ -943,10 +917,6 @@ body {
   line-height: 1.6;
 }
 
-/* ==========================================================================
-   INTERACTIVE DEMO CTA
-   ========================================================================== */
-
 .demo-cta-section {
   padding: 38px 24px 44px;
   background: var(--bg-deep);
@@ -1001,10 +971,6 @@ body {
   gap: 12px;
   flex-wrap: wrap;
 }
-
-/* ==========================================================================
-   DARK FOOTER
-   ========================================================================== */
 
 .dark-footer {
   background: #070a13;
@@ -1180,10 +1146,6 @@ body {
   align-items: center;
   gap: 6px;
 }
-
-/* ==========================================================================
-   REPORTS PAGE STYLING (DARK THEME)
-   ========================================================================== */
 
 .reports-page {
   padding: 45px 24px 70px;
@@ -1386,9 +1348,6 @@ body {
   border-color: var(--neon-cyan);
 }
 
-/* ==========================================================================
-   HOSPITAL DEPARTMENTS & SPECIALISTS SHOWCASE
-   ========================================================================== */
 .departments-showcase-section {
   padding: 44px 24px 50px;
   background: #080d19;
@@ -1576,10 +1535,6 @@ body {
   color: #7dd3fc;
   gap: 12px;
 }
-
-/* ==========================================================================
-   RESPONSIVE DESIGN (DARK THEME)
-   ========================================================================== */
 
 @media (max-width: 1200px) {
   .hero-title {

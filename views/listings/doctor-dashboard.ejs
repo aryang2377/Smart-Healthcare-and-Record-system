@@ -2,7 +2,7 @@
 
 <section class="dashboard-wrapper-dark">
     <div class="dashboard-container">
-        <!-- Unified Staff Header -->
+
         <div class="dash-header-dark">
             <div class="dash-user-info">
                 <div class="user-large-avatar <%= currentUser.role === 'doctor' ? 'doctor-avatar' : 'admin-avatar' %>">
@@ -33,8 +33,7 @@
             </div>
         </div>
 
-        <!-- Metric Cards -->
-        <% 
+        <%
             const inConsultCount = todayQueue.filter(a => a.status === 'In-Consultation').length;
             const waitingCount = todayQueue.filter(a => a.status === 'Checked-In').length;
         %>
@@ -80,7 +79,6 @@
             </div>
         </div>
 
-        <!-- Tab Navigation Bar -->
         <div class="dash-tabs-bar" style="overflow-x: auto; flex-wrap: nowrap;">
             <button type="button" class="dash-tab-btn <%= activeTab === 'queue' ? 'active' : '' %>" onclick="switchTab('queue')">
                 <i class="fas fa-user-clock"></i> Today's Queue (<%= todayQueue.length %>)
@@ -103,7 +101,6 @@
             <% } %>
         </div>
 
-        <!-- TAB 1: TODAY'S OUTPATIENT QUEUE -->
         <div id="tab-queue" class="tab-pane-dark" style="<%= activeTab === 'queue' ? 'display: block;' : 'display: none;' %>">
             <div class="dash-card-dark">
                 <div class="card-head">
@@ -143,7 +140,7 @@
                                         </td>
                                         <td>
                                             <div class="action-btn-group" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                                                <!-- STEP 1: CHECK IN (Receptionist or Doctor) -->
+
                                                 <% if (appt.status === 'Scheduled' || appt.status === 'Confirmed') { %>
                                                     <form action="/staff/appointments/<%= appt._id %>/status" method="POST" style="display:inline;">
                                                         <input type="hidden" name="status" value="Checked-In">
@@ -153,7 +150,6 @@
                                                     </form>
                                                 <% } %>
 
-                                                <!-- STEP 2: BEGIN CONSULTATION (Doctor Only) -->
                                                 <% if (appt.status === 'Checked-In') { %>
                                                     <% if (currentUser.role === 'doctor') { %>
                                                         <form action="/staff/appointments/<%= appt._id %>/status" method="POST" style="display:inline;">
@@ -167,7 +163,6 @@
                                                     <% } %>
                                                 <% } %>
 
-                                                <!-- STEP 3: CONCLUDE CONSULTATION (Doctor Only) -->
                                                 <% if (appt.status === 'In-Consultation') { %>
                                                     <% if (currentUser.role === 'doctor') { %>
                                                         <button type="button" class="btn-sm-action complete" onclick="openConsultModal('<%= appt._id %>', '<%= appt.patientName %>')" title="Complete Consultation & Notes">
@@ -181,12 +176,10 @@
                                                     <% } %>
                                                 <% } %>
 
-                                                <!-- STEP 4: COMPLETED STATE -->
                                                 <% if (appt.status === 'Completed') { %>
                                                     <span style="color: #34d399; font-size: 11.5px; font-weight: 700;"><i class="fas fa-check-circle"></i> Completed</span>
                                                 <% } %>
 
-                                                <!-- CANCELLATION / NO-SHOW CONTROLS -->
                                                 <% if (appt.status !== 'Completed' && appt.status !== 'Cancelled' && appt.status !== 'No-Show') { %>
                                                     <form action="/staff/appointments/<%= appt._id %>/status" method="POST" style="display:inline;" onsubmit="return confirm('Mark as No-Show?');">
                                                         <input type="hidden" name="status" value="No-Show">
@@ -217,11 +210,10 @@
             </div>
         </div>
 
-        <!-- TAB 3: DIGITAL PRESCRIPTION PAD (DOCTOR ONLY) -->
         <% if (currentUser.role === 'doctor') { %>
         <div id="tab-prescription" class="tab-pane-dark" style="<%= activeTab === 'prescription' ? 'display: block;' : 'display: none;' %>">
             <div class="dash-grid-split">
-                <!-- Rx Form -->
+
                 <div class="dash-card-dark">
                     <div class="card-head">
                         <h3><i class="fas fa-file-prescription text-cyan"></i> Digital Prescription & Consultation Pad</h3>
@@ -299,7 +291,6 @@
                     </form>
                 </div>
 
-                <!-- Sent Prescriptions Ledger -->
                 <div class="dash-card-dark">
                     <div class="card-head">
                         <h3><i class="fas fa-history text-emerald"></i> Dispatched Prescriptions Ledger</h3>
@@ -351,10 +342,9 @@
         </div>
         <% } %>
 
-        <!-- TAB 4: DIAGNOSTIC LAB REPORTS -->
         <div id="tab-upload" class="tab-pane-dark" style="<%= activeTab === 'upload' ? 'display: block;' : 'display: none;' %>">
             <div class="dash-grid-split">
-                <!-- Upload form -->
+
                 <div class="dash-card-dark">
                     <div class="card-head">
                         <h3><i class="fas fa-file-signature text-cyan"></i> Issue Authorized Report / EHR</h3>
@@ -405,7 +395,6 @@
                     </form>
                 </div>
 
-                <!-- Issued reports table -->
                 <div class="dash-card-dark">
                     <div class="card-head">
                         <h3><i class="fas fa-folder-open text-blue"></i> Hospital Diagnostic Documents Ledger</h3>
@@ -456,7 +445,6 @@
             </div>
         </div>
 
-        <!-- TAB 5: PATIENT DIRECTORY -->
         <div id="tab-roster" class="tab-pane-dark" style="<%= activeTab === 'roster' ? 'display: block;' : 'display: none;' %>">
             <div class="dash-card-dark">
                 <div class="card-head">
@@ -508,7 +496,6 @@
             </div>
         </div>
 
-        <!-- TAB 6: DOCTOR AVAILABILITY & DUTY SETTINGS -->
         <% if (currentUser.role === 'doctor') { %>
             <div id="tab-availability" class="tab-pane-dark" style="<%= activeTab === 'availability' ? 'display: block;' : 'display: none;' %>">
                 <div class="dash-grid-split">
@@ -594,7 +581,6 @@
     </div>
 </section>
 
-<!-- MODAL: CONCLUDE CONSULTATION & CLINICAL REMARKS -->
 <div id="consultModal" class="modal-backdrop-dark" style="display: none;">
     <div class="modal-box-dark">
         <div class="modal-header">

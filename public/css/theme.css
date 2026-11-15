@@ -1,12 +1,6 @@
-/* ==========================================================================
-   CareSync Complete Light / Dark Theme Engine & Responsive Stylesheet
-   ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   1. Theme Variables & Base Definitions
-   -------------------------------------------------------------------------- */
 :root {
-  /* Default Dark Mode Variables */
+
   --bg-deep: #090d16;
   --bg-surface: #111827;
   --bg-surface-elevated: #162032;
@@ -29,7 +23,6 @@
   --glow-blue: 0 0 25px rgba(59, 130, 246, 0.25);
   --shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.4);
 
-  /* Switch styling tokens */
   --switch-track-bg: #131b2e;
   --switch-track-border: rgba(56, 189, 248, 0.25);
   --switch-thumb-bg: linear-gradient(135deg, #0284c7, #38bdf8);
@@ -38,7 +31,7 @@
 }
 
 [data-theme="light"] {
-  /* Clean, crisp clinical light mode palette */
+
   --bg-deep: #f1f5f9;
   --bg-surface: #ffffff;
   --bg-surface-elevated: #f8fafc;
@@ -53,15 +46,14 @@
   --neon-amber: #d97706;
   --neon-rose: #e11d48;
 
-  --text-white: #0f172a;       /* Primary bold headings & titles */
-  --text-muted: #334155;       /* Primary body & card text */
-  --text-dim: #64748b;         /* Secondary hints & subtle labels */
+  --text-white: #0f172a;
+  --text-muted: #334155;
+  --text-dim: #64748b;
 
   --glow-cyan: 0 4px 20px rgba(2, 132, 199, 0.15);
   --glow-blue: 0 4px 20px rgba(37, 99, 235, 0.15);
   --shadow-dark: 0 8px 24px rgba(15, 23, 42, 0.06);
 
-  /* Switch styling tokens in light mode */
   --switch-track-bg: #e2e8f0;
   --switch-track-border: rgba(2, 132, 199, 0.3);
   --switch-thumb-bg: linear-gradient(135deg, #f59e0b, #fbbf24);
@@ -69,20 +61,16 @@
   --switch-icon-inactive: #94a3b8;
 }
 
-/* Smooth transition when toggling modes */
 .theme-transitioning,
 .theme-transitioning *,
 .theme-transitioning *:before,
 .theme-transitioning *:after {
-  transition: background-color 0.3s ease, 
-              border-color 0.3s ease, 
-              color 0.25s ease, 
+  transition: background-color 0.3s ease,
+              border-color 0.3s ease,
+              color 0.25s ease,
               box-shadow 0.3s ease !important;
 }
 
-/* --------------------------------------------------------------------------
-   2. Theme Toggle Switch Component
-   -------------------------------------------------------------------------- */
 .theme-toggle-switch {
   display: inline-flex;
   align-items: center;
@@ -140,7 +128,6 @@
   transform: scale(0.9);
 }
 
-/* The animated sliding knob/thumb */
 .theme-switch-thumb {
   position: absolute;
   top: 2px;
@@ -163,7 +150,6 @@
   transition: transform 0.3s ease, opacity 0.2s ease;
 }
 
-/* Light mode position for the switch */
 [data-theme="light"] .theme-switch-thumb {
   transform: translateX(27px);
 }
@@ -172,7 +158,6 @@
   color: #78350f;
 }
 
-/* Mobile drawer switch row */
 .mobile-theme-row {
   display: flex;
   align-items: center;
@@ -202,9 +187,6 @@
   color: var(--neon-cyan);
 }
 
-/* --------------------------------------------------------------------------
-   3. Navbar Light Mode Styles
-   -------------------------------------------------------------------------- */
 [data-theme="light"] .navbar-wrapper {
   background: rgba(255, 255, 255, 0.94);
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
@@ -323,7 +305,6 @@
   color: #0f172a;
 }
 
-/* Mobile drawer on light mode */
 @media (max-width: 992px) {
   [data-theme="light"] .nav-center-menu {
     background: #ffffff;
@@ -346,9 +327,6 @@
   }
 }
 
-/* --------------------------------------------------------------------------
-   4. Home & Landing Page Light Mode Styles
-   -------------------------------------------------------------------------- */
 [data-theme="light"] .hero-section {
   background: radial-gradient(circle at 75% 20%, rgba(14, 165, 233, 0.12) 0%, #f8fafc 60%),
               radial-gradient(circle at 15% 80%, rgba(59, 130, 246, 0.08) 0%, #f8fafc 50%);
@@ -429,7 +407,6 @@
   background: radial-gradient(circle, rgba(14, 165, 233, 0.18) 0%, rgba(59, 130, 246, 0.06) 50%, transparent 70%);
 }
 
-/* Hospital Departments Showcase */
 [data-theme="light"] .departments-showcase-section {
   background: #ffffff;
   border-top: 1px solid rgba(15, 23, 42, 0.08);
@@ -485,7 +462,6 @@
   border-top-color: rgba(15, 23, 42, 0.08);
 }
 
-/* AI Clinical Symptom Section on Home */
 [data-theme="light"] .ai-coming-soon-section {
   background: #f1f5f9;
   border-top: 1px solid rgba(15, 23, 42, 0.08);
@@ -577,7 +553,6 @@
   color: #0284c7 !important;
 }
 
-/* Call to Action Banner */
 [data-theme="light"] .demo-cta-section {
   background: #f8fafc;
 }
@@ -596,9 +571,6 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* --------------------------------------------------------------------------
-   5. Footer Light Mode Styles
-   -------------------------------------------------------------------------- */
 [data-theme="light"] .dark-footer {
   background: #f1f5f9;
   border-top: 1px solid rgba(15, 23, 42, 0.08);
@@ -665,9 +637,6 @@
   color: #059669;
 }
 
-/* --------------------------------------------------------------------------
-   6. Authentication Pages (Login, Register, Forgot, Apply, Pending)
-   -------------------------------------------------------------------------- */
 [data-theme="light"] .auth-container,
 [data-theme="light"] .login-container,
 [data-theme="light"] .register-container {
@@ -787,7 +756,6 @@
   color: #0284c7 !important;
 }
 
-/* Doctor Apply Multi-Step Light Overrides */
 [data-theme="light"] .steps-progress-bar::before {
   background: #e2e8f0 !important;
 }
@@ -862,7 +830,6 @@
   color: #0f172a !important;
 }
 
-/* Doctor Pending Verification Card */
 .pending-detail-box {
   background: #0a0f1d;
   border: 1px solid #1e293b;
@@ -944,7 +911,6 @@
   background: #e2e8f0 !important;
 }
 
-/* Auth role outline buttons */
 [data-theme="light"] .btn-auth-outline.patient,
 [data-theme="light"] .btn-auth-outline.doctor {
   background: #f8fafc;
@@ -969,9 +935,6 @@
   border-color: #059669;
 }
 
-/* --------------------------------------------------------------------------
-   7. Find Doctors Page
-   -------------------------------------------------------------------------- */
 [data-theme="light"] .find-doctors-dark {
   background-color: #f1f5f9;
   color: #0f172a;
@@ -1072,9 +1035,6 @@
   box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
 }
 
-/* --------------------------------------------------------------------------
-   8. Symptom Checker Page
-   -------------------------------------------------------------------------- */
 [data-theme="light"] .symptom-page-dark {
   background-color: #f1f5f9;
   color: #0f172a;
@@ -1152,7 +1112,6 @@
   border-color: #0284c7 !important;
 }
 
-/* Guest Details Box */
 .guest-details-box {
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(56, 189, 248, 0.2);
@@ -1220,7 +1179,6 @@
   color: #0f172a;
 }
 
-/* Results idle / loading */
 [data-theme="light"] .results-idle {
   display: flex !important;
   flex-direction: column !important;
@@ -1247,7 +1205,6 @@
   flex-shrink: 0 !important;
 }
 
-/* Triage results & details */
 [data-theme="light"] .triage-result-card,
 [data-theme="light"] .analysis-box,
 [data-theme="light"] .triage-details-box {
@@ -1290,7 +1247,6 @@
   color: #1e293b !important;
 }
 
-/* Matched Doctors on Symptom Checker */
 [data-theme="light"] .matched-doctors-section {
   background: #ffffff !important;
   border: 1px solid rgba(15, 23, 42, 0.08) !important;
@@ -1330,9 +1286,6 @@
   color: #0284c7 !important;
 }
 
-/* --------------------------------------------------------------------------
-   9. Multi-Dashboards (Patient, Doctor, Admin)
-   -------------------------------------------------------------------------- */
 [data-theme="light"] .dashboard-wrapper-dark {
   background-color: #f1f5f9;
   color: #0f172a;
@@ -1391,7 +1344,6 @@
   color: #64748b;
 }
 
-/* Dashboard Tabs */
 [data-theme="light"] .dash-tabs-bar {
   border-bottom-color: rgba(15, 23, 42, 0.08);
 }
@@ -1415,7 +1367,6 @@
   box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
 }
 
-/* Dashboard Cards & Forms */
 [data-theme="light"] .dash-card-dark {
   background: #ffffff;
   border: 1px solid rgba(15, 23, 42, 0.08);
@@ -1462,7 +1413,6 @@
   color: #475569;
 }
 
-/* Dashboard Tables */
 [data-theme="light"] .dash-table-dark th {
   background: #f8fafc;
   color: #475569;
@@ -1494,7 +1444,6 @@
   color: #334155;
 }
 
-/* Prescriptions & Reports on Patient Dashboard */
 [data-theme="light"] .prescription-card {
   background: #ffffff !important;
   border-color: rgba(15, 23, 42, 0.08) !important;
@@ -1573,7 +1522,6 @@
   color: #0f172a;
 }
 
-/* History Timeline */
 [data-theme="light"] .history-timeline::before {
   background: rgba(15, 23, 42, 0.12);
 }
@@ -1594,7 +1542,6 @@
   color: #334155;
 }
 
-/* Admin Dashboard Specific */
 [data-theme="light"] .status-summary-box {
   background: #ffffff;
   border: 1px solid rgba(15, 23, 42, 0.08);
@@ -1620,7 +1567,6 @@
   border-color: #0284c7;
 }
 
-/* Doctor Verification Cards on Admin */
 .doc-verification-card {
   background: #0a0f1d;
   border: 1px solid #1e293b;
@@ -1664,7 +1610,6 @@
   color: #0284c7;
 }
 
-/* Medical Privacy Notice */
 .privacy-notice-box {
   background: rgba(30, 41, 59, 0.4);
   border: 1px solid rgba(148, 163, 184, 0.15);
@@ -1699,9 +1644,6 @@
   color: #64748b;
 }
 
-/* --------------------------------------------------------------------------
-   10. Modals & Triage Dossier Light Mode
-   -------------------------------------------------------------------------- */
 [data-theme="light"] .modal-backdrop-dark {
   background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(8px);
@@ -1747,7 +1689,6 @@
   border-color: rgba(2, 132, 199, 0.25) !important;
 }
 
-/* Admin Triage Dossier Modal Light Styles */
 .triage-modal-patient-card {
   background: rgba(15, 23, 42, 0.8);
   border: 1px solid rgba(56, 189, 248, 0.25);
@@ -1841,7 +1782,6 @@
   color: #0f172a;
 }
 
-/* Light mode scrollbars */
 [data-theme="light"] ::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
@@ -1859,9 +1799,6 @@
   scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
-/* --------------------------------------------------------------------------
-   11. Diagnostic Reports & EHR Records Light Mode
-   -------------------------------------------------------------------------- */
 [data-theme="light"] .reports-page {
   background: #f1f5f9;
 }
@@ -1933,9 +1870,6 @@
   border-color: #0284c7;
 }
 
-/* --------------------------------------------------------------------------
-   12. Prescription View Light Mode Overrides
-   -------------------------------------------------------------------------- */
 [data-theme="light"] .rx-slip-wrapper {
   background: #f1f5f9 !important;
 }
@@ -2055,11 +1989,6 @@
   color: #64748b !important;
 }
 
-/* --------------------------------------------------------------------------
-   12. Complete Light Mode Icon Contrast & Visual Polish Engine
-   -------------------------------------------------------------------------- */
-
-/* Clinical High-Contrast Jewel Tones for Text & Icons */
 [data-theme="light"] .text-cyan { color: #0284c7 !important; }
 [data-theme="light"] .text-blue { color: #1d4ed8 !important; }
 [data-theme="light"] .text-emerald { color: #059669 !important; }
@@ -2069,7 +1998,6 @@
 [data-theme="light"] .text-dim { color: #64748b !important; }
 [data-theme="light"] .text-slate { color: #94a3b8 !important; }
 
-/* Department & Feature Glow Icon Boxes */
 [data-theme="light"] .bg-cyan-glow {
   background: rgba(2, 132, 199, 0.1) !important;
   color: #0284c7 !important;
@@ -2105,7 +2033,6 @@
   box-shadow: 0 4px 12px rgba(225, 29, 72, 0.12) !important;
 }
 
-/* Metric Cards & Icon Boxes */
 [data-theme="light"] .metric-icon {
   border-radius: 12px;
 }
@@ -2121,7 +2048,6 @@
   border: 1px solid rgba(220, 38, 38, 0.25) !important;
 }
 
-/* Department Showcase Cards on Home Page */
 [data-theme="light"] .dept-card-dark {
   background: #ffffff !important;
   border: 1px solid rgba(15, 23, 42, 0.08) !important;
@@ -2145,7 +2071,6 @@
   color: #0284c7 !important;
 }
 
-/* Floating Hero Badges */
 [data-theme="light"] .dark-float-badge {
   background: rgba(255, 255, 255, 0.95) !important;
   border: 1px solid rgba(15, 23, 42, 0.1) !important;
@@ -2160,7 +2085,6 @@
   color: #64748b !important;
 }
 
-/* Quick Stats Bar on Home Hero */
 [data-theme="light"] .quick-stats-bar {
   background: #ffffff !important;
   border: 1px solid rgba(15, 23, 42, 0.09) !important;
@@ -2175,7 +2099,6 @@
   color: #64748b !important;
 }
 
-/* Symptom Checker Chips & Icons */
 [data-theme="light"] .symptom-chip i {
   color: #0284c7;
 }
@@ -2198,7 +2121,6 @@
   color: #0284c7 !important;
 }
 
-/* Badges, Tags, and Role Indicators */
 [data-theme="light"] .badge-tag {
   background: rgba(2, 132, 199, 0.08) !important;
   border-color: rgba(2, 132, 199, 0.25) !important;
@@ -2257,7 +2179,6 @@
   border: 1px solid rgba(124, 58, 237, 0.25) !important;
 }
 
-/* Department Badges (Find Doctors Page) */
 [data-theme="light"] .dept-badge.blue {
   background: rgba(37, 99, 235, 0.08) !important;
   color: #1d4ed8 !important;
@@ -2288,7 +2209,6 @@
   border: 1px solid rgba(217, 119, 6, 0.25) !important;
 }
 
-/* Clinical Status Pills */
 [data-theme="light"] .status-pill.scheduled {
   background: rgba(2, 132, 199, 0.08) !important;
   color: #0284c7 !important;
@@ -2331,12 +2251,10 @@
   border: 1px solid rgba(71, 85, 105, 0.25) !important;
 }
 
-/* Dashboard Tab Buttons Active State */
 [data-theme="light"] .dash-tab-btn.active i {
   color: #ffffff !important;
 }
 
-/* Action Buttons in Tables */
 [data-theme="light"] .btn-file-action {
   background: rgba(2, 132, 199, 0.08) !important;
   border-color: rgba(2, 132, 199, 0.25) !important;
@@ -2386,7 +2304,6 @@
   color: #94a3b8;
 }
 
-/* Health Vitals Biometrics Ribbon Cards */
 [data-theme="light"] .vitals-metric-card {
   background: #ffffff !important;
   border: 1px solid rgba(15, 23, 42, 0.09) !important;
@@ -2405,7 +2322,6 @@
   color: #94a3b8 !important;
 }
 
-/* Triage Table Tags & Quote Blocks */
 [data-theme="light"] .triage-sym-tag {
   background: rgba(2, 132, 199, 0.08) !important;
   color: #0369a1 !important;
@@ -2418,7 +2334,6 @@
   border-left-color: #7c3aed !important;
 }
 
-/* Triage Modal Panels */
 [data-theme="light"] .modal-box-dark div[style*="background: rgba(15, 23, 42"],
 [data-theme="light"] .modal-box-dark [id="mDescriptionBox"],
 [data-theme="light"] .modal-box-dark [id="mSummaryText"] {
@@ -2433,20 +2348,10 @@
   color: #0f172a !important;
 }
 
-/* Eye Toggle Button on Forms */
 [data-theme="light"] .eye-btn:hover {
   color: #0284c7 !important;
 }
 
-/* --------------------------------------------------------------------------
-   END OF SECTION 12
-   -------------------------------------------------------------------------- */
-
-/* ==========================================================================
-   GLOBAL RESPONSIVE ENGINE (ALL PAGES & VIEWPORTS)
-   ========================================================================== */
-
-/* Prevent global horizontal scrollbar across all pages */
 html, body {
   max-width: 100vw !important;
   overflow-x: hidden !important;
@@ -2461,9 +2366,6 @@ img, video, canvas, svg {
   height: auto;
 }
 
-/* --------------------------------------------------------------------------
-   Breakpoint: <= 1200px (Desktop / Laptops)
-   -------------------------------------------------------------------------- */
 @media (max-width: 1200px) {
   .hero-container,
   .section-container,
@@ -2478,9 +2380,6 @@ img, video, canvas, svg {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Breakpoint: <= 1024px (Tablets & iPad Pro)
-   -------------------------------------------------------------------------- */
 @media (max-width: 1024px) {
   .hero-container {
     gap: 30px;
@@ -2534,11 +2433,8 @@ img, video, canvas, svg {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Breakpoint: <= 768px (Small Tablets & Mobile Landscape)
-   -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
-  /* Navigation Bar */
+
   .navbar-wrapper {
     padding: 10px 16px;
   }
@@ -2557,7 +2453,6 @@ img, video, canvas, svg {
     padding: 2px 7px;
   }
 
-  /* Form Rows Collapse to 1 Column */
   .dash-form .form-row,
   .input-row,
   .form-grid-2,
@@ -2574,7 +2469,6 @@ img, video, canvas, svg {
     flex: 1 1 100% !important;
   }
 
-  /* Smooth Touch Tables */
   .table-scroll-wrap,
   .table-responsive,
   .doctor-table-wrapper {
@@ -2593,7 +2487,6 @@ img, video, canvas, svg {
     width: 100% !important;
   }
 
-  /* Dashboard Headers & Banners */
   .dash-header-dark {
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -2622,7 +2515,6 @@ img, video, canvas, svg {
     text-align: center !important;
   }
 
-  /* Dashboard Tabs Bar */
   .dash-tabs-bar {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
@@ -2638,7 +2530,6 @@ img, video, canvas, svg {
     padding: 9px 16px !important;
   }
 
-  /* Symptom Checker */
   .symptom-main-grid {
     grid-template-columns: 1fr !important;
     gap: 20px;
@@ -2669,7 +2560,6 @@ img, video, canvas, svg {
     text-align: center;
   }
 
-  /* Reports Page */
   .reports-page {
     padding: 24px 16px 50px !important;
   }
@@ -2695,7 +2585,6 @@ img, video, canvas, svg {
     justify-content: center !important;
   }
 
-  /* Prescription View Slip */
   .rx-slip-wrapper {
     padding: 20px 14px 40px !important;
   }
@@ -2714,7 +2603,6 @@ img, video, canvas, svg {
     gap: 12px !important;
   }
 
-  /* Modals */
   .modal-box-dark {
     width: 95% !important;
     max-width: 95% !important;
@@ -2724,11 +2612,8 @@ img, video, canvas, svg {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Breakpoint: <= 640px (Mobile Phones)
-   -------------------------------------------------------------------------- */
 @media (max-width: 640px) {
-  /* Hero Section */
+
   .hero-section {
     padding: 30px 14px 50px;
   }
@@ -2764,12 +2649,10 @@ img, video, canvas, svg {
     display: none;
   }
 
-  /* Departments Grid */
   .departments-cards-grid {
     grid-template-columns: 1fr !important;
   }
 
-  /* AI Coming Soon Card */
   .ai-preview-card {
     padding: 24px 18px !important;
   }
@@ -2804,7 +2687,6 @@ img, video, canvas, svg {
     justify-content: center;
   }
 
-  /* Metrics in Dashboards */
   .metrics-row-dark {
     grid-template-columns: 1fr !important;
   }
@@ -2813,7 +2695,6 @@ img, video, canvas, svg {
     grid-template-columns: 1fr !important;
   }
 
-  /* Prescription View Slip */
   .rx-clinic-header {
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -2851,7 +2732,6 @@ img, video, canvas, svg {
     margin-left: 0 !important;
   }
 
-  /* Doctor Directory Controls */
   .dark-stats-grid {
     grid-template-columns: 1fr !important;
   }
@@ -2866,7 +2746,6 @@ img, video, canvas, svg {
     max-width: 100% !important;
   }
 
-  /* Auth Boxes */
   .auth-box,
   .login-box,
   .register-box,
@@ -2904,9 +2783,6 @@ img, video, canvas, svg {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Breakpoint: <= 480px (Compact Mobile Screens)
-   -------------------------------------------------------------------------- */
 @media (max-width: 480px) {
   .brand-name {
     font-size: 17px;

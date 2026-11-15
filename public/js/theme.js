@@ -1,7 +1,4 @@
-/**
- * CareSync Theme Engine
- * Toggles and synchronizes Dark Mode & Light Mode across the entire application.
- */
+
 (function () {
   "use strict";
 
@@ -9,10 +6,6 @@
   const THEME_LIGHT = "light";
   const THEME_DARK = "dark";
 
-  /**
-   * Determine the current preferred theme.
-   * Checks localStorage first, then system OS settings, defaulting to dark mode.
-   */
   function getPreferredTheme() {
     const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("theme");
     if (saved === THEME_LIGHT || saved === THEME_DARK) {
@@ -24,11 +17,6 @@
     return THEME_DARK;
   }
 
-  /**
-   * Apply the theme to the <html> document root and update all switch controls in the DOM.
-   * @param {string} theme - 'light' or 'dark'
-   * @param {boolean} persist - whether to save choice to localStorage
-   */
   function applyTheme(theme, persist) {
     if (persist === undefined) persist = true;
     const isLight = theme === THEME_LIGHT;
@@ -44,7 +32,6 @@
       }
     }
 
-    // Synchronize all desktop and mobile theme switches
     const switches = document.querySelectorAll(".theme-toggle-switch");
     switches.forEach(function (btn) {
       btn.setAttribute("aria-checked", String(isLight));
@@ -63,13 +50,9 @@
       }
     });
 
-    // Notify any other components listening for theme changes
     window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: theme } }));
   }
 
-  /**
-   * Toggle between light and dark modes with a brief smooth transition.
-   */
   function toggleTheme() {
     const currentTheme =
       document.documentElement.getAttribute("data-theme") || getPreferredTheme();
@@ -83,16 +66,12 @@
     }, 350);
   }
 
-  /**
-   * Initialize theme state and event listeners.
-   */
   function init() {
-    // Sync current active DOM state with whatever was applied in head
+
     const initialTheme =
       document.documentElement.getAttribute("data-theme") || getPreferredTheme();
     applyTheme(initialTheme, false);
 
-    // Global click listener for any theme toggle button
     document.addEventListener("click", function (e) {
       const btn = e.target.closest(".theme-toggle-switch");
       if (btn) {
@@ -101,7 +80,6 @@
       }
     });
 
-    // Listen for OS system theme changes if user hasn't explicitly set one
     if (window.matchMedia) {
       const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
       const handleSystemThemeChange = function (e) {
@@ -118,14 +96,12 @@
     }
   }
 
-  // Run as soon as DOM is ready
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
   }
 
-  // Global helper API for developer console / debugging
   window.CareSyncTheme = {
     get: function () {
       return document.documentElement.getAttribute("data-theme") || getPreferredTheme();

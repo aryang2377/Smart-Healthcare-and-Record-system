@@ -19,7 +19,6 @@
             </div>
         <% } %>
 
-        <!-- Multi-Step Progress Bar -->
         <div class="steps-progress-bar">
             <div class="step-indicator active" id="stepIndicator1">
                 <div class="step-circle">1</div>
@@ -40,8 +39,7 @@
         </div>
 
         <form action="/doctor/apply" method="POST" enctype="multipart/form-data" class="auth-form" id="doctorApplyForm">
-            
-            <!-- STEP 1: PERSONAL INFORMATION -->
+
             <div class="step-pane active" id="stepPane1">
                 <div class="step-heading">
                     <i class="fas fa-user text-cyan"></i> Step 1: Personal Information
@@ -97,7 +95,6 @@
                 </div>
             </div>
 
-            <!-- STEP 2: PROFESSIONAL INFORMATION -->
             <div class="step-pane" id="stepPane2">
                 <div class="step-heading">
                     <i class="fas fa-briefcase text-emerald"></i> Step 2: Professional Information
@@ -169,7 +166,6 @@
                 </div>
             </div>
 
-            <!-- STEP 3: VERIFICATION DOCUMENTS -->
             <div class="step-pane" id="stepPane3">
                 <div class="step-heading">
                     <i class="fas fa-file-shield text-purple"></i> Step 3: Verification Documents
@@ -208,7 +204,6 @@
                 </div>
             </div>
 
-            <!-- STEP 4: AVAILABILITY & ACCOUNT CREDENTIALS -->
             <div class="step-pane" id="stepPane4">
                 <div class="step-heading">
                     <i class="fas fa-calendar-check text-cyan"></i> Step 4: Practice Availability & Password

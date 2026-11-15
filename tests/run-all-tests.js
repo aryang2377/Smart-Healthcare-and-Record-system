@@ -34,9 +34,6 @@ async function runTestSuite() {
   await mongoose.connect(process.env.MONGODB_URI);
   console.log("Connected to MongoDB Atlas / Local Database.\n");
 
-  // ----------------------------------------------------
-  // TEST SUITE 1: User Roles, RBAC & Credential Validation
-  // ----------------------------------------------------
   console.log("🔹 Test Suite 1: RBAC & User Identity Models");
   const admin = await User.findOne({ role: "admin" });
   assert(admin !== null && admin.role === "admin", "System Administrator account exists with admin role");
@@ -47,12 +44,8 @@ async function runTestSuite() {
   const patient = await User.findOne({ role: "patient" });
   assert(patient !== null && patient.role === "patient", `Patient record exists (${patient?.fullname || "Patient"})`);
 
-  // Verify bcrypt password hashing is active (never plaintext)
   assert(admin.password.startsWith("$2b$") || admin.password.startsWith("$2a$"), "Admin credentials securely encrypted with bcrypt salt");
 
-  // ----------------------------------------------------
-  // TEST SUITE 2: Prescription IDOR & Privacy Scoping
-  // ----------------------------------------------------
   console.log("\n🔹 Test Suite 2: Prescription IDOR & Confidentiality Authorization");
   const testDoc = approvedDoctors[0];
   const testPatient = patient;
@@ -69,11 +62,9 @@ async function runTestSuite() {
     status: "Sent to Patient",
   });
 
-  // Verify ownership checks
   const canOwnerAccess = testRx.patientId.equals(testPatient._id);
   const canDoctorAccess = testRx.doctorId.equals(testDoc._id);
 
-  // Fake unauthorized third-party user
   const unauthorizedUserId = new mongoose.Types.ObjectId();
   const canThirdPartyAccess = testRx.patientId.equals(unauthorizedUserId) || testRx.doctorId.equals(unauthorizedUserId);
 
@@ -81,20 +72,14 @@ async function runTestSuite() {
   assert(canDoctorAccess === true, "Prescribing physician is authorized to access prescription");
   assert(canThirdPartyAccess === false, "Unauthorized third-party user is blocked (IDOR Protection verified)");
 
-  // Cleanup test prescription
   await Prescription.findByIdAndDelete(testRx._id);
 
-  // ----------------------------------------------------
-  // TEST SUITE 3: Protected Slot Booking & Concurrency Lock
-  // ----------------------------------------------------
   console.log("\n🔹 Test Suite 3: Concurrency & Duplicate Slot Prevention");
-  const testDate = new Date(Date.UTC(2027, 0, 15)); // Future normalized date
+  const testDate = new Date(Date.UTC(2027, 0, 15));
   const testSlot = "11:30 AM";
 
-  // Clean any existing test appointment for this slot
   await Appointment.deleteMany({ doctorId: testDoc._id, date: testDate, time: testSlot });
 
-  // 1. First patient books the slot
   const appt1 = await Appointment.create({
     patientId: testPatient._id,
     patientName: testPatient.fullname,
@@ -107,10 +92,9 @@ async function runTestSuite() {
   });
   assert(appt1._id !== null, `Slot successfully reserved by first patient (${testDoc.fullname} @ ${testSlot})`);
 
-  // 2. Second patient attempts to book the EXACT SAME slot simultaneously
   let duplicateRejected = false;
   try {
-    // Attempt creation which must fail unique index
+
     await Appointment.create({
       patientId: new mongoose.Types.ObjectId(),
       patientName: "Simulated Concurrent Patient",
@@ -128,7 +112,6 @@ async function runTestSuite() {
   }
   assert(duplicateRejected === true, "Database compound unique index prevents simultaneous double-booking (Race Condition Blocked)");
 
-  // 3. Cancelling the appointment releases the slot (partialFilterExpression test)
   appt1.status = "Cancelled";
   await appt1.save();
 
@@ -151,12 +134,8 @@ async function runTestSuite() {
   }
   assert(canRebookAfterCancel === true, "Cancelled appointment releases the slot for other patients");
 
-  // Cleanup test appointment
   await Appointment.findByIdAndDelete(appt1._id);
 
-  // ----------------------------------------------------
-  // TEST SUITE 4: Clinical Vitals Evaluation Engine
-  // ----------------------------------------------------
   console.log("\n🔹 Test Suite 4: Clinical Decision Support (Vitals Rules)");
   const normalBP = evaluateBloodPressure(118, 78);
   assert(normalBP.category === "Normal", "Normal BP evaluated accurately (118/78 mmHg -> Normal)");
@@ -173,9 +152,6 @@ async function runTestSuite() {
   const bradycardia = evaluateHeartRate(48);
   assert(bradycardia.category === "Bradycardia (Low)", "Bradycardia correctly identified (< 60 bpm)");
 
-  // ----------------------------------------------------
-  // TEST SUITE 5: Clinical Symptom Triage & Red-Flag Detection
-  // ----------------------------------------------------
   console.log("\n🔹 Test Suite 5: AI Symptom Triage Fallback & Emergency Red Flags");
   const emergencyCheck = await analyzeSymptoms(
     ["chest pain", "shortness of breath", "sweating"],
@@ -189,9 +165,6 @@ async function runTestSuite() {
   assert(mildCheck.urgency === "low", "Mild dermatological symptoms assigned LOW urgency");
   assert(mildCheck.emergencyFlag === false, "No emergency flag asserted for mild symptoms");
 
-  // ----------------------------------------------------
-  // SUMMARY
-  // ----------------------------------------------------
   await mongoose.disconnect();
 
   console.log("\n=======================================================");

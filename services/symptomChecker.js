@@ -1,6 +1,5 @@
 import Groq from "groq-sdk";
 
-// Clinical rule-based fallback when external AI API is unreachable or key is invalid
 function clinicalRuleBasedTriage(symptoms = [], description = "") {
   const symLower = symptoms.map((s) => s.toLowerCase());
   const descLower = (description || "").toLowerCase();
@@ -13,7 +12,6 @@ function clinicalRuleBasedTriage(symptoms = [], description = "") {
   const recommendedSpecialties = new Set();
   const keySymptoms = [...symptoms];
 
-  // 1. High Urgency / Emergency Red Flag Checks
   const cardiacRedFlags = ["chest pain", "heart palpitations", "fainting"];
   const neuroRedFlags = ["confusion", "fainting", "vision changes", "slurred speech", "facial droop", "paralysis"];
   const respRedFlags = ["shortness of breath", "severe breathlessness", "wheezing"];
@@ -54,7 +52,6 @@ function clinicalRuleBasedTriage(symptoms = [], description = "") {
     recommendedSpecialties.add("General Medicine");
   }
 
-  // 2. Respiratory & Pulmonary
   if (text.includes("cough") || text.includes("wheezing") || text.includes("sore throat") || text.includes("runny nose") || text.includes("nasal congestion")) {
     if (text.includes("wheezing") || text.includes("shortness of breath")) {
       recommendedSpecialties.add("Pulmonology");
@@ -67,55 +64,47 @@ function clinicalRuleBasedTriage(symptoms = [], description = "") {
     if (urgency === "low" && (text.includes("fever") || text.includes("chills"))) urgency = "moderate";
   }
 
-  // 3. Digestive & Gastrointestinal
   if (text.includes("abdominal pain") || text.includes("nausea") || text.includes("vomiting") || text.includes("diarrhea") || text.includes("constipation") || text.includes("bloating")) {
     recommendedSpecialties.add("Gastroenterology");
     primaryConditions.push("Acute Gastroenteritis", "Functional Dyspepsia");
     if (text.includes("vomiting") && text.includes("abdominal pain")) urgency = "moderate";
   }
 
-  // 4. Dermatology / Skin
   if (text.includes("skin rash") || text.includes("itching") || text.includes("hives") || text.includes("discoloration") || text.includes("dry skin")) {
     recommendedSpecialties.add("Dermatology");
     primaryConditions.push("Acute Allergic Dermatitis", "Urticaria / Eczema");
     if (urgency === "low") urgency = "low";
   }
 
-  // 5. Musculoskeletal & Orthopedic
   if (text.includes("joint pain") || text.includes("back pain") || text.includes("muscle weakness") || text.includes("swelling") || text.includes("stiffness")) {
     recommendedSpecialties.add("Orthopedics");
     primaryConditions.push("Musculoskeletal Strain", "Arthralgia / Lumbar Syndrome");
     if (text.includes("swelling") && text.includes("severe")) urgency = "moderate";
   }
 
-  // 6. Urinary & Nephrology
   if (text.includes("frequent urination") || text.includes("dysuria") || text.includes("urination")) {
     recommendedSpecialties.add("Urology");
     primaryConditions.push("Urinary Tract Infection", "Renal Colic Risk");
     urgency = "moderate";
   }
 
-  // 7. Endocrine & Metabolic
   if (text.includes("excessive thirst") || text.includes("weight loss") || text.includes("severe fatigue") && text.includes("night sweats")) {
     recommendedSpecialties.add("Endocrinology");
     primaryConditions.push("Metabolic / Glycemic Imbalance", "Thyroid Dysregulation");
     if (urgency === "low") urgency = "moderate";
   }
 
-  // 8. Vision / Ophthalmology
   if (text.includes("vision changes") || text.includes("eye") || text.includes("blurred vision")) {
     recommendedSpecialties.add("Ophthalmology");
     if (!primaryConditions.includes("Acute Visual Disturbance")) primaryConditions.push("Acute Visual Disturbance");
     if (urgency === "low") urgency = "moderate";
   }
 
-  // 9. Mental Health / Psychiatry
   if (text.includes("anxiety") || text.includes("depression") || text.includes("insomnia") || text.includes("panic")) {
     recommendedSpecialties.add("Psychiatry");
     primaryConditions.push("Acute Anxiety Response", "Adjustment Syndrome");
   }
 
-  // Default fallback if no category matched
   if (recommendedSpecialties.size === 0) {
     recommendedSpecialties.add("General Medicine");
     primaryConditions.push("Undifferentiated Clinical Symptoms");
@@ -150,7 +139,6 @@ export async function analyzeSymptoms(symptoms = [], description = "") {
   const descText = description?.trim() || "none provided";
   const apiKey = (process.env.GROQ_API_KEY || "").trim();
 
-  // If Groq key is present and appears formatted, attempt AI completion
   if (apiKey && apiKey.startsWith("gsk_") && apiKey !== "your_groq_api_key_here") {
     try {
       const client = new Groq({ apiKey });
@@ -202,6 +190,5 @@ recommendedSpecialties: 1-2 from this list ONLY: Cardiology, Neurology, Dermatol
     }
   }
 
-  // Seamless fallback to expert clinical triage rules
   return clinicalRuleBasedTriage(symptoms, description);
 }

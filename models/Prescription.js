@@ -43,32 +43,32 @@ const prescriptionSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  // Patient's problem / symptoms told to doctor
+
   problem: {
     type: String,
     required: true,
   },
-  // Doctor's clinical diagnosis
+
   diagnosis: {
     type: String,
     required: true,
   },
-  // Prescribed medicines
+
   medicines: {
     type: String,
     required: true,
   },
-  // Doctor's advice, diet, instructions
+
   advice: {
     type: String,
     default: "",
   },
-  // Recommended diagnostic tests
+
   testsRecommended: {
     type: String,
     default: "",
   },
-  // Follow-up consultation date
+
   followUp: {
     type: String,
     default: "As needed / 5 days",

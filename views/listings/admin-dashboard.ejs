@@ -2,7 +2,7 @@
 
 <section class="dashboard-wrapper-dark">
     <div class="dashboard-container">
-        <!-- Admin Header -->
+
         <div class="dash-header-dark">
             <div class="dash-user-info">
                 <div class="user-large-avatar admin-avatar">
@@ -24,7 +24,6 @@
             </div>
         </div>
 
-        <!-- Metric Cards -->
         <div class="metrics-row-dark">
             <div class="metric-card-dark">
                 <div class="metric-icon bg-cyan-glow">
@@ -67,7 +66,6 @@
             </div>
         </div>
 
-        <!-- Tab Navigation Bar -->
         <div class="dash-tabs-bar" style="overflow-x: auto; flex-wrap: nowrap;">
             <button type="button" class="dash-tab-btn <%= (activeTab === 'verification' || activeTab === 'overview' || !activeTab) ? 'active' : '' %>" onclick="switchTab('verification')">
                 <i class="fas fa-user-check text-cyan"></i> Doctor Verification (<%= (typeof pendingDoctors !== 'undefined' ? pendingDoctors.length : 0) %>)
@@ -86,7 +84,6 @@
             </button>
         </div>
 
-        <!-- TAB: DOCTOR VERIFICATION DESK -->
         <div id="tab-verification" class="tab-pane-dark" style="<%= (activeTab === 'verification' || activeTab === 'overview' || !activeTab) ? 'display: block;' : 'display: none;' %>">
             <div class="dash-card-dark">
                 <div class="card-head">
@@ -124,19 +121,17 @@
                                     </div>
 
                                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                        <!-- Approve -->
+
                                         <form action="/admin/doctors/<%= doc._id %>/approve" method="POST" style="margin: 0;">
                                             <button type="submit" class="auth-btn doctor-btn" style="width: auto; padding: 8px 16px; font-size: 13px;">
                                                 <i class="fas fa-check-circle"></i> Approve & Activate
                                             </button>
                                         </form>
 
-                                        <!-- Request Info -->
                                         <button type="button" class="auth-btn" style="width: auto; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; padding: 8px 16px; font-size: 13px;" onclick="openInfoModal('<%= doc._id %>', '<%= doc.fullname %>')">
                                             <i class="fas fa-question-circle"></i> Request Info
                                         </button>
 
-                                        <!-- Reject -->
                                         <button type="button" class="auth-btn" style="width: auto; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 8px 16px; font-size: 13px;" onclick="openRejectModal('<%= doc._id %>', '<%= doc.fullname %>')">
                                             <i class="fas fa-times-circle"></i> Reject
                                         </button>
@@ -208,10 +203,9 @@
             </div>
         </div>
 
-        <!-- TAB 3: STAFF MANAGEMENT (DOCTORS & RECEPTIONISTS) -->
         <div id="tab-staff" class="tab-pane-dark" style="<%= activeTab === 'staff' ? 'display: block;' : 'display: none;' %>">
             <div class="dash-grid-split">
-                <!-- Add Staff Form -->
+
                 <div class="dash-card-dark">
                     <div class="card-head">
                         <h3><i class="fas fa-user-plus text-cyan"></i> Provision Staff Member</h3>
@@ -260,14 +254,13 @@
                     </form>
                 </div>
 
-                <!-- Active Staff Table -->
                 <div class="dash-card-dark">
                     <div class="card-head">
                         <h3><i class="fas fa-user-doctor text-emerald"></i> Healthcare Staff Directory</h3>
                         <small>Active physicians, specialists, and front-desk personnel</small>
                     </div>
 
-                    <% 
+                    <%
                         const allStaff = [...(typeof doctorsList !== 'undefined' ? doctorsList : []), ...(typeof receptionistsList !== 'undefined' ? receptionistsList : [])];
                     %>
                     <% if (allStaff.length > 0) { %>
@@ -327,7 +320,6 @@
             </div>
         </div>
 
-        <!-- TAB 4: PATIENT MANAGEMENT -->
         <div id="tab-patients" class="tab-pane-dark" style="<%= activeTab === 'patients' ? 'display: block;' : 'display: none;' %>">
             <div class="dash-card-dark">
                 <div class="card-head">
@@ -369,7 +361,6 @@
             </div>
         </div>
 
-        <!-- TAB 5: MASTER APPOINTMENTS LEDGER -->
         <div id="tab-appointments" class="tab-pane-dark" style="<%= activeTab === 'appointments' ? 'display: block;' : 'display: none;' %>">
             <div class="dash-card-dark">
                 <div class="card-head">
@@ -439,7 +430,6 @@
             </div>
         </div>
 
-        <!-- TAB 7: AUDIT LOGS -->
         <div id="tab-audit" class="tab-pane-dark" style="<%= activeTab === 'audit' ? 'display: block;' : 'display: none;' %>">
             <div class="dash-card-dark">
                 <div class="card-head">
@@ -499,7 +489,6 @@
     </div>
 </section>
 
-<!-- MODAL: REQUEST MORE INFO FROM DOCTOR -->
 <div id="requestInfoModal" class="modal-backdrop-dark" style="display: none;">
     <div class="modal-box-dark">
         <div class="modal-header">
@@ -522,7 +511,6 @@
     </div>
 </div>
 
-<!-- MODAL: REJECT DOCTOR APPLICATION -->
 <div id="rejectModal" class="modal-backdrop-dark" style="display: none;">
     <div class="modal-box-dark">
         <div class="modal-header">

@@ -1,15 +1,10 @@
-/**
- * CareSync Modern Alert & Toast Notification Engine
- * Replaces browser alerts with modern floating toasts matching reference design.
- * Handles form validation errors, missing inputs, and success notifications everywhere.
- */
+
 (function () {
   "use strict";
 
   const CONTAINER_ID = "caresync-toast-container";
-  const DEFAULT_DURATION = 4200; // ms
+  const DEFAULT_DURATION = 4200;
 
-  // Subtle Web Audio chime for feedback
   function playPopChime(type) {
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -49,7 +44,7 @@
       osc.start(now);
       osc.stop(now + 0.16);
     } catch (e) {
-      // Ignore if audio is restricted
+
     }
   }
 
@@ -127,16 +122,6 @@
     }, 4000);
   }
 
-  /**
-   * Show a modern floating toast notification.
-   *
-   * @param {string} message - Description message
-   * @param {string} [type='success'] - 'success' | 'warning' | 'error' | 'info'
-   * @param {Object} [options={}] - Optional configuration
-   * @param {string} [options.title] - Card title (defaults to "Success", "Warning", etc.)
-   * @param {HTMLElement|string} [options.targetInput] - Form element to highlight and focus
-   * @param {number} [options.duration=4200] - Duration before auto-dismiss
-   */
   function showModernAlert(message, type = "success", options = {}) {
     const validTypes = ["success", "warning", "error", "info"];
     const alertType = validTypes.includes(type) ? type : "success";
@@ -362,7 +347,6 @@
     return null;
   }
 
-  // Intercept native window.alert to seamlessly pop modern toasts
   const originalAlert = window.alert;
   window.alert = function (message) {
     if (message === undefined || message === null) return;
@@ -409,7 +393,6 @@
     });
   };
 
-  // Global form submission interceptor for missing fields
   document.addEventListener(
     "submit",
     function (e) {
@@ -466,12 +449,8 @@
     true
   );
 
-  /**
-   * Check for queued toasts from sessionStorage or URL search parameters
-   * Enables toasts after redirects (e.g. "Admin Login Successful")
-   */
   function checkQueuedToasts() {
-    // 1. Session Storage queued toasts
+
     try {
       const queued = sessionStorage.getItem("caresync_toast");
       if (queued) {
@@ -487,7 +466,6 @@
       }
     } catch (e) {}
 
-    // 2. URL Query Params for flash notifications
     try {
       const params = new URLSearchParams(window.location.search);
       let triggered = false;
@@ -534,7 +512,6 @@
         triggered = true;
       }
 
-      // Clean query parameters from address bar smoothly without reloading
       if (triggered) {
         params.delete("login");
         params.delete("register");
@@ -565,7 +542,6 @@
     setTimeout(checkQueuedToasts, 80);
   }
 
-  // Public API Exposure
   window.showModernAlert = showModernAlert;
   window.showToast = showModernAlert;
   window.highlightField = highlightField;

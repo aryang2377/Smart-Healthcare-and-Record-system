@@ -5,7 +5,7 @@ import AuditLog from "../models/AuditLog.js";
 
 export const seedDefaultUsers = async ({ force = false } = {}) => {
   try {
-    // Fast idempotent guard: avoid heavy multi-pass bcrypt hashing on every server restart
+
     const adminCount = await User.countDocuments({ role: "admin" });
     const doctorCount = await User.countDocuments({ role: "doctor", approvalStatus: "approved" });
     const deptCount = await Department.countDocuments();
@@ -14,7 +14,6 @@ export const seedDefaultUsers = async ({ force = false } = {}) => {
       return;
     }
 
-    // 1. Seed or sync Single System Administrator from .env
     const adminEmail = process.env.ADMIN_EMAIL || "admin@caresync.health";
     const adminPass = process.env.ADMIN_PASSWORD || "AdminCareSync@2026";
     const adminName = process.env.ADMIN_NAME || "Hospital Administrator";
@@ -40,7 +39,6 @@ export const seedDefaultUsers = async ({ force = false } = {}) => {
       }
     }
 
-    // 2. Seed or sync Verified Medical Specialists across all major departments
     const defaultDoctors = [
       {
         fullname: "Dr. Rajesh Sharma",
@@ -352,7 +350,6 @@ export const seedDefaultUsers = async ({ force = false } = {}) => {
         await existingDoc.save();
       }
 
-      // Strictly enforce ONE doctor per specialization (cleanup any extraneous duplicates)
       await User.deleteMany({
         role: "doctor",
         specialization: docData.specialization,
@@ -360,7 +357,6 @@ export const seedDefaultUsers = async ({ force = false } = {}) => {
       });
     }
 
-    // 3. Seed or sync 2 Front-Desk Receptionists with distinct credentials
     const defaultReceptionists = [
       {
         fullname: "Sarah Jenkins (Front Desk)",
@@ -410,7 +406,6 @@ export const seedDefaultUsers = async ({ force = false } = {}) => {
       }
     }
 
-    // 4. Ensure single demo patient John Doe is active and clean
     const johnEmail = "john@gmail.com";
     const existingJohn = await User.findOne({ email: johnEmail });
     if (!existingJohn) {
@@ -428,7 +423,6 @@ export const seedDefaultUsers = async ({ force = false } = {}) => {
       await existingJohn.save();
     }
 
-    // 4. Seed or sync Hospital Departments across all clinical specialties
     const defaultDepartments = [
       { name: "Cardiology", code: "CARD", icon: "fa-heartbeat", description: "Comprehensive cardiovascular diagnostics, ECG, echocardiography, and hypertension clinics.", headDoctor: "Dr. Rajesh Sharma", floor: "Wing A, 2nd Floor" },
       { name: "Dermatology", code: "DERM", icon: "fa-allergies", description: "Clinical skin evaluations, allergy management, and medical dermatological therapies.", headDoctor: "Dr. Priya Mehta", floor: "Wing B, 1st Floor" },
@@ -459,7 +453,6 @@ export const seedDefaultUsers = async ({ force = false } = {}) => {
       }
     }
 
-    // 5. Seed initial Audit Log if empty
     const auditCount = await AuditLog.countDocuments();
     if (auditCount === 0) {
       await AuditLog.create({

@@ -1,7 +1,3 @@
-/**
- * CareSync Clinical Vitals Rules Engine
- * Non-ML Deterministic Classification based on WHO, AHA, and ADA Guidelines
- */
 
 export function evaluateBloodPressure(systolic, diastolic) {
   if (!systolic || !diastolic) return { category: "Unrecorded", badgeClass: "secondary", alert: false };
@@ -38,7 +34,7 @@ export function evaluateBloodSugar(sugar, type = "Fasting") {
     if (g <= 125) return { category: "Pre-Diabetes", badgeClass: "warning", alert: false, note: "Elevated fasting glucose. Dietary changes recommended." };
     return { category: "Diabetic / Elevated", badgeClass: "danger", alert: true, note: "Consult your doctor for diabetes management." };
   } else {
-    // Post-Meal or Random
+
     if (g < 70) return { category: "Hypoglycemia (Low)", badgeClass: "warning", alert: true, note: "Blood sugar is low. Consume fast-acting glucose." };
     if (g < 140) return { category: "Normal Post-Meal", badgeClass: "success", alert: false, note: "Optimal healthy post-meal range." };
     if (g <= 199) return { category: "Pre-Diabetes", badgeClass: "warning", alert: false, note: "Impaired glucose tolerance." };

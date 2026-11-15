@@ -3,7 +3,6 @@
 <div class="dashboard-wrapper-dark" style="min-height: calc(100vh - 120px); padding-bottom: 60px;">
     <div class="dashboard-container dash-container">
 
-        <!-- Top Header Bar (No action buttons, robust flex structure) -->
         <header class="dash-header-dark" style="margin-bottom: 24px;">
             <div class="dash-user-info">
                 <div class="user-large-avatar doctor-avatar" style="color: #fff; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); flex-shrink: 0;">
@@ -26,7 +25,6 @@
             </div>
         </header>
 
-        <!-- KPI Metrics Strip -->
         <div class="metrics-row-dark" style="margin-bottom: 24px;">
             <div class="metric-card-dark">
                 <div class="metric-icon bg-purple-glow">
@@ -69,7 +67,6 @@
             </div>
         </div>
 
-        <!-- Main Triage Records Card -->
         <div class="dash-card-dark">
             <div class="card-head" style="flex-wrap: wrap; gap: 14px;">
                 <div>
@@ -81,7 +78,6 @@
                 </div>
             </div>
 
-            <!-- Live Filter & Search Toolbar -->
             <% if (typeof doctorTriageLeads !== 'undefined' && doctorTriageLeads.length > 0) { %>
             <div class="triage-toolbar-box" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; padding: 14px 16px; border-radius: 10px;">
                 <div style="flex: 1 1 240px; position: relative;">
@@ -120,7 +116,6 @@
             </div>
             <% } %>
 
-            <!-- Triage Data Table -->
             <% if (typeof doctorTriageLeads === 'undefined' || doctorTriageLeads.length === 0) { %>
                 <div class="empty-tab-state" style="padding: 48px 20px; text-align: center;">
                     <div class="empty-icon" style="font-size: 40px; color: #a855f7; margin-bottom: 12px;"><i class="fas fa-robot"></i></div>
@@ -145,7 +140,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% doctorTriageLeads.forEach((triage) => { 
+                            <% doctorTriageLeads.forEach((triage) => {
                                 const isHigh = triage.urgency === 'high';
                                 const isMod = triage.urgency === 'moderate';
                                 const urgencyVal = (triage.urgency || 'moderate').toLowerCase();
@@ -283,7 +278,6 @@
     </div>
 </div>
 
-<!-- MODAL: FULL CLINICAL TRIAGE DOSSIER -->
 <div id="triageDetailModal" class="modal-backdrop-dark" style="display: none; align-items: center; justify-content: center; z-index: 9999;">
     <div class="modal-box-dark" style="max-width: 720px; width: 95%; max-height: 90vh; overflow-y: auto;">
         <div class="modal-header">
@@ -295,7 +289,7 @@
         </div>
 
         <div class="modal-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 18px;">
-            <!-- Patient Banner -->
+
             <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div>
                     <h4 id="mPatientName" style="margin: 0; font-size: 17px; font-weight: 700; color: #f8fafc;"></h4>
@@ -307,7 +301,6 @@
                 <span id="mVisitorBadge" class="badge-tag"></span>
             </div>
 
-            <!-- Urgency & Flags Banner -->
             <div id="mUrgencyBanner" style="padding: 12px 16px; border-radius: 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                 <div id="mUrgencyIcon" style="font-size: 20px;"></div>
                 <div style="flex: 1;">
@@ -317,7 +310,6 @@
                 <div id="mStatusBadge"></div>
             </div>
 
-            <!-- Reported Symptoms Section -->
             <div>
                 <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
                     Reported Symptoms &amp; Notes
@@ -326,7 +318,6 @@
                 <div id="mDescriptionBox" style="background: rgba(15, 23, 42, 0.4); border-left: 3px solid #a855f7; padding: 8px 12px; border-radius: 4px; font-style: italic; font-size: 13px; color: #cbd5e1; display: none;"></div>
             </div>
 
-            <!-- Suspected Conditions / Differential Diagnoses -->
             <div>
                 <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
                     NLP Suspected Conditions
@@ -334,7 +325,6 @@
                 <div id="mConditionsList" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
             </div>
 
-            <!-- Recommended Specialties & Doctors -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
                 <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 8px; padding: 12px;">
                     <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #c084fc; display: block; margin-bottom: 4px;">Recommended Faculty</span>
@@ -346,7 +336,6 @@
                 </div>
             </div>
 
-            <!-- Full AI Clinical Assessment Summary -->
             <div>
                 <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
                     Clinical Assessment &amp; Guidance
@@ -357,7 +346,6 @@
                 </div>
             </div>
 
-            <!-- Modal Footer Actions -->
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 16px; margin-top: 4px; flex-wrap: wrap; gap: 10px;">
                 <form id="mStatusForm" method="POST" style="margin: 0;">
                     <input type="hidden" name="status" id="mStatusInput" value="">
@@ -388,13 +376,13 @@
 
         // Date
         const dt = new Date(item.createdAt);
-        document.getElementById('mDateTime').textContent = dt.toLocaleDateString('en-US', { 
-            weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+        document.getElementById('mDateTime').textContent = dt.toLocaleDateString('en-US', {
+            weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
         });
 
         // Patient Info
         document.getElementById('mPatientName').textContent = item.patientName || 'Anonymous Visitor';
-        
+
         const phoneWrap = document.getElementById('mPatientPhone');
         if (item.patientPhone) {
             phoneWrap.style.display = 'inline';

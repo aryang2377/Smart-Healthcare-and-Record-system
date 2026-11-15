@@ -8,10 +8,9 @@ async function verifyAll() {
   console.log("Connected to MongoDB.");
 
   const allAccounts = [
-    // 1. System Admin
+
     { role: "admin", email: "admin@caresync.health", pass: "AdminCareSync@2026", name: "System Administrator" },
 
-    // 2. 14 Specialists
     { role: "doctor", email: "doctor@caresync.health", pass: "Cardio#Sharma26", name: "Dr. Rajesh Sharma (Cardiology)" },
     { role: "doctor", email: "dr.priya@caresync.health", pass: "Derma#Mehta26", name: "Dr. Priya Mehta (Dermatology)" },
     { role: "doctor", email: "dr.verma@caresync.health", pass: "GenMed#Verma26", name: "Dr. Amit Verma (General Medicine)" },
@@ -27,11 +26,9 @@ async function verifyAll() {
     { role: "doctor", email: "dr.deshmukh@caresync.health", pass: "Endo#Deshmukh26", name: "Dr. Sanjay Deshmukh (Endocrinology)" },
     { role: "doctor", email: "dr.aggarwal@caresync.health", pass: "Uro#Aggarwal26", name: "Dr. Deepak Aggarwal (Urology)" },
 
-    // 3. 2 Receptionists
     { role: "receptionist", email: "receptionist@caresync.health", pass: "Staff#Sarah26", name: "Sarah Jenkins (Day Shift)" },
     { role: "receptionist", email: "reception@caresync.health", pass: "Staff#David26", name: "David Miller (Evening Shift)" },
 
-    // 4. Patients (Only John Doe per explicit request)
     { role: "patient", email: "john@gmail.com", pass: "john12", name: "john doe" },
   ];
 

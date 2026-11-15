@@ -1,6 +1,3 @@
-/* ==========================================================================
-   CareSync Multi-Dashboard Dark Theme Stylesheet (Patient, Doctor, Admin)
-   ========================================================================== */
 
 .dashboard-wrapper-dark {
     min-height: calc(100vh - 140px);
@@ -14,7 +11,6 @@
     margin: 0 auto;
 }
 
-/* Header */
 .dash-header-dark {
     background: linear-gradient(135deg, #111827 0%, #172554 50%, #0c4a6e 100%);
     border: 1px solid rgba(56, 189, 248, 0.25);
@@ -110,7 +106,6 @@
     box-shadow: 0 0 26px rgba(14, 165, 233, 0.55);
 }
 
-/* Metric Cards */
 .metrics-row-dark {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -160,7 +155,6 @@
     font-weight: 500;
 }
 
-/* Tab Bar */
 .dash-tabs-bar {
     display: flex;
     gap: 10px;
@@ -205,7 +199,6 @@
     box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
 }
 
-/* Grids & Cards */
 .dash-grid-split {
     display: grid;
     grid-template-columns: 1.1fr 1fr;
@@ -239,7 +232,6 @@
     color: #64748b;
 }
 
-/* Forms */
 .dash-form .form-group {
     margin-bottom: 16px;
 }
@@ -320,7 +312,6 @@
     transform: translateY(-1px);
 }
 
-/* Tables */
 .table-scroll-wrap {
     overflow-x: auto;
 }
@@ -352,7 +343,6 @@
     background: rgba(255, 255, 255, 0.02);
 }
 
-/* Status & Role Pills */
 .status-pill {
     padding: 3px 10px;
     border-radius: 20px;
@@ -463,7 +453,6 @@
     color: #090d16;
 }
 
-/* Action Buttons in Doctor Queue */
 .action-btn-group {
     display: flex;
     gap: 6px;
@@ -552,7 +541,6 @@
     border-left: 2px solid #a855f7;
 }
 
-/* Prescriptions Grid */
 .prescriptions-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -631,7 +619,6 @@
     gap: 6px;
 }
 
-/* History Timeline */
 .history-timeline {
     position: relative;
     padding-left: 24px;
@@ -687,7 +674,6 @@
     margin-bottom: 10px;
 }
 
-/* Admin Dashboard Specific */
 .status-summary-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -768,10 +754,6 @@
     font-size: 36px;
     margin-bottom: 12px;
 }
-
-/* ==========================================================================
-   AI COMING SOON SECTION & PREVIEW STYLES
-   ========================================================================== */
 
 .ai-coming-soon-section {
     padding: 42px 24px;
@@ -959,7 +941,6 @@
     box-shadow: 0 0 15px rgba(14, 165, 233, 0.35);
 }
 
-/* Coming Soon on /symptom standalone page */
 .ai-coming-soon-card {
     background: #111827;
     border: 1px solid rgba(56, 189, 248, 0.25);
@@ -1116,7 +1097,6 @@
     flex-shrink: 0;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
     .metrics-row-dark {
         grid-template-columns: repeat(2, 1fr);

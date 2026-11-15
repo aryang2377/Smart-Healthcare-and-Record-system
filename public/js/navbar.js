@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const backdrop = document.getElementById("nav-backdrop");
   const navbar = document.querySelector(".navbar");
 
-  // Toggle mobile drawer
   const toggleMenu = (forceClose = false) => {
     if (!navMenu) return;
     const isActive = forceClose ? false : !navMenu.classList.contains("active");
@@ -31,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
     backdrop.addEventListener("click", () => toggleMenu(true));
   }
 
-  // Close drawer when a nav link is clicked
   const navLinks = document.querySelectorAll(".nav-link");
   navLinks.forEach((link) => {
     link.addEventListener("click", () => {
@@ -41,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Highlight active link based on current path
   const updateActiveNavLinks = () => {
     const currentPath = window.location.pathname;
 
@@ -67,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.updateActiveNavLinks = updateActiveNavLinks;
   updateActiveNavLinks();
 
-  // Sticky navbar shadow on scroll
   window.addEventListener("scroll", () => {
     if (navbar) {
       if (window.scrollY > 20) {
