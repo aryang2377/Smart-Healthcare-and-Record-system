@@ -17,7 +17,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "seed": "node -e \"import('./db/seed.js').then(m => m.seedDefaultUsers({ force: true }).then(() => process.exit(0)))\"",
+    "test": "node tests/run-all-tests.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

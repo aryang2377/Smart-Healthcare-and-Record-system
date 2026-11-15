@@ -51,18 +51,33 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Ensure private upload directories exist
-const uploadDir = path.join(__dirname, "public", "uploads", "reports");
+// Ensure private upload directories exist outside public web root (HIPAA / PHI Compliance)
+const uploadDir = path.join(__dirname, "storage", "private_uploads", "reports");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const doctorUploadDir = path.join(__dirname, "public", "uploads", "doctor_docs");
+const doctorUploadDir = path.join(__dirname, "storage", "private_uploads", "doctor_docs");
 if (!fs.existsSync(doctorUploadDir)) {
   fs.mkdirSync(doctorUploadDir, { recursive: true });
 }
 
-// Multer Storages
+// Multer Allowed File Whitelist (Prevent malicious executables / RCE)
+const medicalFileFilter = (req, file, cb) => {
+  const allowedMimeTypes = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ];
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Invalid file format. Only clinical PDF, JPEG, PNG, or WEBP files are permitted."), false);
+  }
+};
+
+// Multer Storages for Confidential Health Records & Doctor Credentials
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
@@ -71,7 +86,11 @@ const storage = multer.diskStorage({
     cb(null, `${uniqueSuffix}-${cleanName}`);
   },
 });
-const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: medicalFileFilter,
+});
 
 const doctorDocStorage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, doctorUploadDir),
@@ -81,7 +100,11 @@ const doctorDocStorage = multer.diskStorage({
     cb(null, `${uniqueSuffix}-${cleanName}`);
   },
 });
-const doctorUpload = multer({ storage: doctorDocStorage, limits: { fileSize: 10 * 1024 * 1024 } });
+const doctorUpload = multer({
+  storage: doctorDocStorage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: medicalFileFilter,
+});
 
 // Audit Logging Utility
 const logAudit = async (action, category, actor, target, details, req) => {
@@ -643,10 +666,10 @@ app.post(
       const hashPass = await bcrypt.hash(password, 10);
 
       const files = req.files || {};
-      const profilePhoto = files.profilePhoto ? `/uploads/doctor_docs/${files.profilePhoto[0].filename}` : "";
-      const licenseDoc = files.licenseDoc ? `/uploads/doctor_docs/${files.licenseDoc[0].filename}` : "";
-      const degreeDoc = files.degreeDoc ? `/uploads/doctor_docs/${files.degreeDoc[0].filename}` : "";
-      const idDoc = files.idDoc ? `/uploads/doctor_docs/${files.idDoc[0].filename}` : "";
+      const profilePhoto = files.profilePhoto ? files.profilePhoto[0].filename : "";
+      const licenseDoc = files.licenseDoc ? files.licenseDoc[0].filename : "";
+      const degreeDoc = files.degreeDoc ? files.degreeDoc[0].filename : "";
+      const idDoc = files.idDoc ? files.idDoc[0].filename : "";
 
       const formattedName = fullname.trim().startsWith("Dr.") ? fullname.trim() : `Dr. ${fullname.trim()}`;
 
@@ -708,13 +731,9 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
     let reportFilter = {};
 
     if (req.user.role === "doctor") {
-      appointmentFilter = {
-        $or: [{ doctorId: req.user._id }, { doctorName: req.user.fullname }],
-      };
+      appointmentFilter = { doctorId: req.user._id };
       rxFilter = { doctorId: req.user._id };
-      reportFilter = {
-        $or: [{ doctorId: req.user._id }, { uploadedByRole: "doctor" }],
-      };
+      reportFilter = { doctorId: req.user._id };
     }
 
     const allAppointments = await Appointment.find(appointmentFilter).sort({ date: 1 });
@@ -732,27 +751,16 @@ app.get("/staff", isStaffLoggedIn, async (req, res) => {
       (a) => a.status === "Completed"
     );
 
-    // Patients appear in doctor's panel IF AND ONLY IF they have booked an appointment with this doctor
+    // Patients appear in doctor's panel IF AND ONLY IF they have booked an appointment with this doctor (Strict ObjectId Relational Scoping)
     let patientRoster = [];
     if (req.user.role === "doctor") {
-      const docAppts = await Appointment.find({
-        $or: [{ doctorId: req.user._id }, { doctorName: req.user.fullname }],
-      }).select("patientId patientName");
+      const docAppts = await Appointment.find({ doctorId: req.user._id }).select("patientId");
+      const patientIds = [...new Set(docAppts.map((a) => a.patientId).filter(Boolean))];
 
-      const patientIds = docAppts
-        .map((a) => a.patientId)
-        .filter((id) => id != null);
-      const patientNames = docAppts
-        .map((a) => a.patientName)
-        .filter((n) => Boolean(n && n.trim()));
-
-      if (patientIds.length > 0 || patientNames.length > 0) {
+      if (patientIds.length > 0) {
         patientRoster = await User.find({
           role: "patient",
-          $or: [
-            ...(patientIds.length > 0 ? [{ _id: { $in: patientIds } }] : []),
-            ...(patientNames.length > 0 ? [{ fullname: { $in: patientNames } }] : []),
-          ],
+          _id: { $in: patientIds },
         }).select("fullname email phone createdAt");
       } else {
         patientRoster = [];
@@ -934,23 +942,27 @@ app.post(["/staff/reports/upload", "/doctor/reports/upload"], isStaffLoggedIn, u
     const { patientId, title, category, notes } = req.body;
     const patientObj = await User.findById(patientId);
 
-    const fileUrl = req.file ? `/uploads/reports/${req.file.filename}` : "";
+    const diskPath = req.file ? req.file.path : "";
     const fileName = req.file ? req.file.originalname : "Diagnostic Document";
     const fileSize = req.file ? `${(req.file.size / 1024).toFixed(1)} KB` : "";
 
-    await Report.create({
+    const newReport = await Report.create({
       patientId: patientObj ? patientObj._id : req.user._id,
       patientName: patientObj ? patientObj.fullname : "Hospital Patient",
       doctorId: req.user._id,
       doctorName: req.user.fullname,
       title: title || "Diagnostic Evaluation",
       category: category || "Lab Report",
-      fileUrl,
+      filePath: diskPath,
+      fileUrl: "",
       fileName,
       fileSize,
       notes: notes || "",
       uploadedByRole: req.user.role,
     });
+
+    newReport.fileUrl = `/reports/${newReport._id}/file`;
+    await newReport.save();
 
     if (patientObj) {
       await Notification.create({
@@ -1087,8 +1099,12 @@ app.post("/staff/availability/update", isDoctorOnly, async (req, res) => {
   }
 });
 
-// View & Print Official Digital Prescription
-app.get("/prescriptions/:id", async (req, res) => {
+// ==========================================
+// SECURE PHI / DOCUMENT ACCESS ENDPOINTS (HIPAA & IDOR Protected)
+// ==========================================
+
+// View & Print Official Digital Prescription (Strict RBAC & IDOR Protected)
+app.get("/prescriptions/:id", isLoggedIn, async (req, res) => {
   try {
     const rx = await Prescription.findById(req.params.id);
     if (!rx) {
@@ -1096,12 +1112,167 @@ app.get("/prescriptions/:id", async (req, res) => {
         message: "Prescription record not found.",
       });
     }
+
+    // Strict Authorization & IDOR Check: Only Patient, Prescribing Doctor, or Hospital Staff
+    const isOwnerPatient = rx.patientId && rx.patientId.toString() === req.user._id.toString();
+    const isDoctor = rx.doctorId && rx.doctorId.toString() === req.user._id.toString();
+    const isHospitalStaff = req.user.role === "admin" || req.user.role === "receptionist";
+
+    if (!isOwnerPatient && !isDoctor && !isHospitalStaff) {
+      await logAudit(
+        "Unauthorized Prescription Access Attempt",
+        "PRESCRIPTION",
+        req.user,
+        rx.rxNumber,
+        `Blocked unauthorized view attempt for prescription #${rx.rxNumber}`,
+        req
+      );
+      return res.status(403).render("error", {
+        message: "Access Denied: You do not have permission to inspect this confidential medical prescription.",
+      });
+    }
+
+    await logAudit(
+      "Prescription Inspected",
+      "PRESCRIPTION",
+      req.user,
+      rx.rxNumber,
+      `Inspected prescription slip #${rx.rxNumber}`,
+      req
+    );
+
     res.render("listings/prescription-view", { rx });
   } catch (err) {
     res.status(404).render("error", {
       message: "Unable to load prescription.",
     });
   }
+});
+
+// Secure Diagnostic Report Stream Endpoint (Strict PHI Access Control)
+app.get("/reports/:id/file", isLoggedIn, async (req, res) => {
+  try {
+    const report = await Report.findById(req.params.id);
+    if (!report) {
+      return res.status(404).render("error", { message: "Report record not found." });
+    }
+
+    // Authorization: Owner Patient, Doctor, or Hospital Admin/Receptionist
+    const isOwnerPatient = report.patientId && report.patientId.toString() === req.user._id.toString();
+    const isDoctor = report.doctorId && report.doctorId.toString() === req.user._id.toString();
+    const isHospitalStaff = req.user.role === "admin" || req.user.role === "doctor" || req.user.role === "receptionist";
+
+    if (!isOwnerPatient && !isDoctor && !isHospitalStaff) {
+      await logAudit(
+        "Unauthorized PHI Access Blocked",
+        "CONSULTATION",
+        req.user,
+        report.title,
+        `Blocked unauthorized download attempt for report #${report._id}`,
+        req
+      );
+      return res.status(403).render("error", {
+        message: "Access Denied: You do not have authorization to view this protected health record.",
+      });
+    }
+
+    // Determine disk file path
+    let diskPath = report.filePath;
+    if (!diskPath || !fs.existsSync(diskPath)) {
+      const fileName = path.basename(report.fileUrl || report.fileName || "");
+      const path1 = path.join(__dirname, "storage", "private_uploads", "reports", fileName);
+      const path2 = path.join(__dirname, "public", "uploads", "reports", fileName);
+      if (fs.existsSync(path1)) diskPath = path1;
+      else if (fs.existsSync(path2)) diskPath = path2;
+    }
+
+    if (!diskPath || !fs.existsSync(diskPath)) {
+      return res.status(404).render("error", { message: "Diagnostic file attachment is not found on server storage." });
+    }
+
+    await logAudit("PHI Report Streamed", "CONSULTATION", req.user, report.patientName, `Downloaded: ${report.title}`, req);
+
+    res.sendFile(path.resolve(diskPath));
+  } catch (err) {
+    console.error("Report download error:", err);
+    res.status(500).render("error", { message: "Error retrieving diagnostic file." });
+  }
+});
+
+// Secure Doctor Verification Document Endpoint (Admin & Self-Doctor Only)
+app.get("/staff/doctor-docs/:doctorId/:docType", isLoggedIn, async (req, res) => {
+  try {
+    const { doctorId, docType } = req.params;
+    const allowedDocs = ["licenseDoc", "degreeDoc", "idDoc", "profilePhoto"];
+    if (!allowedDocs.includes(docType)) {
+      return res.status(400).render("error", { message: "Invalid verification document identifier." });
+    }
+
+    const docUser = await User.findById(doctorId);
+    if (!docUser || docUser.role !== "doctor") {
+      return res.status(404).render("error", { message: "Doctor profile not found." });
+    }
+
+    const isAdmin = req.user.role === "admin";
+    const isSelfDoctor = req.user._id.toString() === docUser._id.toString();
+
+    if (!isAdmin && !isSelfDoctor) {
+      await logAudit(
+        "Unauthorized Credential Inspection Blocked",
+        "VERIFICATION",
+        req.user,
+        docUser.fullname,
+        `Blocked attempt to view ${docType}`,
+        req
+      );
+      return res.status(403).render("error", {
+        message: "Access Denied: Verification documents are restricted to hospital administration.",
+      });
+    }
+
+    const rawDocVal = docUser[docType];
+    if (!rawDocVal) {
+      return res.status(404).render("error", { message: "Document has not been uploaded yet." });
+    }
+
+    const fileName = path.basename(rawDocVal);
+    const path1 = path.join(__dirname, "storage", "private_uploads", "doctor_docs", fileName);
+    const path2 = path.join(__dirname, "public", "uploads", "doctor_docs", fileName);
+
+    const filePath = fs.existsSync(path1) ? path1 : (fs.existsSync(path2) ? path2 : null);
+
+    if (!filePath) {
+      return res.status(404).render("error", { message: "Physical document file is not found on disk." });
+    }
+
+    await logAudit("Doctor Credential Inspected", "VERIFICATION", req.user, docUser.fullname, `Inspected ${docType}`, req);
+
+    res.sendFile(path.resolve(filePath));
+  } catch (err) {
+    console.error("Doctor doc access error:", err);
+    res.status(500).render("error", { message: "Error accessing doctor verification document." });
+  }
+});
+
+// Intercept legacy static upload routes to prevent unauthorized bypass
+app.get("/uploads/reports/:filename", isLoggedIn, async (req, res) => {
+  const rep = await Report.findOne({ $or: [{ fileUrl: { $regex: req.params.filename } }, { fileName: req.params.filename }] });
+  if (rep) {
+    return res.redirect(`/reports/${rep._id}/file`);
+  }
+  return res.status(404).render("error", { message: "Report file not found." });
+});
+
+app.get("/uploads/doctor_docs/:filename", isLoggedIn, async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).render("error", { message: "Access Denied: Doctor credentials are restricted to administration." });
+  }
+  const fileName = path.basename(req.params.filename);
+  const path1 = path.join(__dirname, "storage", "private_uploads", "doctor_docs", fileName);
+  const path2 = path.join(__dirname, "public", "uploads", "doctor_docs", fileName);
+  const safePath = fs.existsSync(path1) ? path1 : (fs.existsSync(path2) ? path2 : null);
+  if (safePath) return res.sendFile(path.resolve(safePath));
+  return res.status(404).render("error", { message: "Document file not found." });
 });
 
 // ==========================================
@@ -1117,17 +1288,10 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
       return res.redirect("/staff");
     }
 
-    const patientAppointments = await Appointment.find({
-      $or: [{ patientId: req.user._id }, { patientName: req.user.fullname }],
-    }).sort({ date: -1 });
-
-    const patientReports = await Report.find({
-      $or: [{ patientId: req.user._id }, { patientName: req.user.fullname }],
-    }).sort({ createdAt: -1 });
-
-    const patientPrescriptions = await Prescription.find({
-      $or: [{ patientId: req.user._id }, { patientName: req.user.fullname }],
-    }).sort({ createdAt: -1 });
+    // Strict Patient-Ownership Scoping via ObjectId
+    const patientAppointments = await Appointment.find({ patientId: req.user._id }).sort({ date: -1 });
+    const patientReports = await Report.find({ patientId: req.user._id }).sort({ createdAt: -1 });
+    const patientPrescriptions = await Prescription.find({ patientId: req.user._id }).sort({ createdAt: -1 });
 
     const prescriptions = patientReports.filter(
       (r) => r.category === "Prescription"
@@ -1245,42 +1409,97 @@ app.post("/vitals/:id/delete", isLoggedIn, async (req, res) => {
   }
 });
 
-// Book Appointment with protected time slot
+// Book Appointment with protected time slot & atomic concurrency lock
 app.post("/appointments", async (req, res) => {
   try {
     const { patientName, age, gender, date, time, doctorName, notes } = req.body;
 
     const currentUser = req.user || res.locals.currentUser;
-    const patientId = currentUser && currentUser.role === "patient" ? currentUser._id : undefined;
-    const finalPatientName = (patientName && patientName.trim()) || (currentUser ? currentUser.fullname : "Patient");
+    if (!currentUser) {
+      return res.redirect("/login");
+    }
+
+    const patientId = currentUser.role === "patient" ? currentUser._id : undefined;
+    const finalPatientName = currentUser.role === "patient" ? currentUser.fullname : ((patientName && patientName.trim()) || "Patient");
 
     const cleanDoctorName = doctorName ? doctorName.trim() : "";
     const doctorObj = await User.findOne({
       fullname: { $regex: new RegExp(`^${cleanDoctorName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") },
       role: "doctor",
+      approvalStatus: "approved",
+      isActive: { $ne: false },
     });
 
-    const parsedDate = date && !isNaN(new Date(date).getTime()) ? new Date(date) : new Date();
+    if (!doctorObj) {
+      return res.status(400).render("error", {
+        message: "The requested medical doctor could not be found or is currently inactive.",
+      });
+    }
 
-    const appt = await Appointment.create({
-      patientId,
-      patientName: finalPatientName,
-      age: Number(age) || undefined,
-      gender: gender || (currentUser ? currentUser.gender : ""),
-      date: parsedDate,
-      time: time || "10:00 AM",
-      slot: time || "10:00 AM",
-      doctorName: doctorObj ? doctorObj.fullname : cleanDoctorName,
-      doctorId: doctorObj ? doctorObj._id : undefined,
-      notes: notes ? notes.trim() : "",
-      status: "Scheduled",
+    // Normalize date to UTC midnight to ensure consistent indexing and comparison
+    const rawDate = date && !isNaN(new Date(date).getTime()) ? new Date(date) : new Date();
+    const normalizedDate = new Date(Date.UTC(rawDate.getUTCFullYear(), rawDate.getUTCMonth(), rawDate.getUTCDate()));
+    const cleanTime = (time || "10:00 AM").trim();
+
+    // 1. Conflict Check: Is the doctor already booked for this slot?
+    const existingConflict = await Appointment.findOne({
+      doctorId: doctorObj._id,
+      date: normalizedDate,
+      time: cleanTime,
+      status: { $in: ["Scheduled", "Confirmed", "Checked-In", "In-Consultation"] },
     });
+
+    if (existingConflict) {
+      return res.status(409).render("error", {
+        message: `Scheduling Conflict: Dr. ${doctorObj.fullname} already has a consultation scheduled for ${cleanTime} on ${normalizedDate.toLocaleDateString()}. Please select an alternate clinical time slot.`,
+      });
+    }
+
+    // 2. Prevent patient double-booking at the exact same time
+    if (patientId) {
+      const patientConflict = await Appointment.findOne({
+        patientId,
+        date: normalizedDate,
+        time: cleanTime,
+        status: { $in: ["Scheduled", "Confirmed", "Checked-In", "In-Consultation"] },
+      });
+      if (patientConflict) {
+        return res.status(409).render("error", {
+          message: `You already have an active consultation booked at ${cleanTime} on ${normalizedDate.toLocaleDateString()}. Please select a different time slot.`,
+        });
+      }
+    }
+
+    // 3. Create appointment with unique compound index error handling (handles parallel race conditions)
+    let appt;
+    try {
+      appt = await Appointment.create({
+        patientId,
+        patientName: finalPatientName,
+        age: Number(age) || currentUser.age || undefined,
+        gender: gender || currentUser.gender || "",
+        date: normalizedDate,
+        time: cleanTime,
+        slot: cleanTime,
+        doctorName: doctorObj.fullname,
+        doctorId: doctorObj._id,
+        notes: notes ? notes.trim() : "",
+        status: "Scheduled",
+      });
+    } catch (createErr) {
+      if (createErr.code === 11000) {
+        return res.status(409).render("error", {
+          message: `Slot Conflict: This clinical time slot (${cleanTime} with Dr. ${doctorObj.fullname}) was just booked by another patient. Please choose another slot.`,
+        });
+      }
+      throw createErr;
+    }
 
     // Notify patient
     if (patientId) {
       await Notification.create({
         userId: patientId,
-        message: `Your appointment with ${appt.doctorName} on ${parsedDate.toLocaleDateString()} at ${appt.time} is scheduled.`,
+        message: `Your appointment with ${appt.doctorName} on ${normalizedDate.toLocaleDateString()} at ${appt.time} is scheduled.`,
         type: "appointment",
       });
     }
@@ -1289,7 +1508,7 @@ app.post("/appointments", async (req, res) => {
     if (doctorObj) {
       await Notification.create({
         userId: doctorObj._id,
-        message: `New consultation booked by ${finalPatientName} on ${parsedDate.toLocaleDateString()} at ${appt.time}.`,
+        message: `New consultation booked by ${finalPatientName} on ${normalizedDate.toLocaleDateString()} at ${appt.time}.`,
         type: "appointment",
       });
     }
@@ -1297,26 +1516,26 @@ app.post("/appointments", async (req, res) => {
     await logAudit(
       "Appointment Booked",
       "APPOINTMENT",
-      currentUser || { fullname: finalPatientName, role: "guest" },
+      currentUser,
       appt.doctorName,
-      `Consultation booked for ${finalPatientName} on ${parsedDate.toLocaleDateString()} at ${appt.time}`,
+      `Consultation booked for ${finalPatientName} on ${normalizedDate.toLocaleDateString()} at ${appt.time}`,
       req
     );
 
-    if (currentUser && (currentUser.role === "doctor" || currentUser.role === "receptionist")) {
+    if (currentUser.role === "doctor" || currentUser.role === "receptionist") {
       return res.redirect("/staff?tab=schedule&appointment=success");
-    } else if (currentUser && currentUser.role === "admin") {
+    } else if (currentUser.role === "admin") {
       return res.redirect("/admin?tab=appointments&appointment=success");
     } else {
       return res.redirect("/dashboard?tab=appointments&appointment=success");
     }
   } catch (err) {
     console.error("Appointment booking error:", err);
-    res.redirect("/dashboard");
+    res.status(500).render("error", { message: "An error occurred while booking your appointment. Please try again." });
   }
 });
 
-// Patient Cancel Appointment
+// Patient / Staff Cancel Appointment (Strict Ownership Verification)
 app.post("/appointments/:id/cancel", isLoggedIn, async (req, res) => {
   try {
     const appt = await Appointment.findById(req.params.id);
@@ -1325,12 +1544,20 @@ app.post("/appointments/:id/cancel", isLoggedIn, async (req, res) => {
     }
 
     const isOwner = appt.patientId && appt.patientId.toString() === req.user._id.toString();
-    const isNameMatch = appt.patientName && appt.patientName.toLowerCase() === req.user.fullname.toLowerCase();
-    const isPrivileged = req.user.role === "admin" || req.user.role === "doctor" || req.user.role === "receptionist";
+    const isAttendingDoctor = appt.doctorId && appt.doctorId.toString() === req.user._id.toString();
+    const isPrivilegedStaff = req.user.role === "admin" || req.user.role === "receptionist" || isAttendingDoctor;
 
-    if (!isOwner && !isNameMatch && !isPrivileged) {
+    if (!isOwner && !isPrivilegedStaff) {
+      await logAudit(
+        "Unauthorized Cancellation Attempt",
+        "APPOINTMENT",
+        req.user,
+        appt.doctorName,
+        `Blocked unauthorized attempt to cancel appointment #${appt._id}`,
+        req
+      );
       return res.status(403).render("error", {
-        message: "You are not authorized to cancel this appointment.",
+        message: "Access Denied: You are not authorized to cancel this appointment.",
       });
     }
 

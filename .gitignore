@@ -19,7 +19,13 @@ tmp/
 temp/
 *.tmp
 
+
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Private Protected Storage (PHI / HIPAA)
+storage/private_uploads/*
+!storage/private_uploads/**/.gitkeep
+

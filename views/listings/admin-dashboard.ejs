@@ -176,22 +176,22 @@
                                     </span>
                                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                                         <% if (doc.licenseDoc) { %>
-                                            <a href="<%= doc.licenseDoc %>" target="_blank" class="btn-file-action" style="font-size: 12px; padding: 6px 12px;">
-                                                <i class="fas fa-file-pdf text-cyan"></i> View License Document
+                                            <a href="/staff/doctor-docs/<%= doc._id %>/licenseDoc" target="_blank" class="btn-file-action" style="font-size: 12px; padding: 6px 12px;">
+                                                <i class="fas fa-file-pdf text-cyan"></i> View License Document (Secure)
                                             </a>
                                         <% } else { %>
                                             <span style="font-size: 12px; color: #64748b; background: rgba(255,255,255,0.03); padding: 4px 10px; border-radius: 4px;">License Document Pending</span>
                                         <% } %>
 
                                         <% if (doc.degreeDoc) { %>
-                                            <a href="<%= doc.degreeDoc %>" target="_blank" class="btn-file-action" style="font-size: 12px; padding: 6px 12px;">
-                                                <i class="fas fa-graduation-cap text-emerald"></i> View Degree Certificate
+                                            <a href="/staff/doctor-docs/<%= doc._id %>/degreeDoc" target="_blank" class="btn-file-action" style="font-size: 12px; padding: 6px 12px;">
+                                                <i class="fas fa-graduation-cap text-emerald"></i> View Degree Certificate (Secure)
                                             </a>
                                         <% } %>
 
                                         <% if (doc.idDoc) { %>
-                                            <a href="<%= doc.idDoc %>" target="_blank" class="btn-file-action" style="font-size: 12px; padding: 6px 12px;">
-                                                <i class="fas fa-id-card text-purple"></i> View Government ID
+                                            <a href="/staff/doctor-docs/<%= doc._id %>/idDoc" target="_blank" class="btn-file-action" style="font-size: 12px; padding: 6px 12px;">
+                                                <i class="fas fa-id-card text-purple"></i> View Government ID (Secure)
                                             </a>
                                         <% } %>
                                     </div>

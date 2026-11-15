@@ -87,6 +87,18 @@ const appointmentSchema = new mongoose.Schema({
   },
 });
 
+// Compound unique index: guarantees strict double-booking prevention under concurrent requests.
+// Partial filter ensures cancelled or no-show visits release the time slot immediately.
+appointmentSchema.index(
+  { doctorId: 1, date: 1, time: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: { $in: ["Scheduled", "Confirmed", "Checked-In", "In-Consultation"] },
+    },
+  }
+);
+
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 
 export default Appointment;

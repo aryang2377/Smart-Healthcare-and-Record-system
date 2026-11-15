@@ -31,6 +31,10 @@ const reportSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  filePath: {
+    type: String,
+    default: "",
+  },
   fileName: {
     type: String,
     default: "",

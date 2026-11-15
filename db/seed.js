@@ -3,8 +3,17 @@ import User from "../models/user.js";
 import Department from "../models/Department.js";
 import AuditLog from "../models/AuditLog.js";
 
-export const seedDefaultUsers = async () => {
+export const seedDefaultUsers = async ({ force = false } = {}) => {
   try {
+    // Fast idempotent guard: avoid heavy multi-pass bcrypt hashing on every server restart
+    const adminCount = await User.countDocuments({ role: "admin" });
+    const doctorCount = await User.countDocuments({ role: "doctor", approvalStatus: "approved" });
+    const deptCount = await Department.countDocuments();
+    if (!force && adminCount > 0 && doctorCount >= 10 && deptCount >= 10) {
+      console.log(`[Seed] System already initialized (${doctorCount} verified specialists, ${deptCount} clinical departments). Skipping repetitive sync.`);
+      return;
+    }
+
     // 1. Seed or sync Single System Administrator from .env
     const adminEmail = process.env.ADMIN_EMAIL || "admin@caresync.health";
     const adminPass = process.env.ADMIN_PASSWORD || "AdminCareSync@2026";
